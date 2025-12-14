@@ -222,7 +222,7 @@ bcommerce/
 │   │   │   │   │   └── INotificationService.cs
 │   │   │   │   └── Users.Application.csproj
 │   │   │   │
-│   │   │   ├── Users.Infrastructure/             # ✅ PARCIALMENTE IMPLEMENTADO
+│   │   │   ├── Users.Infrastructure/             # 
 │   │   │   │   ├── Persistence/
 │   │   │   │   │   ├── Configurations/
 │   │   │   │   │   │   ├── UserConfiguration.cs
