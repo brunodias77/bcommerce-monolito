@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Users.Application.Commands.RegisterUser;
 using Users.Presentation.Requests;
 
 namespace Users.Presentation.Controllers;
@@ -22,9 +23,17 @@ public class UsersController : ApiControllerBase
     /// <summary>
     /// Registra um novo usuário.
     /// </summary>
+    /// <remarks>
+    /// Cria uma nova conta de usuário com perfil básico.
+    /// 
+    /// **Regras de negócio:**
+    /// - Email deve ser único no sistema
+    /// - Senha deve ter mínimo 8 caracteres, incluindo maiúscula e número
+    /// - Envia email de boas-vindas após registro
+    /// </remarks>
     [HttpPost("register")]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(RegisterUserResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Register(
@@ -38,11 +47,25 @@ public class UsersController : ApiControllerBase
 
         _logger.LogInformation("Registrando novo usuário: {Email}", request.Email);
 
-        // TODO: Enviar RegisterUserCommand via MediatR
-        // var result = await _mediator.Send(new RegisterUserCommand(...), cancellationToken);
+        var command = new RegisterUserCommand(
+            request.Email,
+            request.Password,
+            request.FirstName,
+            request.LastName);
 
-        return StatusCode(StatusCodes.Status501NotImplemented, new { message = "RegisterUserCommand não implementado" });
+        var result = await Mediator.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleError(result.Error);
+        }
+
+        return CreatedAtAction(
+            nameof(GetCurrentUser),
+            new { },
+            new RegisterUserResponse(result.Value));
     }
+
 
     /// <summary>
     /// Busca o usuário atual.

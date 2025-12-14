@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Users.Core.Events;
 
 namespace Users.Core.Entities;
 
@@ -20,11 +21,19 @@ public class User : IdentityUser<Guid>
     public ICollection<LoginHistory> LoginHistories { get; private set; } = new List<LoginHistory>();
     public NotificationPreferences? NotificationPreferences { get; private set; }
 
-    private User()
+    /// <summary>
+    /// Construtor público necessário para o ASP.NET Identity UserManager.
+    /// </summary>
+    public User()
     {
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 
-    public User Create(string email, string userName)
+    /// <summary>
+    /// Factory method para criar um novo usuário com validações de domínio.
+    /// </summary>
+    public static User Create(string email, string userName)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be empty.", nameof(email));
@@ -53,6 +62,7 @@ public class User : IdentityUser<Guid>
 
         return user;
     }
+
 
     public void UpdateEmail(string email)
     {

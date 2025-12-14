@@ -1,5 +1,7 @@
 using BuildingBlocks.Application.Behaviors;
+using FluentValidation;
 using MediatR;
+using Users.Application.Commands.RegisterUser;
 
 namespace Bcommerce.Api.Configurations;
 
@@ -20,13 +22,14 @@ public static class ApplicationDependencyInjection
         // MediatR
         // ===============================================================
         // Registra handlers de todos os assemblies de módulos
-        // Por enquanto, apenas os building blocks estão disponíveis
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
             
-            // Adicione aqui os assemblies dos módulos quando implementados:
-            // cfg.RegisterServicesFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
+            // Users Module
+            cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly);
+            
+            // Adicione aqui os assemblies dos outros módulos quando implementados:
             // cfg.RegisterServicesFromAssembly(typeof(Catalog.Application.AssemblyReference).Assembly);
             // cfg.RegisterServicesFromAssembly(typeof(Orders.Application.AssemblyReference).Assembly);
         });
@@ -49,8 +52,8 @@ public static class ApplicationDependencyInjection
         // ===============================================================
         // FluentValidation
         // ===============================================================
-        // Registra validators dos módulos quando implementados:
-        // services.AddValidatorsFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
+        // Registra validators do módulo Users
+        services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
 
         return services;
     }

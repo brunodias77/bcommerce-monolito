@@ -18,7 +18,7 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// 
 /// Configuração:
 /// <code>
-/// services.AddHostedService&lt;ProcessOutboxMessagesJob&gt;();
+/// services.AddOutboxProcessor&lt;UsersDbContext&gt;();
 /// </code>
 /// 
 /// Configurações recomendadas:
@@ -26,17 +26,18 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// - Batch size: 10-100 mensagens
 /// - Max retries: 3-5
 /// </remarks>
-public class ProcessOutboxMessagesJob : BackgroundService
+public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
+    where TDbContext : DbContext
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<ProcessOutboxMessagesJob> _logger;
+    private readonly ILogger<ProcessOutboxMessagesJob<TDbContext>> _logger;
     private readonly TimeSpan _processInterval;
     private readonly int _batchSize;
     private readonly int _maxRetries;
 
     public ProcessOutboxMessagesJob(
         IServiceProvider serviceProvider,
-        ILogger<ProcessOutboxMessagesJob> logger,
+        ILogger<ProcessOutboxMessagesJob<TDbContext>> logger,
         TimeSpan? processInterval = null,
         int batchSize = 20,
         int maxRetries = 3)
@@ -50,8 +51,8 @@ public class ProcessOutboxMessagesJob : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Outbox Processor started. Interval: {Interval}s, BatchSize: {BatchSize}",
-            _processInterval.TotalSeconds, _batchSize);
+        _logger.LogInformation("Outbox Processor started for {DbContext}. Interval: {Interval}s, BatchSize: {BatchSize}",
+            typeof(TDbContext).Name, _processInterval.TotalSeconds, _batchSize);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -73,51 +74,60 @@ public class ProcessOutboxMessagesJob : BackgroundService
     private async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
 
-        // Busca mensagens não processadas
-        var messages = await dbContext.Set<OutboxMessage>()
-            .Where(m => m.ProcessedAt == null && m.RetryCount < _maxRetries)
-            .OrderBy(m => m.CreatedAt)
-            .Take(_batchSize)
-            .ToListAsync(cancellationToken);
-
-        if (!messages.Any())
-            return;
-
-        _logger.LogDebug("Processing {Count} outbox messages", messages.Count);
-
-        foreach (var message in messages)
+        // Verifica se o DbContext tem a tabela de OutboxMessage mapeada
+        try
         {
-            try
+            // Busca mensagens não processadas
+            var messages = await dbContext.Set<OutboxMessage>()
+                .Where(m => m.ProcessedAt == null && m.RetryCount < _maxRetries)
+                .OrderBy(m => m.CreatedAt)
+                .Take(_batchSize)
+                .ToListAsync(cancellationToken);
+
+            if (!messages.Any())
+                return;
+
+            _logger.LogDebug("Processing {Count} outbox messages", messages.Count);
+
+            foreach (var message in messages)
             {
-                await ProcessMessageAsync(scope.ServiceProvider, message, cancellationToken);
-
-                message.ProcessedAt = DateTime.UtcNow;
-                message.ErrorMessage = null;
-
-                _logger.LogDebug("Processed outbox message {MessageId} of type {EventType}",
-                    message.Id, message.EventType);
-            }
-            catch (Exception ex)
-            {
-                message.RetryCount++;
-                message.ErrorMessage = ex.Message;
-
-                _logger.LogWarning(ex,
-                    "Error processing outbox message {MessageId}. Retry count: {RetryCount}",
-                    message.Id, message.RetryCount);
-
-                if (message.RetryCount >= _maxRetries)
+                try
                 {
-                    _logger.LogError(
-                        "Max retries reached for outbox message {MessageId}. Moving to dead letter.",
-                        message.Id);
+                    await ProcessMessageAsync(scope.ServiceProvider, message, cancellationToken);
+
+                    message.ProcessedAt = DateTime.UtcNow;
+                    message.ErrorMessage = null;
+
+                    _logger.LogDebug("Processed outbox message {MessageId} of type {EventType}",
+                        message.Id, message.EventType);
+                }
+                catch (Exception ex)
+                {
+                    message.RetryCount++;
+                    message.ErrorMessage = ex.Message;
+
+                    _logger.LogWarning(ex,
+                        "Error processing outbox message {MessageId}. Retry count: {RetryCount}",
+                        message.Id, message.RetryCount);
+
+                    if (message.RetryCount >= _maxRetries)
+                    {
+                        _logger.LogError(
+                            "Max retries reached for outbox message {MessageId}. Moving to dead letter.",
+                            message.Id);
+                    }
                 }
             }
-        }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (InvalidOperationException)
+        {
+            // OutboxMessage não está mapeada neste DbContext, ignorar silenciosamente
+            _logger.LogDebug("{DbContext} does not have OutboxMessage mapped, skipping", typeof(TDbContext).Name);
+        }
     }
 
     private async Task ProcessMessageAsync(
@@ -194,17 +204,22 @@ public class OutboxProcessorOptions
 /// </summary>
 public static class OutboxProcessorExtensions
 {
-    public static IServiceCollection AddOutboxProcessor(
+    /// <summary>
+    /// Adiciona o Outbox Processor para um DbContext específico.
+    /// </summary>
+    /// <typeparam name="TDbContext">DbContext que contém a tabela de OutboxMessage</typeparam>
+    public static IServiceCollection AddOutboxProcessor<TDbContext>(
         this IServiceCollection services,
         Action<OutboxProcessorOptions>? configure = null)
+        where TDbContext : DbContext
     {
         var options = new OutboxProcessorOptions();
         configure?.Invoke(options);
 
         services.AddHostedService(sp =>
-            new ProcessOutboxMessagesJob(
+            new ProcessOutboxMessagesJob<TDbContext>(
                 sp,
-                sp.GetRequiredService<ILogger<ProcessOutboxMessagesJob>>(),
+                sp.GetRequiredService<ILogger<ProcessOutboxMessagesJob<TDbContext>>>(),
                 options.ProcessInterval,
                 options.BatchSize,
                 options.MaxRetries));
