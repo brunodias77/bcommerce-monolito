@@ -1,98 +1,159 @@
-Aqui está um guia detalhado em formato Markdown explicando os padrões implementados no projeto `BuildingBlocks`, as dores que eles resolvem e como configurá-los em sua aplicação.
+Aqui está uma versão aprimorada e mais detalhada da documentação, rica em exemplos práticos e explicações arquiteturais baseadas no seu código.
 
 ---
 
-#🏗️ Building Blocks: Padrões e Guia de ConfiguraçãoEste documento detalha os padrões arquiteturais implementados na biblioteca compartilhada `BuildingBlocks`, explicando **qual problema cada um resolve** e **como configurá-los** nas camadas apropriadas do seu Monolito Modular.
+#🏗️ Building Blocks: Guia de Padrões ArquiteturaisEste documento detalha os padrões arquiteturais implementados na biblioteca central `BuildingBlocks`. Ele serve como guia para entender **quais problemas resolvemos**, **como implementamos** e **onde configurar** cada padrão dentro da arquitetura do BCommerce.
 
 ---
 
-##1. Outbox Pattern (Eventos Confiáveis)###🤕 A Dor (Problema)O "Dual Write Problem": Quando você precisa salvar uma alteração no banco de dados e publicar uma mensagem (evento) para outro módulo/sistema. Se o banco comitar mas o broker de mensagem falhar (ou vice-versa), seu sistema fica inconsistente e o evento é perdido.
+##📋 Índice1. [Outbox Pattern (Eventos Confiáveis)](https://www.google.com/search?q=%231-outbox-pattern)
+2. [CQRS (Command Query Responsibility Segregation)](https://www.google.com/search?q=%232-cqrs)
+3. [MediatR Pipeline Behaviors](https://www.google.com/search?q=%233-pipeline-behaviors)
+4. [Result Pattern (Tratamento de Erros)](https://www.google.com/search?q=%234-result-pattern)
+5. [Domain Events (Eventos de Domínio)](https://www.google.com/search?q=%235-domain-events)
+6. [EF Core Interceptors (Auditoria e Soft Delete)](https://www.google.com/search?q=%236-ef-core-interceptors)
+7. [Value Objects (Objetos de Valor)](https://www.google.com/search?q=%237-value-objects)
+8. [Smart Enums (Enumerações Ricas)](https://www.google.com/search?q=%238-smart-enums)
+9. [Global Exception Handling](https://www.google.com/search?q=%239-global-exception-handling)
 
-###✅ A SoluçãoSalvar o evento na mesma transação do banco de dados em uma tabela `outbox`. Um processo em background lê essa tabela posteriormente e envia as mensagens com garantia de entrega.
+---
 
-###⚙️ Como Configurar**1. Infrastructure (`Modules.{Module}.Infrastructure`)**
-No `DbContext` do módulo, registre o interceptor que captura eventos e os salva no Outbox.
+##1. Outbox Pattern###🤕 A Dor (Problema)O clássico **"Dual Write Problem"**.
+Exemplo: Um usuário se cadastra. Você precisa:
+
+1. Salvar o usuário no banco de dados (`users.asp_net_users`).
+2. Publicar um evento para o módulo de Carrinho (`UserCreatedIntegrationEvent`).
+
+Se o banco comitar e o broker de mensagens falhar (ou o processo cair), o usuário é criado mas o carrinho nunca será gerado. O sistema fica inconsistente.
+
+###✅ A SoluçãoSalvar o evento **na mesma transação** do banco de dados, em uma tabela auxiliar (`shared.domain_events`). Um processo em background lê essa tabela e despacha as mensagens com garantia de entrega.
+
+###⚙️ Como Configurar e Usar**1. No Core (`Modules.Users.Core`)**
+Defina o evento de integração.
 
 ```csharp
-// Em Modules/Users/Users.Infrastructure/Persistence/UsersDbContext.cs
+// Em Users.Contracts/Events/UserCreatedIntegrationEvent.cs
+public record UserCreatedIntegrationEvent(Guid UserId, string Email) : IIntegrationEvent;
+
+```
+
+**2. Na Infrastructure (`Modules.Users.Infrastructure`)**
+No `UsersDbContext`, registre o `PublishDomainEventsInterceptor`. Ele intercepta o `SaveChanges`, captura os eventos e salva na tabela de Outbox.
+
+```csharp
+// Em Users.Infrastructure/Persistence/UsersDbContext.cs
 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 {
-    // O interceptor é injetado via Dependency Injection no Startup
+    // O interceptor "users" é injetado via DI no Startup
     optionsBuilder.AddInterceptors(_publishDomainEventsInterceptor); 
 }
 
 ```
 
-**2. API (`Bcommerce.Api/Program.cs`)**
-Registre o interceptor e o Background Job que processa as mensagens.
+**3. Na API (`Bcommerce.Api/Configurations/InfraDependencyInjection.cs`)**
+Registre o interceptor (com chave para identificar o módulo) e o Background Job.
 
 ```csharp
-// Registra uma instância do interceptor para cada módulo (identificado por chave)
-builder.Services.AddKeyedSingleton("users", (sp, key) => new PublishDomainEventsInterceptor("users"));
+// Registra uma instância específica para o módulo 'users'
+services.AddKeyedSingleton("users", (sp, key) => new PublishDomainEventsInterceptor("users"));
 
-// Registra o Job que processa a tabela shared.domain_events
-builder.Services.AddHostedService<ProcessOutboxMessagesJob>();
-
-```
-
----
-
-##2. CQRS (Command Query Responsibility Segregation)###🤕 A Dor (Problema)Usar o mesmo modelo de objeto para leitura e escrita torna o sistema complexo e lento. Validações complexas de escrita atrapalham consultas simples, e consultas performáticas exigem "burlar" as regras de domínio.
-
-###✅ A SoluçãoSeparar as operações em **Commands** (mudam estado, não retornam dados complexos) e **Queries** (retornam dados, não mudam estado).
-
-###⚙️ Como Configurar**1. Application (`Modules.{Module}.Application`)**
-Defina Commands e Queries implementando as interfaces do BuildingBlocks.
-
-```csharp
-// Command (Escrita)
-public record CreateUserCommand(string Email) : ICommand<Guid>;
-
-// Query (Leitura)
-public record GetUserByIdQuery(Guid Id) : IQuery<UserDto>;
-
-```
-
-**2. API (`Bcommerce.Api/Program.cs`)**
-Registre o MediatR para escanear os handlers dos seus módulos.
-
-```csharp
-builder.Services.AddMediatR(cfg => {
-    cfg.RegisterServicesFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(Catalog.Application.AssemblyReference).Assembly);
+// Job que lê a tabela shared.domain_events e processa
+services.AddOutboxProcessor(options => {
+    options.ProcessInterval = TimeSpan.FromSeconds(2); // Polling a cada 2s
+    options.BatchSize = 20;
 });
 
 ```
 
 ---
 
-##3. Pipeline Behaviors (Cross-Cutting Concerns)###🤕 A Dor (Problema)Código repetitivo em todo Handler: "Logar entrada...", "Validar dados...", "Abrir transação...", "Try/Catch...", "Logar erro...". Isso suja a regra de negócio.
+##2. CQRS###🤕 A Dor (Problema)Usar o mesmo modelo de objeto para leitura e escrita cria conflitos.
 
-###✅ A SoluçãoUsar Behaviors do MediatR para interceptar a requisição antes e depois do Handler, centralizando essa lógica.
+* **Escrita:** Precisa de validações complexas, regras de negócio e transações.
+* **Leitura:** Precisa de performance, joins específicos e dados "mastigados" para a tela.
+* Tentar usar a mesma Entidade do EF Core para ambos resulta em queries lentas ou entidades anêmicas.
 
-###⚙️ Como Configurar**1. API (`Bcommerce.Api/Program.cs`)**
-A ordem de registro define a ordem de execução (cebola).
+###✅ A SoluçãoSeparar explicitamente:
+
+* **Commands (Escrita):** Intenção de mudar estado. Retornam apenas sucesso/falha ou IDs.
+* **Queries (Leitura):** Intenção de buscar dados. Retornam DTOs otimizados. Não mudam estado.
+
+###⚙️ Como Configurar e Usar**1. Na Application (`Modules.Users.Application`)**
+Implemente as interfaces `ICommand` e `IQuery` do BuildingBlocks.
 
 ```csharp
-// 1. Logging (Mais externo: loga tudo, inclusive erros de validação)
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+// --- ESCRITA ---
+// Define o comando e o retorno (Guid)
+public record CreateUserCommand(string Email, string Name) : ICommand<Guid>;
 
-// 2. Validation (Valida antes de abrir transação)
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+// Handler contém a regra de negócio
+public class CreateUserHandler : ICommandHandler<CreateUserCommand, Guid>
+{
+    public async Task<Result<Guid>> Handle(CreateUserCommand cmd, CancellationToken ct) { ... }
+}
 
-// 3. Transaction (Mais interno: abre transação apenas para Commands válidos)
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+// --- LEITURA ---
+// Define a query e o DTO de retorno
+public record GetUserByIdQuery(Guid Id) : IQuery<UserDto>;
+
+// Handler otimizado para leitura (pode usar Dapper ou EF AsNoTracking)
+public class GetUserQueryHandler : IQueryHandler<GetUserByIdQuery, UserDto>
+{
+    public async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken ct) { ... }
+}
 
 ```
 
-**2. Application (`Modules.{Module}.Application`)**
-Crie validadores usando FluentValidation. O `ValidationBehavior` irá encontrá-los automaticamente.
+**2. Na API (`Bcommerce.Api/Configurations/ApplicationDependencyInjection.cs`)**
+O MediatR escaneia os assemblies para conectar Commands aos Handlers.
+
+```csharp
+services.AddMediatR(cfg => {
+    // Registra todos os handlers do módulo Users
+    cfg.RegisterServicesFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
+});
+
+```
+
+---
+
+##3. Pipeline Behaviors###🤕 A Dor (Problema)Código "boilerplate" repetido em todo Handler:
+
+* `_logger.LogInformation("Iniciando...")`
+* `if (!validator.Validate()) return Error`
+* `try { await _unitOfWork.SaveChanges() } catch { ... }`
+
+Isso polui a regra de negócio e viola o DRY (Don't Repeat Yourself).
+
+###✅ A SoluçãoUsar o padrão **Decorator** (via MediatR Pipeline) para envolver os Handlers com comportamentos transversais.
+
+###⚙️ Como Configurar e Usar**1. Na API (`Bcommerce.Api/Configurations/ApplicationDependencyInjection.cs`)**
+A ordem de registro define a ordem de execução ("cebola").
+
+```csharp
+// 1. Logging (Mais externo): Loga entrada e saída de TODOS os requests.
+services.AddLoggingBehavior();
+
+// 2. Validation: Executa FluentValidation. Se falhar, nem chama o Handler.
+services.AddValidationBehavior();
+
+// 3. Transaction (Mais interno): Abre transação APENAS para Commands.
+//    Queries passam direto por esse behavior.
+services.AddTransactionBehavior();
+
+```
+
+**2. Na Application (`Modules.Users.Application`)**
+Basta criar um validador. O `ValidationBehavior` o encontrará e executará automaticamente.
 
 ```csharp
 public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 {
-    public CreateUserValidator() {
-        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+    public CreateUserValidator() 
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email é obrigatório")
+            .EmailAddress().WithMessage("Email inválido");
     }
 }
 
@@ -100,30 +161,33 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 
 ---
 
-##4. Result Pattern###🤕 A Dor (Problema)Usar `Exceptions` para controle de fluxo (ex: `UserNotFoundException` para um fluxo normal de busca). Isso é caro (performance) e torna o fluxo do código confuso (GOTO disfarçado).
+##4. Result Pattern###🤕 A Dor (Problema)Uso excessivo de Exceptions para controle de fluxo (`UserNotFoundException`, `InsufficientFundsException`).
 
-###✅ A SoluçãoRetornar um objeto `Result` que indica explicitamente Sucesso ou Falha, contendo o valor ou o erro, forçando quem chama a tratar o resultado.
+* **Performance:** Exceptions são caras em .NET.
+* **Legibilidade:** Não fica claro na assinatura do método que ele pode falhar. É um "GOTO" invisível.
 
-###⚙️ Como Configurar**1. Application (`Modules.{Module}.Application`)**
-Retorne `Result` nos seus Handlers.
+###✅ A SoluçãoUm objeto `Result` ou `Result<T>` que encapsula o sucesso ou a falha. O fluxo é explícito e funcional.
+
+###⚙️ Como Configurar e Usar**1. No Domain/Application**
+Retorne `Result` em vez de lançar exceções de negócio.
 
 ```csharp
-public async Task<Result<Guid>> Handle(CreateUserCommand command, CancellationToken ct)
+public Result<Product> ReduceStock(int quantity)
 {
-    if (await _repo.Exists(command.Email))
+    if (this.Stock < quantity)
     {
-        // Retorna erro de negócio sem lançar exceção
-        return Result.Fail<Guid>(UserErrors.EmailAlreadyExists);
+        // Retorna um erro tipado (Conflict - 409)
+        return Result.Fail<Product>(Error.Conflict("STOCK_LOW", "Estoque insuficiente"));
     }
     
-    // ... lógica ...
-    return Result.Ok(user.Id);
+    this.Stock -= quantity;
+    return Result.Ok(this);
 }
 
 ```
 
-**2. Presentation (`Modules.{Module}.Presentation` / Controllers)**
-Use a classe base `ApiControllerBase` para converter `Result` em `IActionResult`.
+**2. Na Presentation (`Modules.Users.Presentation/Controllers`)**
+Use a classe base `ApiControllerBase` para converter o `Result` em resposta HTTP padrão (RFC 7807).
 
 ```csharp
 public class UsersController : ApiControllerBase
@@ -131,13 +195,12 @@ public class UsersController : ApiControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateUserCommand command)
     {
-        var result = await Mediator.Send(command);
+        Result<Guid> result = await Mediator.Send(command);
         
-        // Converte automaticamente:
-        // Success -> 200 OK / 201 Created
-        // Failure (Validation) -> 400 Bad Request
-        // Failure (NotFound) -> 404 Not Found
-        return HandleResult(result); 
+        // Se Sucesso: Retorna 201 Created com o ID
+        // Se Falha (Validation): Retorna 400 Bad Request
+        // Se Falha (Conflict): Retorna 409 Conflict
+        return HandleCreatedResult(result, nameof(GetById), new { id = result.Value }); 
     }
 }
 
@@ -145,109 +208,170 @@ public class UsersController : ApiControllerBase
 
 ---
 
-##5. Domain Events (Eventos de Domínio)###🤕 A Dor (Problema)Acoplamento alto entre regras de negócio. Exemplo: Ao criar um pedido, atualizar estoque, limpar carrinho e enviar e-mail, tudo no mesmo método gigante.
+##5. Domain Events###🤕 A Dor (Problema)Regras de negócio acopladas.
+Exemplo: O método `Order.Confirmar()` não deveria saber como enviar e-mail, dar baixa no estoque e notificar o usuário. Se colocar tudo ali, a classe `Order` vira um "God Object".
 
-###✅ A SoluçãoA entidade dispara um evento "Ocorreu X". Handlers específicos reagem a isso. O código principal foca apenas em "fazer X".
+###✅ A SoluçãoInversão de controle. A entidade apenas diz **"Ocorreu X"** (passado). Handlers externos reagem a isso.
 
-###⚙️ Como Configurar**1. Core (`Modules.{Module}.Core`)**
-A entidade adiciona o evento à sua lista interna.
+###⚙️ Como Configurar e Usar**1. No Core (`Modules.Catalog.Core`)**
+A entidade registra o evento em sua lista interna (`_domainEvents`).
 
 ```csharp
-public class User : Entity 
+public class Product : Entity 
 {
-    public static User Create(...) 
+    public void UpdatePrice(decimal newPrice) 
     {
-        var user = new User(...);
-        // Apenas registra na memória, não publica ainda
-        user.AddDomainEvent(new UserCreatedEvent(user.Id));
-        return user;
+        var oldPrice = this.Price;
+        this.Price = newPrice;
+        
+        // Apenas adiciona à memória. NÃO dispara ainda.
+        this.AddDomainEvent(new ProductPriceChangedEvent(this.Id, oldPrice, newPrice));
     }
 }
 
 ```
 
-**2. Infrastructure (`Modules.{Module}.Infrastructure`)**
-O `PublishDomainEventsInterceptor` (mencionado no item 1 - Outbox) irá interceptar o `SaveChangesAsync`, pegar esses eventos da memória e salvá-los no Outbox automaticamente.
+**2. Na Infrastructure**
+O `PublishDomainEventsInterceptor` detecta que a entidade tem eventos pendentes e, antes de salvar no banco, converte esses eventos para o Outbox. Isso garante atomicidade.
 
 ---
 
-##6. Smart Enums (Enumeration)###🤕 A Dor (Problema)"Primitive Obsession". Usar `int` ou `string` para status (ex: `status == 1`). Falta de lugar para colocar lógica associada ao status (ex: "Posso cancelar se o status for 1 ou 2?").
+##6. EF Core Interceptors###🤕 A Dor (Problema)* Esquecer de setar `UpdatedAt = DateTime.Now` em todo update.
+* Implementar "Soft Delete" manualmente com `WHERE DeletedAt IS NULL` em todas as queries.
 
-###✅ A SoluçãoClasses que se comportam como Enums, mas permitem métodos e validações.
+###✅ A SoluçãoInterceptar o comando `SaveChanges` do EF Core e injetar lógica globalmente.
 
-###⚙️ Como Configurar**1. Core (`Modules.{Module}.Core`)**
+###⚙️ Como Configurar e Usar**1. No Core (`Modules.Users.Core`)**
+Marque suas entidades com interfaces.
+
+```csharp
+public class User : Entity, IAuditableEntity, ISoftDeletable
+{
+    // Propriedades exigidas pelas interfaces
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime? DeletedAt { get; private set; }
+}
+
+```
+
+**2. Na Infrastructure (`Modules.Users.Infrastructure`)**
+Configure o DbContext.
+
+```csharp
+// UsersDbContext.cs
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    // Filtro Global: O EF Core adiciona "AND DeletedAt IS NULL" em TODAS as queries automaticamente
+    builder.Entity<User>().HasQueryFilter(x => x.DeletedAt == null);
+}
+
+// Configuração no DependencyInjection.cs
+services.AddDbContext<UsersDbContext>((sp, options) => {
+    options.AddInterceptors(
+        sp.GetRequiredService<AuditableEntityInterceptor>(), // Preenche datas
+        sp.GetRequiredService<SoftDeleteInterceptor>()       // Muda State=Deleted para State=Modified
+    );
+});
+
+```
+
+---
+
+##7. Value Objects###🤕 A Dor (Problema)"Primitive Obsession". Usar `string` para CPF, Email, CEP.
+
+* Risco de passar dados inválidos.
+* Lógica de validação espalhada (repetir Regex de email em 10 lugares).
+* Confusão de parâmetros (`void Metodo(string email, string nome)` vs `void Metodo(string nome, string email)`).
+
+###✅ A SoluçãoClasses imutáveis que encapsulam a validação. Se o objeto existe, ele é válido.
+
+###⚙️ Como Configurar e Usar**1. No Core (`BuildingBlocks.Domain/Models`)**
+Herde de `ValueObject`.
+
+```csharp
+public sealed class Email : ValueObject
+{
+    public string Value { get; }
+
+    private Email(string value) { Value = value; }
+
+    public static Result<Email> Create(string email)
+    {
+        if (!Regex.IsMatch(email, "...")) 
+            return Result.Fail<Email>("Email inválido");
+            
+        return Result.Ok(new Email(email));
+    }
+
+    // Garante igualdade por valor (email1 == email2 se os textos forem iguais)
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Value;
+    }
+}
+
+```
+
+**2. No Uso**
+
+```csharp
+// O compilador impede passar uma string qualquer. Exige um objeto Email válido.
+public void UpdateEmail(Email newEmail) { ... }
+
+```
+
+---
+
+##8. Smart Enums###🤕 A Dor (Problema)Enums do C# são apenas `int`.
+
+* Não podem ter comportamento (`OrderStatus.Paid.CanBeCancelled()`).
+* Não suportam herança ou lógica complexa.
+
+###✅ A SoluçãoClasses que parecem Enums, mas são objetos completos.
+
+###⚙️ Como Configurar e Usar**1. No Core**
+Herde de `Enumeration`.
 
 ```csharp
 public class OrderStatus : Enumeration
 {
-    public static OrderStatus Pending = new(1, "Pending");
-    public static OrderStatus Paid = new(2, "Paid");
-    public static OrderStatus Shipped = new(3, "Shipped");
+    public static OrderStatus Paid = new(1, "Paid");
+    public static OrderStatus Shipped = new(2, "Shipped");
 
     public OrderStatus(int id, string name) : base(id, name) { }
 
-    // Lógica encapsulada no próprio enum!
-    public bool CanBeCancelled => this == Pending || this == Paid;
+    // Lógica encapsulada!
+    public bool CanCancel => this == Paid; 
 }
 
 ```
 
 ---
 
-##7. EF Core Interceptors (Auditoria e Soft Delete)###🤕 A Dor (Problema)Esquecer de preencher `CreatedAt` ou `UpdatedAt`. Deletar dados fisicamente e perder histórico (`DELETE FROM`).
+##9. Global Exception Handling###🤕 A Dor (Problema)Blocos `try/catch` em todos os Controllers. Se um erro não tratado ocorrer, a API retorna stack trace (inseguro) ou erro 500 genérico sem detalhes.
 
-###✅ A SoluçãoInterceptors que alteram o comportamento do `SaveChanges` globalmente.
+###✅ A SoluçãoMiddleware centralizado que captura qualquer exceção não tratada e a converte em uma resposta JSON padronizada (ProblemDetails).
 
-###⚙️ Como Configurar**1. Core (`Modules.{Module}.Core`)**
-Implemente as interfaces marcadoras nas suas entidades.
+###⚙️ Como Configurar e Usar**1. Na Presentation (`BuildingBlocks.Presentation/Middleware`)**
+O `ExceptionHandlingMiddleware` mapeia exceções para Status Codes.
 
 ```csharp
-public class Product : Entity, IAuditableEntity, ISoftDeletable
+private static (int StatusCode, string Title) MapException(Exception ex) => ex switch
 {
-    // ... propriedades
-}
+    EntityNotFoundException => (404, "Não Encontrado"),
+    BusinessRuleValidationException => (409, "Erro de Negócio"),
+    _ => (500, "Erro Interno")
+};
 
 ```
 
-**2. Infrastructure (`Modules.{Module}.Infrastructure`)**
-No `DbContext` do módulo, configure o filtro global para Soft Delete e registre os interceptors.
+**2. Na API (`Program.cs`)**
+Deve ser um dos primeiros middlewares.
 
 ```csharp
-protected override void OnModelCreating(ModelBuilder builder)
-{
-    // Filtro global: nunca traga deletados nas queries
-    builder.Entity<Product>().HasQueryFilter(x => x.DeletedAt == null);
-}
-
-protected override void OnConfiguring(DbContextOptionsBuilder options)
-{
-    // Injetam comportamento automático
-    options.AddInterceptors(
-        _auditableEntityInterceptor, // Preenche CreatedAt/UpdatedAt
-        _softDeleteInterceptor       // Transforma gb.Remove(x) em UPDATE x SET DeletedAt = Now
-    );
-}
-
-```
-
----
-
-##8. Value Objects###🤕 A Dor (Problema)Repetir validação de formato (CPF, Email, CEP) em todo lugar. Risco de trocar parâmetros (passar string de Email onde espera string de Nome).
-
-###✅ A SoluçãoObjetos imutáveis validados na construção. Se o objeto existe, ele é válido. Igualdade por valor, não por referência.
-
-###⚙️ Como Configurar**1. Core (`Modules.{Module}.Core`)**
-Use as classes base do BuildingBlocks ou crie novas.
-
-```csharp
-// Em vez de:
-// public void Register(string email) { ... valida regex ... }
-
-// Use:
-public void Register(Email email) 
-{ 
-    // Se chegou aqui, 'email' é garantidamente válido.
-    // Lógica de validação fica isolada na classe Email.
-}
+var app = builder.Build();
+app.UseExceptionHandlingMiddleware(); // Captura tudo que vem depois
+app.MapControllers();
 
 ```
