@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Entities;
+using Users.Core.Events;
 
 namespace Users.Core.Entities;
 
@@ -93,6 +94,9 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
         IsBillingAddress = isBillingAddress;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new AddressAddedEvent(Id, UserId, City, State, IsDefault));
+
     }
 
     public void Update(

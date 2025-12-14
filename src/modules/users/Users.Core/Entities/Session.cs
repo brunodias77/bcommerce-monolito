@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Entities;
+using Users.Core.Events;
 
 namespace Users.Core.Entities;
 
@@ -65,6 +66,9 @@ public class Session : Entity
         ExpiresAt = expiresAt;
         CreatedAt = DateTime.UtcNow;
         LastActivityAt = DateTimeOffset.UtcNow;
+
+        AddDomainEvent(new SessionCreatedEvent(Id, UserId, DeviceType, IpAddress));
+
     }
 
     public void UpdateActivity()
@@ -90,6 +94,10 @@ public class Session : Entity
 
         RevokedAt = DateTimeOffset.UtcNow;
         RevokedReason = reason;
+
+        AddDomainEvent(new SessionRevokedEvent(Id, UserId, reason));
+
+
     }
 
     public void UpdateLocation(string? country, string? city)

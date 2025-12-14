@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Entities;
+using Users.Core.Events;
 
 namespace Users.Core.Entities;
 
@@ -68,6 +69,9 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
         Cpf = cpf;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new ProfileCreatedEvent(Id, UserId, FirstName, LastName));
+
     }
 
     public void UpdatePersonalInfo(
@@ -88,6 +92,9 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
         BirthDate = birthDate;
         Gender = gender;
         UpdatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new ProfileUpdatedEvent(Id, UserId));
+
     }
 
     public void UpdateDisplayName(string displayName)
