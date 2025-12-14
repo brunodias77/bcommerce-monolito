@@ -8,20 +8,20 @@ public enum CartStatus
     /// <summary>
     /// Carrinho ativo, disponível para adicionar itens.
     /// </summary>
-    Active,
+    ACTIVE,
 
     /// <summary>
     /// Carrinho abandonado (expirado).
     /// </summary>
-    Abandoned,
+    ABANDONED,
 
     /// <summary>
     /// Carrinho convertido em pedido.
     /// </summary>
-    Converted,
+    CONVERTED,
 
     /// <summary>
     /// Carrinho mesclado com outro.
     /// </summary>
-    Merged
+    MERGED
 }
