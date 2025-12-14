@@ -47,7 +47,7 @@ public class User : IdentityUser<Guid>
             LockoutEnabled = true,
             AccessFailedCount = 0
         };
-        
+
         // ⭐ Levanta Domain Event
         // user.AddDomainEvent(new UserCreatedEvent(user.Id, email, userName));
 

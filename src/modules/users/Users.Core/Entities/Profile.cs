@@ -1,4 +1,7 @@
 using BuildingBlocks.Domain.Entities;
+using BuildingBlocks.Domain.Models;
+using Users.Core.Events;
+
 
 namespace Users.Core.Entities;
 
@@ -17,7 +20,7 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
     public string? AvatarUrl { get; private set; }
     public DateTime? BirthDate { get; private set; }
     public string? Gender { get; private set; }
-    public string? Cpf { get; private set; }
+    public Cpf? Cpf { get; private set; }
 
     // Preferências
     public string PreferredLanguage { get; private set; } = "pt-BR";
@@ -57,17 +60,17 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
         if (string.IsNullOrWhiteSpace(lastName))
             throw new ArgumentException("Last name cannot be empty.", nameof(lastName));
 
-        if (cpf != null && !IsValidCpfFormat(cpf))
-            throw new ArgumentException("Invalid CPF format. Expected: 000.000.000-00", nameof(cpf));
-
         UserId = userId;
         FirstName = firstName;
         LastName = lastName;
         DisplayName = $"{firstName} {lastName}";
         BirthDate = birthDate;
-        Cpf = cpf;
+        Cpf = cpf != null ? BuildingBlocks.Domain.Models.Cpf.Create(cpf) : null;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new ProfileCreatedEvent(Id, UserId, FirstName, LastName));
+
     }
 
     public void UpdatePersonalInfo(
@@ -88,6 +91,9 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
         BirthDate = birthDate;
         Gender = gender;
         UpdatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new ProfileUpdatedEvent(Id, UserId));
+
     }
 
     public void UpdateDisplayName(string displayName)
@@ -107,10 +113,7 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
 
     public void UpdateCpf(string cpf)
     {
-        if (!IsValidCpfFormat(cpf))
-            throw new ArgumentException("Invalid CPF format. Expected: 000.000.000-00", nameof(cpf));
-
-        Cpf = cpf;
+        Cpf = BuildingBlocks.Domain.Models.Cpf.Create(cpf);
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -166,15 +169,5 @@ public class Profile : AggregateRoot, IAuditableEntity, ISoftDeletable
     {
         DeletedAt = null;
         UpdatedAt = DateTime.UtcNow;
-    }
-
-    private static bool IsValidCpfFormat(string cpf)
-    {
-        if (string.IsNullOrWhiteSpace(cpf))
-            return false;
-
-        // Formato esperado: 000.000.000-00
-        var pattern = @"^\d{3}\.\d{3}\.\d{3}-\d{2}$";
-        return System.Text.RegularExpressions.Regex.IsMatch(cpf, pattern);
     }
 }

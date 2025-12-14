@@ -164,7 +164,10 @@ CREATE TYPE shared.coupon_scope AS ENUM (
 -- ========================================
 -- 2.1 ASP.NET CORE IDENTITY
 -- ========================================
+-- NOTA: Estas tabelas são gerenciadas pelo Entity Framework Core Migrations.
+-- Ver: src/modules/users/Users.Infrastructure/Persistence/Migrations/
 
+/*
 -- Tabela principal de usuários (gerenciada pelo ASP.NET Identity)
 CREATE TABLE users.asp_net_users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -239,11 +242,15 @@ CREATE TABLE users.asp_net_user_tokens (
 
     PRIMARY KEY (user_id, login_provider, name)
 );
+*/
 
 -- ========================================
 -- 2.2 TABELAS CUSTOMIZADAS DE USUÁRIO
 -- ========================================
+-- NOTA: Estas tabelas são gerenciadas pelo Entity Framework Core Migrations.
+-- Ver: src/modules/users/Users.Infrastructure/Persistence/Migrations/
 
+/*
 -- Perfil estendido do usuário
 CREATE TABLE users.profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -384,6 +391,7 @@ CREATE TABLE users.notification_preferences (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+*/
 
 -- ========================================
 -- PARTE 3: MÓDULO DE CATÁLOGO (catalog)
@@ -1192,7 +1200,8 @@ ALTER TABLE catalog.product_reviews
 -- PARTE 10: TRIGGERS
 -- ========================================
 
--- Users - Identity
+-- Users - Identity and custom tables (managed by EF Core Migrations)
+/*
 -- Trigger para atualizar updated_at em asp_net_users
 CREATE TRIGGER trg_asp_net_users_updated_at
     BEFORE UPDATE ON users.asp_net_users
@@ -1214,6 +1223,7 @@ CREATE TRIGGER trg_addresses_updated_at
 CREATE TRIGGER trg_notification_prefs_updated_at
     BEFORE UPDATE ON users.notification_preferences
     FOR EACH ROW EXECUTE FUNCTION shared.trigger_set_timestamp();
+*/
 
 -- Catalog - Brands
 CREATE TRIGGER trg_brands_updated_at
@@ -1343,7 +1353,8 @@ CREATE TRIGGER trg_coupon_check_depleted
 -- PARTE 11: INDEXES
 -- ========================================
 
--- Users - ASP.NET Identity
+-- Users - ASP.NET Identity and custom tables (managed by EF Core Migrations)
+/*
 CREATE UNIQUE INDEX user_name_index ON users.asp_net_users(normalized_user_name) WHERE normalized_user_name IS NOT NULL;
 CREATE INDEX email_index ON users.asp_net_users(normalized_email);
 CREATE UNIQUE INDEX role_name_index ON users.asp_net_roles(normalized_name) WHERE normalized_name IS NOT NULL;
@@ -1365,6 +1376,7 @@ CREATE INDEX idx_sessions_expires ON users.sessions(expires_at) WHERE revoked_at
 CREATE UNIQUE INDEX uq_sessions_refresh_token ON users.sessions(refresh_token_hash);
 CREATE INDEX idx_notifications_user_id ON users.notifications(user_id);
 CREATE INDEX idx_notifications_unread ON users.notifications(user_id, created_at DESC) WHERE read_at IS NULL;
+*/
 
 -- Catalog - Brands
 CREATE UNIQUE INDEX uq_brands_slug ON catalog.brands(slug) WHERE deleted_at IS NULL;
@@ -1494,6 +1506,8 @@ CREATE INDEX idx_audit_logs_created ON shared.audit_logs(created_at DESC);
 -- PARTE 12: VIEWS
 -- ========================================
 
+-- Users views (managed by EF Core Migrations - tables created via migration)
+/*
 -- View de sessões ativas por usuário
 CREATE VIEW users.v_active_sessions AS
 SELECT 
@@ -1515,6 +1529,7 @@ SELECT
 FROM users.notifications
 WHERE read_at IS NULL
 GROUP BY user_id;
+*/
 
 -- View materializada para estatísticas de produtos
 CREATE MATERIALIZED VIEW catalog.mv_product_stats AS
@@ -1769,20 +1784,23 @@ $$ LANGUAGE plpgsql;
 -- PARTE 14: SEED DATA - Roles padrão
 -- ========================================
 
--- Roles padrão do sistema
+-- Roles padrão do sistema (managed by EF Core Migrations)
+/*
 INSERT INTO users.asp_net_roles (id, name, normalized_name, concurrency_stamp)
 VALUES
     (uuid_generate_v4(), 'Admin', 'ADMIN', uuid_generate_v4()::TEXT),
     (uuid_generate_v4(), 'Customer', 'CUSTOMER', uuid_generate_v4()::TEXT),
     (uuid_generate_v4(), 'Manager', 'MANAGER', uuid_generate_v4()::TEXT)
 ON CONFLICT DO NOTHING;
+*/
 
 -- ========================================
 -- PARTE 15: COMMENTS
 -- ========================================
 
--- Users
+-- Users (managed by EF Core Migrations)
 COMMENT ON SCHEMA users IS 'Módulo de usuários: autenticação, perfis, endereços, sessões';
+/*
 COMMENT ON TABLE users.asp_net_users IS 'Usuários gerenciados pelo ASP.NET Identity';
 COMMENT ON TABLE users.asp_net_roles IS 'Papéis/perfis de acesso do sistema';
 COMMENT ON TABLE users.asp_net_user_roles IS 'Relacionamento entre usuários e roles';
@@ -1794,6 +1812,7 @@ COMMENT ON TABLE users.profiles IS 'Dados estendidos do perfil do usuário';
 COMMENT ON TABLE users.addresses IS 'Endereços de entrega e cobrança';
 COMMENT ON TABLE users.sessions IS 'Sessões ativas para gerenciamento de dispositivos';
 COMMENT ON TABLE users.notifications IS 'Notificações in-app';
+*/
 
 -- Catalog
 COMMENT ON SCHEMA catalog IS 'Módulo de catálogo: produtos, categorias, marcas, estoque, avaliações';
