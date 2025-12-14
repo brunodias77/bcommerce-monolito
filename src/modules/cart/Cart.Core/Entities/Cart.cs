@@ -46,7 +46,7 @@ public class Cart : AggregateRoot, IAuditableEntity
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            Status = CartStatus.Active,
+            Status = CartStatus.ACTIVE,
             IpAddress = ipAddress,
             UserAgent = userAgent,
             DiscountAmount = 0,
@@ -70,7 +70,7 @@ public class Cart : AggregateRoot, IAuditableEntity
         {
             Id = Guid.NewGuid(),
             SessionId = sessionId,
-            Status = CartStatus.Active,
+            Status = CartStatus.ACTIVE,
             IpAddress = ipAddress,
             UserAgent = userAgent,
             DiscountAmount = 0,
@@ -103,7 +103,7 @@ public class Cart : AggregateRoot, IAuditableEntity
     /// </summary>
     public void MarkAsConverted()
     {
-        Status = CartStatus.Converted;
+        Status = CartStatus.CONVERTED;
         ConvertedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
         Version++;
@@ -114,7 +114,7 @@ public class Cart : AggregateRoot, IAuditableEntity
     /// </summary>
     public void MarkAsAbandoned()
     {
-        Status = CartStatus.Abandoned;
+        Status = CartStatus.ABANDONED;
         UpdatedAt = DateTime.UtcNow;
         Version++;
     }

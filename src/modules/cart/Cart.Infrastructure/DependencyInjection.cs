@@ -28,7 +28,9 @@ public static class DependencyInjection
         
         // Configura o DataSource com mapeamento do ENUM PostgreSQL
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-        dataSourceBuilder.MapEnum<CartStatus>("shared.cart_status");
+        // Usa tradutor nulo para manter UPPERCASE (Active -> ACTIVE no C#, mas o ToString() do enum é o que vale)
+        // Como o Postgres espera 'ACTIVE' e o Enum C# agora é ACTIVE, precisamos que o Npgsql não converta para minúsculo.
+        dataSourceBuilder.MapEnum<CartStatus>("shared.cart_status", new Npgsql.NameTranslation.NpgsqlNullNameTranslator());
         var dataSource = dataSourceBuilder.Build();
 
         services.AddDbContext<CartDbContext>(options =>
