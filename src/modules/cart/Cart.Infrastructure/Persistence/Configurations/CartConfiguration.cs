@@ -40,10 +40,6 @@ public class CartConfiguration : IEntityTypeConfiguration<Core.Entities.Cart>
 
         builder.Property(c => c.Status)
             .HasColumnName("status")
-            .HasColumnType("shared.cart_status")
-            .HasConversion(
-                v => v.ToString().ToLower(),
-                v => Enum.Parse<CartStatus>(v, true))
             .IsRequired();
 
         builder.Property(c => c.IpAddress)

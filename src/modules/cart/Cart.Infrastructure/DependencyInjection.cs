@@ -1,11 +1,13 @@
 using BuildingBlocks.Infrastructure.Messaging.Integration;
 using Cart.Application.IntegrationEventHandlers;
+using Cart.Core.Enums;
 using Cart.Core.Repositories;
 using Cart.Infrastructure.Persistence;
 using Cart.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Users.Contracts.Events;
 
 namespace Cart.Infrastructure;
@@ -20,11 +22,18 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         // ===============================================================
-        // DbContext
+        // DbContext com mapeamento de ENUM PostgreSQL
         // ===============================================================
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        
+        // Configura o DataSource com mapeamento do ENUM PostgreSQL
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.MapEnum<CartStatus>("shared.cart_status");
+        var dataSource = dataSourceBuilder.Build();
+
         services.AddDbContext<CartDbContext>(options =>
             options.UseNpgsql(
-                configuration.GetConnectionString("DefaultConnection"),
+                dataSource,
                 builder => builder.MigrationsHistoryTable("__EFMigrationsHistory", "cart")
             ));
 
@@ -45,4 +54,3 @@ public static class DependencyInjection
         return services;
     }
 }
-
