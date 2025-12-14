@@ -241,7 +241,7 @@
 7. PERSISTIR alterações
 8. RETORNAR sucesso
 ```
-
+use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); e await _userManager.ConfirmEmailAsync(user, token) do identity
 ---
 
 ### Queries - Customer (Users)
