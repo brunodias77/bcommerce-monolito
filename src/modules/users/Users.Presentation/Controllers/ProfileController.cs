@@ -1,4 +1,4 @@
-using MediatR;
+using BuildingBlocks.Presentation.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,19 +10,13 @@ namespace Users.Presentation.Controllers;
 /// <summary>
 /// Controller para operações de perfil.
 /// </summary>
-[ApiController]
-[Route("api/[controller]")]
 [Authorize]
-public class ProfileController : ControllerBase
+public class ProfileController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly ILogger<ProfileController> _logger;
 
-    public ProfileController(
-        IMediator mediator,
-        ILogger<ProfileController> logger)
+    public ProfileController(ILogger<ProfileController> logger)
     {
-        _mediator = mediator;
         _logger = logger;
     }
 
