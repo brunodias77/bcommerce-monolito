@@ -7,10 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-        <PackageReference Include="MediatR" Version="12.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -18,6 +22,21 @@
         <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
         <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
         <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Presentation\BuildingBlocks.Presentation.csproj" />
+        
+        <!-- Users Module -->
+        <ProjectReference Include="..\..\modules\users\Users.Application\Users.Application.csproj" />
+        <ProjectReference Include="..\..\modules\users\Users.Core\Users.Core.csproj" />
+        <ProjectReference Include="..\..\modules\users\Users.Infrastructure\Users.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\modules\users\Users.Presentation\Users.Presentation.csproj" />
+        
+        <!-- Catalog Module -->
+        <ProjectReference Include="..\..\modules\catalog\Catalog.Core\Catalog.Core.csproj" />
+        <ProjectReference Include="..\..\modules\catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+        
+        <!-- Cart Module -->
+        <ProjectReference Include="..\..\modules\cart\Cart.Application\Cart.Application.csproj" />
+        <ProjectReference Include="..\..\modules\cart\Cart.Core\Cart.Core.csproj" />
+        <ProjectReference Include="..\..\modules\cart\Cart.Infrastructure\Cart.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-using MediatR;
+using BuildingBlocks.Presentation.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,19 +10,13 @@ namespace Users.Presentation.Controllers;
 /// <summary>
 /// Controller para operações de endereços.
 /// </summary>
-[ApiController]
-[Route("api/[controller]")]
 [Authorize]
-public class AddressesController : ControllerBase
+public class AddressesController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly ILogger<AddressesController> _logger;
 
-    public AddressesController(
-        IMediator mediator,
-        ILogger<AddressesController> logger)
+    public AddressesController(ILogger<AddressesController> logger)
     {
-        _mediator = mediator;
         _logger = logger;
     }
 

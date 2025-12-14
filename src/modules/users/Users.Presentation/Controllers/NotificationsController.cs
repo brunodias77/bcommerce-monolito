@@ -1,4 +1,4 @@
-using MediatR;
+using BuildingBlocks.Presentation.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +9,13 @@ namespace Users.Presentation.Controllers;
 /// <summary>
 /// Controller para operações de notificações.
 /// </summary>
-[ApiController]
-[Route("api/[controller]")]
 [Authorize]
-public class NotificationsController : ControllerBase
+public class NotificationsController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly ILogger<NotificationsController> _logger;
 
-    public NotificationsController(
-        IMediator mediator,
-        ILogger<NotificationsController> logger)
+    public NotificationsController(ILogger<NotificationsController> logger)
     {
-        _mediator = mediator;
         _logger = logger;
     }
 

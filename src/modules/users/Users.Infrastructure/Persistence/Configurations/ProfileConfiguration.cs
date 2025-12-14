@@ -49,7 +49,10 @@ public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
 
         builder.Property(p => p.Cpf)
             .HasColumnName("cpf")
-            .HasMaxLength(14);
+            .HasMaxLength(14)
+            .HasConversion(
+                cpf => cpf != null ? cpf.Value : null,
+                value => value != null ? BuildingBlocks.Domain.Models.Cpf.Create(value) : null);
 
         builder.Property(p => p.PreferredLanguage)
             .HasColumnName("preferred_language")
