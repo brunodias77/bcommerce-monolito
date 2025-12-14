@@ -13,22 +13,28 @@ public static class MiddlewarePipelineConfiguration
     public static WebApplication UseMiddlewarePipeline(this WebApplication app)
     {
         // ===============================================================
-        // Exception Handling (captura todas as exceções)
+        // EXCEPTION HANDLING (Camada de Segurança)
         // ===============================================================
+        // Deve ser o PRIMEIRO middleware para capturar exceções de todo o pipeline.
+        // Retorna ProblemDetails padronizados (RFC 7807) para o cliente.
         app.UseExceptionHandlingMiddleware();
 
         // ===============================================================
-        // Request Logging (logging de todas as requisições)
+        // REQUEST LOGGING (Auditoria)
         // ===============================================================
+        // Loga informações sobre a requisição (Método, Path, Status Code, Latência).
+        // Útil para monitoramento e debugging.
         app.UseRequestLoggingMiddleware(options =>
         {
-            options.SlowRequestThresholdMs = 3000;
-            options.IgnoredPaths.Add("/health");
+            options.SlowRequestThresholdMs = 3000; // Alerta se demorar mais de 3s
+            options.IgnoredPaths.Add("/health");   // Não poluir log com health checks
         });
 
         // ===============================================================
-        // Swagger (apenas em desenvolvimento)
+        // SWAGGER (Documentação)
         // ===============================================================
+        // Disponível apenas em ambiente de desenvolvimento.
+        // Expõe a documentação da API e interface interativa (/index.html).
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -40,20 +46,25 @@ public static class MiddlewarePipelineConfiguration
         }
 
         // ===============================================================
-        // HTTPS e Segurança
+        // HTTPS & SEGURANÇA
         // ===============================================================
+        // Força redirecionamento para HTTPS.
         app.UseHttpsRedirection();
 
         // ===============================================================
-        // Authentication & Authorization
+        // AUTENTICAÇÃO & AUTORIZAÇÃO
         // ===============================================================
-        // Será configurado quando implementar autenticação
+        // Authentication: Identifica QUEM é o usuário (valida token JWT).
+        // Authorization: Verifica se tem PERMISSÃO para acessar o recurso.
+        // Ordem: AuthN -> AuthZ
         // app.UseAuthentication();
         app.UseAuthorization();
 
         // ===============================================================
-        // Endpoints
+        // ENDPOINTS (Execução Final)
         // ===============================================================
+        // Mapeia as rotas dos Controllers para os endpoints.
+        // É aqui que o código da sua API (Controllers) é executado.
         app.MapControllers();
 
         return app;

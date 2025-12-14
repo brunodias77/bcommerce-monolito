@@ -36,6 +36,9 @@ namespace BuildingBlocks.Application.Abstractions;
 /// </remarks>
 public interface ICommand : IRequest<Result>
 {
+    // A interface ICommand herda de IRequest<Result> do MediatR.
+    // Isso impõe que todo comando deve retornar um objeto Result.
+    // O Result encapsula sucesso ou falha, evitando o uso excessivo de Exceptions para controle de fluxo.
 }
 
 /// <summary>
