@@ -79,7 +79,7 @@ bcommerce/
 │   │   │   ├── examples.md
 │   │   │   └── BuildingBlocks.Application.csproj
 │   │   │
-│   │   ├── BuildingBlocks.Infrastructure/        # 🔨 A IMPLEMENTAR
+│   │   ├── BuildingBlocks.Infrastructure/        # ✅ IMPLEMENTADO
 │   │   │   ├── Persistence/
 │   │   │   │   ├── Configurations/
 │   │   │   │   │   └── BaseEntityConfiguration.cs
@@ -103,7 +103,7 @@ bcommerce/
 │   │   │   ├── README.md
 │   │   │   └── BuildingBlocks.Infrastructure.csproj
 │   │   │
-│   │   └── BuildingBlocks.Presentation/          # 🔨 A IMPLEMENTAR
+│   │   └── BuildingBlocks.Presentation/          # ✅ IMPLEMENTADO
 │   │       ├── Controllers/
 │   │       │   └── ApiControllerBase.cs
 │   │       ├── Filters/

@@ -1,4 +1,6 @@
 using Bcommerce.Api.Configurations;
+using BuildingBlocks.Presentation.Filters;
+using BuildingBlocks.Presentation.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +12,14 @@ builder.Services.AddApplication(builder.Configuration);
 // Configuração da camada de infraestrutura (DbContexts, Repositories, Interceptors, etc.)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Configuração de Controllers
-builder.Services.AddControllers();
+// Configuração de Controllers com ExceptionHandlingFilter
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ExceptionHandlingFilter>();
+});
+
+// Registrar ExceptionHandlingFilter no DI
+builder.Services.AddScoped<ExceptionHandlingFilter>();
 
 // Configuração do Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -36,6 +44,16 @@ var app = builder.Build();
 
 // ===== CONFIGURAÇÃO DO PIPELINE HTTP =====
 
+// 1. Exception Handling (captura todas as exceções)
+app.UseExceptionHandlingMiddleware();
+
+// 2. Request Logging (logging de todas as requisições)
+app.UseRequestLoggingMiddleware(options =>
+{
+    options.SlowRequestThresholdMs = 3000;
+    options.IgnoredPaths.Add("/health");
+});
+
 // Swagger (apenas em desenvolvimento)
 if (app.Environment.IsDevelopment())
 {
@@ -45,9 +63,6 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "BCommerce API v1");
         options.RoutePrefix = string.Empty; // Swagger na raiz (http://localhost:5000)
     });
-
-    // Habilita logging detalhado em desenvolvimento
-    app.UseDeveloperExceptionPage();
 }
 
 // HTTPS Redirection
