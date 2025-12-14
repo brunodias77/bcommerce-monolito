@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Entities;
+using BuildingBlocks.Domain.Models;
 
 namespace Users.Core.Entities;
 
@@ -19,7 +20,7 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
     public string? Neighborhood { get; private set; }
     public string City { get; private set; } = string.Empty;
     public string State { get; private set; } = string.Empty;
-    public string PostalCode { get; private set; } = string.Empty;
+    public PostalCode PostalCode { get; private set; } = null!;
     public string Country { get; private set; } = "BR";
 
     // Coordenadas
@@ -76,9 +77,6 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
         if (string.IsNullOrWhiteSpace(postalCode))
             throw new ArgumentException("Postal code cannot be empty.", nameof(postalCode));
 
-        if (!IsValidPostalCodeFormat(postalCode))
-            throw new ArgumentException("Invalid postal code format. Expected: 00000-000", nameof(postalCode));
-
         UserId = userId;
         Label = label;
         RecipientName = recipientName;
@@ -88,7 +86,7 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
         Neighborhood = neighborhood;
         City = city;
         State = state.ToUpperInvariant();
-        PostalCode = postalCode;
+        PostalCode = BuildingBlocks.Domain.Models.PostalCode.Create(postalCode);
         IsDefault = isDefault;
         IsBillingAddress = isBillingAddress;
         CreatedAt = DateTime.UtcNow;
@@ -121,9 +119,6 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
         if (string.IsNullOrWhiteSpace(postalCode))
             throw new ArgumentException("Postal code cannot be empty.", nameof(postalCode));
 
-        if (!IsValidPostalCodeFormat(postalCode))
-            throw new ArgumentException("Invalid postal code format. Expected: 00000-000", nameof(postalCode));
-
         Label = label;
         RecipientName = recipientName;
         Street = street;
@@ -132,7 +127,7 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
         Neighborhood = neighborhood;
         City = city;
         State = state.ToUpperInvariant();
-        PostalCode = postalCode;
+        PostalCode = BuildingBlocks.Domain.Models.PostalCode.Create(postalCode);
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -183,16 +178,6 @@ public class Address : Entity, IAuditableEntity, ISoftDeletable
     {
         DeletedAt = null;
         UpdatedAt = DateTime.UtcNow;
-    }
-
-    private static bool IsValidPostalCodeFormat(string postalCode)
-    {
-        if (string.IsNullOrWhiteSpace(postalCode))
-            return false;
-
-        // Formato: 00000-000 ou 00000000
-        var pattern = @"^\d{5}-?\d{3}$";
-        return System.Text.RegularExpressions.Regex.IsMatch(postalCode, pattern);
     }
 
     private static bool IsValidStateFormat(string state)

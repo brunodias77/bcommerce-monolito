@@ -62,7 +62,10 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
         builder.Property(a => a.PostalCode)
             .HasColumnName("postal_code")
             .HasMaxLength(9)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion(
+                postalCode => postalCode.Value,
+                value => BuildingBlocks.Domain.Models.PostalCode.Create(value));
 
         builder.Property(a => a.Country)
             .HasColumnName("country")

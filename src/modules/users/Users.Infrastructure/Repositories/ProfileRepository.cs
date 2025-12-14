@@ -35,13 +35,13 @@ internal class ProfileRepository : IProfileRepository
     public async Task<Profile?> GetByCpfAsync(string cpf, CancellationToken cancellationToken = default)
     {
         return await _context.Profiles
-            .FirstOrDefaultAsync(p => p.Cpf == cpf, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Cpf != null && p.Cpf == cpf, cancellationToken);
     }
 
     public async Task<bool> CpfExistsAsync(string cpf, CancellationToken cancellationToken = default)
     {
         return await _context.Profiles
-            .AnyAsync(p => p.Cpf == cpf, cancellationToken);
+            .AnyAsync(p => p.Cpf != null && p.Cpf == cpf, cancellationToken);
     }
 
     public async Task AddAsync(Profile profile, CancellationToken cancellationToken = default)
