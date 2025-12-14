@@ -1,4 +1,4 @@
-using MediatR;
+using BuildingBlocks.Presentation.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,18 +10,12 @@ namespace Users.Presentation.Controllers;
 /// <summary>
 /// Controller para operações de usuários.
 /// </summary>
-[ApiController]
-[Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly ILogger<UsersController> _logger;
 
-    public UsersController(
-        IMediator mediator,
-        ILogger<UsersController> logger)
+    public UsersController(ILogger<UsersController> logger)
     {
-        _mediator = mediator;
         _logger = logger;
     }
 

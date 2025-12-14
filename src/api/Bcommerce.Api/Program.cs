@@ -16,7 +16,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ExceptionHandlingFilter>();
-});
+})
+.AddPresentation(); // Registra controllers dos módulos
 
 // Registrar ExceptionHandlingFilter no DI
 builder.Services.AddScoped<ExceptionHandlingFilter>();

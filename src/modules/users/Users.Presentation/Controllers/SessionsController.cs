@@ -1,4 +1,4 @@
-using MediatR;
+using BuildingBlocks.Presentation.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +9,13 @@ namespace Users.Presentation.Controllers;
 /// <summary>
 /// Controller para operações de sessões.
 /// </summary>
-[ApiController]
-[Route("api/[controller]")]
 [Authorize]
-public class SessionsController : ControllerBase
+public class SessionsController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly ILogger<SessionsController> _logger;
 
-    public SessionsController(
-        IMediator mediator,
-        ILogger<SessionsController> logger)
+    public SessionsController(ILogger<SessionsController> logger)
     {
-        _mediator = mediator;
         _logger = logger;
     }
 
