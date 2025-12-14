@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using System.Text.Json;
 
 namespace BuildingBlocks.Application.Behaviors;
 
@@ -98,56 +97,6 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
 }
 
 /// <summary>
-/// Behavior de logging detalhado (inclui serialização JSON do request).
-/// Use apenas em desenvolvimento ou para debugging.
-/// </summary>
-public class DetailedLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
-    where TResponse : Result
-{
-    private readonly ILogger<DetailedLoggingBehavior<TRequest, TResponse>> _logger;
-
-    public DetailedLoggingBehavior(ILogger<DetailedLoggingBehavior<TRequest, TResponse>> logger)
-    {
-        _logger = logger;
-    }
-
-    public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
-    {
-        var requestName = typeof(TRequest).Name;
-        var requestJson = JsonSerializer.Serialize(request, new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
-
-        _logger.LogDebug(
-            "=== START {RequestName} ===\n{RequestJson}",
-            requestName,
-            requestJson);
-
-        var stopwatch = Stopwatch.StartNew();
-        var response = await next();
-        stopwatch.Stop();
-
-        var responseJson = JsonSerializer.Serialize(response, new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
-
-        _logger.LogDebug(
-            "=== END {RequestName} ({ElapsedMilliseconds}ms) ===\n{ResponseJson}",
-            requestName,
-            stopwatch.ElapsedMilliseconds,
-            responseJson);
-
-        return response;
-    }
-}
-
-/// <summary>
 /// Behavior de performance logging (alerta se exceder threshold).
 /// </summary>
 public class PerformanceLoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
@@ -202,15 +151,6 @@ public static class LoggingBehaviorExtensions
     public static IServiceCollection AddLoggingBehavior(this IServiceCollection services)
     {
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-        return services;
-    }
-
-    /// <summary>
-    /// Registra DetailedLoggingBehavior (apenas desenvolvimento).
-    /// </summary>
-    public static IServiceCollection AddDetailedLoggingBehavior(this IServiceCollection services)
-    {
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DetailedLoggingBehavior<,>));
         return services;
     }
 

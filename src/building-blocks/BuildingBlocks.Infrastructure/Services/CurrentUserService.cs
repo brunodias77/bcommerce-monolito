@@ -81,81 +81,6 @@ public class CurrentUserService : ICurrentUserService
 }
 
 /// <summary>
-/// Implementação fake do ICurrentUserService para testes.
-/// </summary>
-/// <remarks>
-/// Use esta implementação em testes unitários para simular diferentes cenários:
-///
-/// <code>
-/// // Teste com usuário autenticado
-/// var currentUser = new FakeCurrentUserService(
-///     userId: Guid.NewGuid(),
-///     email: "test@example.com"
-/// );
-///
-/// // Teste com usuário não autenticado
-/// var anonymousUser = new FakeCurrentUserService();
-///
-/// // Teste alterando o usuário durante o teste
-/// var currentUser = new FakeCurrentUserService();
-/// currentUser.SetUser(Guid.NewGuid(), "user1@example.com");
-/// // ... executar código
-/// currentUser.SetUser(Guid.NewGuid(), "user2@example.com");
-/// // ... executar mais código
-/// currentUser.SetAnonymous();
-/// // ... testar cenário não autenticado
-/// </code>
-/// </remarks>
-public class FakeCurrentUserService : ICurrentUserService
-{
-    private Guid? _userId;
-    private string? _email;
-    private bool _isAuthenticated;
-
-    /// <summary>
-    /// Cria um usuário fake não autenticado.
-    /// </summary>
-    public FakeCurrentUserService()
-    {
-        _isAuthenticated = false;
-    }
-
-    /// <summary>
-    /// Cria um usuário fake autenticado.
-    /// </summary>
-    public FakeCurrentUserService(Guid userId, string email)
-    {
-        _userId = userId;
-        _email = email;
-        _isAuthenticated = true;
-    }
-
-    public Guid? UserId => _userId;
-    public string? Email => _email;
-    public bool IsAuthenticated => _isAuthenticated;
-
-    /// <summary>
-    /// Define um usuário autenticado.
-    /// </summary>
-    public void SetUser(Guid userId, string email)
-    {
-        _userId = userId;
-        _email = email;
-        _isAuthenticated = true;
-    }
-
-    /// <summary>
-    /// Define o estado como não autenticado.
-    /// </summary>
-    public void SetAnonymous()
-    {
-        _userId = null;
-        _email = null;
-        _isAuthenticated = false;
-    }
-}
-
-/// <summary>
 /// Extensões para facilitar registro do CurrentUserService.
 /// </summary>
 public static class CurrentUserServiceExtensions
@@ -168,22 +93,6 @@ public static class CurrentUserServiceExtensions
         // AddHttpContextAccessor deve ser chamado no projeto da API
         // services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        return services;
-    }
-
-    /// <summary>
-    /// Registra um FakeCurrentUserService para testes.
-    /// </summary>
-    public static IServiceCollection AddFakeCurrentUserService(
-        this IServiceCollection services,
-        Guid? userId = null,
-        string? email = null)
-    {
-        var fakeService = userId.HasValue && email != null
-            ? new FakeCurrentUserService(userId.Value, email)
-            : new FakeCurrentUserService();
-
-        services.AddSingleton<ICurrentUserService>(fakeService);
         return services;
     }
 }
