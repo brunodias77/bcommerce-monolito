@@ -40,6 +40,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Core.Entities.Cart>
 
         builder.Property(c => c.Status)
             .HasColumnName("status")
+            .HasColumnType("shared.cart_status")
             .IsRequired();
 
         builder.Property(c => c.IpAddress)

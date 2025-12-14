@@ -29,14 +29,14 @@ public class CartRepository : ICartRepository
     public async Task<Core.Entities.Cart?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Carts
-            .Where(c => c.UserId == userId && c.Status == CartStatus.Active)
+            .Where(c => c.UserId == userId && c.Status == CartStatus.ACTIVE)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<Core.Entities.Cart?> GetActiveBySessionIdAsync(string sessionId, CancellationToken cancellationToken = default)
     {
         return await _context.Carts
-            .Where(c => c.SessionId == sessionId && c.Status == CartStatus.Active)
+            .Where(c => c.SessionId == sessionId && c.Status == CartStatus.ACTIVE)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -50,7 +50,7 @@ public class CartRepository : ICartRepository
     public async Task<bool> UserHasActiveCartAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Carts
-            .AnyAsync(c => c.UserId == userId && c.Status == CartStatus.Active, cancellationToken);
+            .AnyAsync(c => c.UserId == userId && c.Status == CartStatus.ACTIVE, cancellationToken);
     }
 
     public async Task AddAsync(Core.Entities.Cart cart, CancellationToken cancellationToken = default)
