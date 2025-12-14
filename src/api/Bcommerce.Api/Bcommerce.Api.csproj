@@ -17,6 +17,7 @@
         <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
         <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\..\building-blocks\BuildingBlocks.Presentation\BuildingBlocks.Presentation.csproj" />
     </ItemGroup>
 
 </Project>

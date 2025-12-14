@@ -1,204 +1,129 @@
+using BuildingBlocks.Domain.Repositories;
+using BuildingBlocks.Infrastructure.BackgroundJobs;
+using BuildingBlocks.Infrastructure.Caching;
 using BuildingBlocks.Infrastructure.Messaging.Integration;
+using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using BuildingBlocks.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bcommerce.Api.Configurations;
 
+/// <summary>
+/// Configuração de Dependency Injection para a camada Infrastructure.
+/// </summary>
+/// <remarks>
+/// Registra:
+/// - Serviços compartilhados (DateTimeProvider, CurrentUserService)
+/// - EF Core Interceptors
+/// - Event Bus
+/// - Cache Service
+/// - Background Jobs
+/// - DbContexts dos módulos
+/// </remarks>
 public static class InfraDependencyInjection
 {
-    public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // ===== SERVIÇOS DE INFRAESTRUTURA COMPARTILHADOS =====
-
-        // DateTime Provider - Facilita testes e garante consistência de timezone
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-
-        // HttpContextAccessor - Necessário para CurrentUserService
+        // ===============================================================
+        // Serviços Compartilhados
+        // ===============================================================
+        services.AddDateTimeProvider();
         services.AddHttpContextAccessor();
-
-        // Current User Service - Acessa informações do usuário autenticado
         services.AddCurrentUserService();
 
-        // Event Bus - Para publicação de Integration Events entre módulos
-        services.AddScoped<IEventBus, EventBus>();
-
-        // ===== CONFIGURAÇÃO DE INTERCEPTORS (EF CORE) =====
-        // Os interceptors são registrados por módulo, cada um com seu nome específico
-
-        // Auditable Entity Interceptor - Preenche CreatedAt e UpdatedAt automaticamente
+        // ===============================================================
+        // EF Core Interceptors (Singletons para reutilização)
+        // ===============================================================
         services.AddSingleton<AuditableEntityInterceptor>();
-
-        // Soft Delete Interceptor - Converte DELETE em UPDATE (soft delete)
         services.AddSingleton<SoftDeleteInterceptor>();
-
-        // Publish Domain Events Interceptor - Salva eventos no Outbox durante SaveChanges
-        // Cada módulo precisa de seu próprio interceptor com nome específico
-        services.AddSingleton(sp => new PublishDomainEventsInterceptor("users"));
-        services.AddSingleton(sp => new PublishDomainEventsInterceptor("catalog"));
-        services.AddSingleton(sp => new PublishDomainEventsInterceptor("orders"));
-        services.AddSingleton(sp => new PublishDomainEventsInterceptor("payments"));
-        services.AddSingleton(sp => new PublishDomainEventsInterceptor("coupons"));
-        services.AddSingleton(sp => new PublishDomainEventsInterceptor("cart"));
-
-        // Optimistic Concurrency Interceptor - Gerencia concorrência otimista
         services.AddSingleton<OptimisticConcurrencyInterceptor>();
+        
+        // PublishDomainEventsInterceptor é registrado por módulo com KeyedServices
+        // Cada módulo tem sua própria instância identificada pelo nome do módulo
+        services.AddKeyedSingleton("users", (sp, key) => new PublishDomainEventsInterceptor("users"));
+        services.AddKeyedSingleton("catalog", (sp, key) => new PublishDomainEventsInterceptor("catalog"));
+        services.AddKeyedSingleton("cart", (sp, key) => new PublishDomainEventsInterceptor("cart"));
+        services.AddKeyedSingleton("orders", (sp, key) => new PublishDomainEventsInterceptor("orders"));
+        services.AddKeyedSingleton("payments", (sp, key) => new PublishDomainEventsInterceptor("payments"));
+        services.AddKeyedSingleton("coupons", (sp, key) => new PublishDomainEventsInterceptor("coupons"));
 
-        // ===== CONFIGURAÇÃO DOS DbCONTEXTS E UNIT OF WORK DE CADA MÓDULO =====
+        // ===============================================================
+        // Event Bus
+        // ===============================================================
+        // InMemoryEventBus para desenvolvimento/testes
+        // Para produção, use OutboxEventBus + ProcessOutboxMessagesJob
+        services.AddScoped<IEventBus, InMemoryEventBus>();
 
-        var connectionString = configuration.GetConnectionString("Database")
-            ?? throw new InvalidOperationException("Connection string 'Database' not found.");
+        // ===============================================================
+        // Cache Service
+        // ===============================================================
+        services.AddMemoryCacheService(options =>
+        {
+            options.DefaultExpiration = TimeSpan.FromMinutes(5);
+            options.KeyPrefix = "bcommerce";
+        });
 
-        // ----- MÓDULO: USERS -----
+        // ===============================================================
+        // Background Jobs (descomente para habilitar)
+        // ===============================================================
+        // Outbox Processor - processa domain events do Outbox
+        // services.AddOutboxProcessor(options =>
+        // {
+        //     options.ProcessInterval = TimeSpan.FromSeconds(2);
+        //     options.BatchSize = 20;
+        //     options.MaxRetries = 3;
+        // });
+
+        // Session Cleanup - limpa sessões expiradas
+        // services.AddSessionCleanupJob(options =>
+        // {
+        //     options.CleanupInterval = TimeSpan.FromMinutes(5);
+        //     options.BatchSize = 100;
+        // });
+
+        // ===============================================================
+        // Database Connection String
+        // ===============================================================
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+        // ===============================================================
+        // DbContexts dos Módulos
+        // ===============================================================
+        // Cada módulo tem seu próprio DbContext com interceptors compartilhados
+        
+        // Users Module - TODO: Descomentar quando Users.Infrastructure estiver pronto
         // services.AddDbContext<UsersDbContext>((sp, options) =>
         // {
         //     options.UseNpgsql(connectionString, npgsqlOptions =>
         //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__ef_migrations_history", "users");
-        //         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        //         npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "users");
         //     });
-        //
-        //     // Adiciona os interceptors
         //     options.AddInterceptors(
         //         sp.GetRequiredService<AuditableEntityInterceptor>(),
         //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetServices<PublishDomainEventsInterceptor>()
-        //             .First(i => i.ModuleName == "users"),
+        //         sp.GetRequiredKeyedService<PublishDomainEventsInterceptor>("users"),
         //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
         //     );
-        //
-        //     // Configurações adicionais
-        //     options.EnableSensitiveDataLogging(configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"));
-        //     options.EnableDetailedErrors(configuration.GetValue<bool>("Logging:EnableDetailedErrors"));
         // });
-        //
-        // // Registra o UnitOfWork do módulo Users
         // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersDbContext>());
 
-        // ----- MÓDULO: CATALOG -----
-        // services.AddDbContext<CatalogDbContext>((sp, options) =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__ef_migrations_history", "catalog");
-        //         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        //     });
-        //
-        //     options.AddInterceptors(
-        //         sp.GetRequiredService<AuditableEntityInterceptor>(),
-        //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetServices<PublishDomainEventsInterceptor>()
-        //             .First(i => i.ModuleName == "catalog"),
-        //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
-        //     );
-        //
-        //     options.EnableSensitiveDataLogging(configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"));
-        //     options.EnableDetailedErrors(configuration.GetValue<bool>("Logging:EnableDetailedErrors"));
-        // });
-        //
-        // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CatalogDbContext>());
+        // Catalog Module - TODO: Implementar CatalogDbContext
+        // services.AddDbContext<CatalogDbContext>(...);
 
-        // ----- MÓDULO: ORDERS -----
-        // services.AddDbContext<OrdersDbContext>((sp, options) =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__ef_migrations_history", "orders");
-        //         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        //     });
-        //
-        //     options.AddInterceptors(
-        //         sp.GetRequiredService<AuditableEntityInterceptor>(),
-        //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetServices<PublishDomainEventsInterceptor>()
-        //             .First(i => i.ModuleName == "orders"),
-        //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
-        //     );
-        //
-        //     options.EnableSensitiveDataLogging(configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"));
-        //     options.EnableDetailedErrors(configuration.GetValue<bool>("Logging:EnableDetailedErrors"));
-        // });
-        //
-        // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrdersDbContext>());
+        // Orders Module - TODO: Implementar OrdersDbContext
+        // services.AddDbContext<OrdersDbContext>(...);
 
-        // ----- MÓDULO: PAYMENTS -----
-        // services.AddDbContext<PaymentsDbContext>((sp, options) =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__ef_migrations_history", "payments");
-        //         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        //     });
-        //
-        //     options.AddInterceptors(
-        //         sp.GetRequiredService<AuditableEntityInterceptor>(),
-        //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetServices<PublishDomainEventsInterceptor>()
-        //             .First(i => i.ModuleName == "payments"),
-        //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
-        //     );
-        //
-        //     options.EnableSensitiveDataLogging(configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"));
-        //     options.EnableDetailedErrors(configuration.GetValue<bool>("Logging:EnableDetailedErrors"));
-        // });
-        //
-        // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PaymentsDbContext>());
+        // Payments Module - TODO: Implementar PaymentsDbContext
+        // services.AddDbContext<PaymentsDbContext>(...);
 
-        // ----- MÓDULO: COUPONS -----
-        // services.AddDbContext<CouponsDbContext>((sp, options) =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__ef_migrations_history", "coupons");
-        //         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        //     });
-        //
-        //     options.AddInterceptors(
-        //         sp.GetRequiredService<AuditableEntityInterceptor>(),
-        //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetServices<PublishDomainEventsInterceptor>()
-        //             .First(i => i.ModuleName == "coupons"),
-        //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
-        //     );
-        //
-        //     options.EnableSensitiveDataLogging(configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"));
-        //     options.EnableDetailedErrors(configuration.GetValue<bool>("Logging:EnableDetailedErrors"));
-        // });
-        //
-        // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CouponsDbContext>());
+        // Cart Module - TODO: Implementar CartDbContext
+        // services.AddDbContext<CartDbContext>(...);
 
-        // ----- MÓDULO: CART -----
-        // services.AddDbContext<CartDbContext>((sp, options) =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__ef_migrations_history", "cart");
-        //         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        //     });
-        //
-        //     options.AddInterceptors(
-        //         sp.GetRequiredService<AuditableEntityInterceptor>(),
-        //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetServices<PublishDomainEventsInterceptor>()
-        //             .First(i => i.ModuleName == "cart"),
-        //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
-        //     );
-        //
-        //     options.EnableSensitiveDataLogging(configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"));
-        //     options.EnableDetailedErrors(configuration.GetValue<bool>("Logging:EnableDetailedErrors"));
-        // });
-        //
-        // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CartDbContext>());
+        // Coupons Module - TODO: Implementar CouponsDbContext
+        // services.AddDbContext<CouponsDbContext>(...);
 
-        // ===== OUTBOX PROCESSOR (BACKGROUND SERVICE) =====
-        // Processa eventos do Outbox (shared.domain_events) e publica para outros módulos
-        // services.AddHostedService<OutboxProcessor>();
-
-        // ===== REPOSITÓRIOS =====
-        // Cada módulo registra seus próprios repositórios
-        // Exemplo:
-        // services.AddScoped<IProductRepository, ProductRepository>();
-        // services.AddScoped<IOrderRepository, OrderRepository>();
-        // etc...
+        return services;
     }
 }

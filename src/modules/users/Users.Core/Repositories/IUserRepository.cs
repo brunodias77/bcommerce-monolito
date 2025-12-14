@@ -1,12 +1,13 @@
-using BuildingBlocks.Domain.Repositories;
 using Users.Core.Entities;
 
 namespace Users.Core.Repositories;
 
 /// <summary>
 /// Interface do repositório de usuários.
+/// Não herda de IRepository<User> porque User herda de IdentityUser<Guid> (ASP.NET Identity)
+/// em vez de Entity (BuildingBlocks.Domain).
 /// </summary>
-public interface IUserRepository : IRepository<User>
+public interface IUserRepository
 {
     /// <summary>
     /// Busca um usuário por ID.
