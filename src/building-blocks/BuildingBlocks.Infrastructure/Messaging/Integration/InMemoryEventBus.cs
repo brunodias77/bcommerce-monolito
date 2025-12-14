@@ -20,17 +20,20 @@ namespace BuildingBlocks.Infrastructure.Messaging.Integration;
 /// <code>
 /// services.AddSingleton&lt;IEventBus, InMemoryEventBus&gt;();
 /// 
-/// // Registrar handlers
-/// services.AddScoped&lt;UserCreatedIntegrationEventHandler&gt;();
+/// // Registrar handlers estaticamente (recomendado para módulos)
+/// InMemoryEventBus.RegisterHandler&lt;UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler&gt;();
 /// 
-/// // Configurar assinaturas
+/// // Ou via instância
 /// var eventBus = app.Services.GetRequiredService&lt;IEventBus&gt;();
 /// eventBus.Subscribe&lt;UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler&gt;();
 /// </code>
 /// </remarks>
 public class InMemoryEventBus : IEventBus
 {
-    private readonly Dictionary<Type, List<Type>> _handlers = new();
+    // Registro estático de handlers - permite que módulos registrem handlers durante AddModule()
+    private static readonly Dictionary<Type, List<Type>> _staticHandlers = new();
+    private static readonly object _lock = new();
+
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<InMemoryEventBus>? _logger;
 
@@ -40,6 +43,46 @@ public class InMemoryEventBus : IEventBus
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Registra um handler estaticamente.
+    /// Útil para registrar handlers durante a configuração de DI dos módulos.
+    /// </summary>
+    public static void RegisterHandler<TEvent, THandler>()
+        where TEvent : IIntegrationEvent
+        where THandler : IIntegrationEventHandler<TEvent>
+    {
+        var eventType = typeof(TEvent);
+        var handlerType = typeof(THandler);
+
+        lock (_lock)
+        {
+            if (!_staticHandlers.ContainsKey(eventType))
+            {
+                _staticHandlers[eventType] = new List<Type>();
+            }
+
+            if (!_staticHandlers[eventType].Contains(handlerType))
+            {
+                _staticHandlers[eventType].Add(handlerType);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Obtém os handlers registrados para um tipo de evento.
+    /// </summary>
+    public static IReadOnlyCollection<Type> GetHandlersForEvent(Type eventType)
+    {
+        lock (_lock)
+        {
+            if (_staticHandlers.TryGetValue(eventType, out var handlers))
+            {
+                return handlers.AsReadOnly();
+            }
+            return Array.Empty<Type>();
+        }
     }
 
     public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
@@ -52,7 +95,13 @@ public class InMemoryEventBus : IEventBus
             eventType.Name,
             @event.EventId);
 
-        if (!_handlers.TryGetValue(eventType, out var handlerTypes))
+        List<Type>? handlerTypes;
+        lock (_lock)
+        {
+            _staticHandlers.TryGetValue(eventType, out handlerTypes);
+        }
+
+        if (handlerTypes == null || handlerTypes.Count == 0)
         {
             _logger?.LogWarning("No handlers registered for event {EventType}", eventType.Name);
             return;
@@ -126,23 +175,13 @@ public class InMemoryEventBus : IEventBus
         where TEvent : IIntegrationEvent
         where THandler : IIntegrationEventHandler<TEvent>
     {
-        var eventType = typeof(TEvent);
-        var handlerType = typeof(THandler);
+        // Delega para o registro estático
+        RegisterHandler<TEvent, THandler>();
 
-        if (!_handlers.ContainsKey(eventType))
-        {
-            _handlers[eventType] = new List<Type>();
-        }
-
-        if (!_handlers[eventType].Contains(handlerType))
-        {
-            _handlers[eventType].Add(handlerType);
-
-            _logger?.LogInformation(
-                "Subscribed {HandlerType} to {EventType}",
-                handlerType.Name,
-                eventType.Name);
-        }
+        _logger?.LogInformation(
+            "Subscribed {HandlerType} to {EventType}",
+            typeof(THandler).Name,
+            typeof(TEvent).Name);
     }
 
     public void Unsubscribe<TEvent, THandler>()
@@ -152,14 +191,18 @@ public class InMemoryEventBus : IEventBus
         var eventType = typeof(TEvent);
         var handlerType = typeof(THandler);
 
-        if (_handlers.TryGetValue(eventType, out var handlers))
+        lock (_lock)
         {
-            handlers.Remove(handlerType);
+            if (_staticHandlers.TryGetValue(eventType, out var handlers))
+            {
+                handlers.Remove(handlerType);
 
-            _logger?.LogInformation(
-                "Unsubscribed {HandlerType} from {EventType}",
-                handlerType.Name,
-                eventType.Name);
+                _logger?.LogInformation(
+                    "Unsubscribed {HandlerType} from {EventType}",
+                    handlerType.Name,
+                    eventType.Name);
+            }
         }
     }
 }
+

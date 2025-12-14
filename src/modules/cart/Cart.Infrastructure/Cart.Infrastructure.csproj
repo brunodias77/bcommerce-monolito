@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Catalog.Infrastructure</RootNamespace>
+        <RootNamespace>Cart.Infrastructure</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,7 +14,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\building-blocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
-        <ProjectReference Include="..\Catalog.Core\Catalog.Core.csproj" />
+        <ProjectReference Include="..\Cart.Application\Cart.Application.csproj" />
+        <ProjectReference Include="..\Cart.Core\Cart.Core.csproj" />
     </ItemGroup>
 
 </Project>

@@ -5,7 +5,10 @@ using BuildingBlocks.Infrastructure.Messaging.Integration;
 using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using BuildingBlocks.Infrastructure.Services;
+using Cart.Infrastructure;
+using Catalog.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Users.Infrastructure;
 
 namespace Bcommerce.Api.Configurations;
 
@@ -38,7 +41,7 @@ public static class InfraDependencyInjection
         services.AddSingleton<AuditableEntityInterceptor>();
         services.AddSingleton<SoftDeleteInterceptor>();
         services.AddSingleton<OptimisticConcurrencyInterceptor>();
-        
+
         // PublishDomainEventsInterceptor é registrado por módulo com KeyedServices
         // Cada módulo tem sua própria instância identificada pelo nome do módulo
         services.AddKeyedSingleton("users", (sp, key) => new PublishDomainEventsInterceptor("users"));
@@ -68,12 +71,13 @@ public static class InfraDependencyInjection
         // Background Jobs (descomente para habilitar)
         // ===============================================================
         // Outbox Processor - processa domain events do Outbox
-        // services.AddOutboxProcessor(options =>
-        // {
-        //     options.ProcessInterval = TimeSpan.FromSeconds(2);
-        //     options.BatchSize = 20;
-        //     options.MaxRetries = 3;
-        // });
+        // Usa CatalogDbContext pois ele tem a tabela OutboxMessage mapeada
+        services.AddOutboxProcessor<Catalog.Infrastructure.Persistence.CatalogDbContext>(options =>
+        {
+            options.ProcessInterval = TimeSpan.FromSeconds(2);
+            options.BatchSize = 20;
+            options.MaxRetries = 3;
+        });
 
         // Session Cleanup - limpa sessões expiradas
         // services.AddSessionCleanupJob(options =>
@@ -92,37 +96,24 @@ public static class InfraDependencyInjection
         // DbContexts dos Módulos
         // ===============================================================
         // Cada módulo tem seu próprio DbContext com interceptors compartilhados
-        
-        // Users Module - TODO: Descomentar quando Users.Infrastructure estiver pronto
-        // services.AddDbContext<UsersDbContext>((sp, options) =>
-        // {
-        //     options.UseNpgsql(connectionString, npgsqlOptions =>
-        //     {
-        //         npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "users");
-        //     });
-        //     options.AddInterceptors(
-        //         sp.GetRequiredService<AuditableEntityInterceptor>(),
-        //         sp.GetRequiredService<SoftDeleteInterceptor>(),
-        //         sp.GetRequiredKeyedService<PublishDomainEventsInterceptor>("users"),
-        //         sp.GetRequiredService<OptimisticConcurrencyInterceptor>()
-        //     );
-        // });
-        // services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersDbContext>());
 
-        // Catalog Module - TODO: Implementar CatalogDbContext
-        // services.AddDbContext<CatalogDbContext>(...);
+        // Users Module
+        services.AddUsersModule(configuration);
+
+        // Catalog Module
+        services.AddCatalogModule(configuration);
+
+        // Cart Module
+        services.AddCartModule(configuration);
 
         // Orders Module - TODO: Implementar OrdersDbContext
-        // services.AddDbContext<OrdersDbContext>(...);
+        // services.AddOrdersModule(configuration);
 
         // Payments Module - TODO: Implementar PaymentsDbContext
-        // services.AddDbContext<PaymentsDbContext>(...);
-
-        // Cart Module - TODO: Implementar CartDbContext
-        // services.AddDbContext<CartDbContext>(...);
+        // services.AddPaymentsModule(configuration);
 
         // Coupons Module - TODO: Implementar CouponsDbContext
-        // services.AddDbContext<CouponsDbContext>(...);
+        // services.AddCouponsModule(configuration);
 
         return services;
     }
