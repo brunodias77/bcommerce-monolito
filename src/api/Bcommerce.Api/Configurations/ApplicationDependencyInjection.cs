@@ -1,48 +1,57 @@
 using BuildingBlocks.Application.Behaviors;
+using MediatR;
 
 namespace Bcommerce.Api.Configurations;
 
+/// <summary>
+/// Configuração de Dependency Injection para a camada Application.
+/// </summary>
+/// <remarks>
+/// Registra:
+/// - MediatR com handlers de todos os assemblies
+/// - Pipeline behaviors na ordem correta: Logging → Validation → Transaction
+/// - FluentValidation validators
+/// </remarks>
 public static class ApplicationDependencyInjection
 {
-    public static void AddApplication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        // Configuração do MediatR
-        // Registra todos os handlers (Commands, Queries, Domain Events) de todos os módulos
-        services.AddMediatR(config =>
+        // ===============================================================
+        // MediatR
+        // ===============================================================
+        // Registra handlers de todos os assemblies de módulos
+        // Por enquanto, apenas os building blocks estão disponíveis
+        services.AddMediatR(cfg =>
         {
-            // Registra handlers de todos os assemblies dos módulos
-            // config.RegisterServicesFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
-            // config.RegisterServicesFromAssembly(typeof(Catalog.Application.AssemblyReference).Assembly);
-            // config.RegisterServicesFromAssembly(typeof(Orders.Application.AssemblyReference).Assembly);
-            // config.RegisterServicesFromAssembly(typeof(Payments.Application.AssemblyReference).Assembly);
-            // config.RegisterServicesFromAssembly(typeof(Coupons.Application.AssemblyReference).Assembly);
-            // config.RegisterServicesFromAssembly(typeof(Cart.Application.AssemblyReference).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
+            
+            // Adicione aqui os assemblies dos módulos quando implementados:
+            // cfg.RegisterServicesFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
+            // cfg.RegisterServicesFromAssembly(typeof(Catalog.Application.AssemblyReference).Assembly);
+            // cfg.RegisterServicesFromAssembly(typeof(Orders.Application.AssemblyReference).Assembly);
         });
 
-        // Configuração dos Behaviors do MediatR (Pipeline)
-        // A ORDEM importa! Os behaviors são executados na ordem de registro
-
-        // 1. Logging Behavior - Loga todas as requisições (início, fim, duração, erros)
+        // ===============================================================
+        // MediatR Pipeline Behaviors (ordem importa!)
+        // ===============================================================
+        // 1. Logging: Mais externo - captura tudo incluindo exceções
         services.AddLoggingBehavior();
 
-        // 2. Performance Logging Behavior - Alerta se requisição demorar mais que o threshold (500ms default)
-        // Descomentar apenas se necessário monitorar performance
-        // services.AddPerformanceLoggingBehavior(slowRequestThresholdMs: 500);
+        // 2. Validation: Antes da transação - evita abrir transação para request inválido
+        services.AddValidationBehavior();
 
-        // 3. Validation Behavior - Valida comandos/queries usando FluentValidation
-        // Será implementado quando adicionar FluentValidation
-        // services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
-        // 4. Transaction Behavior - Gerencia transações automaticamente para Commands
-        // IMPORTANTE: Cada módulo terá seu próprio UnitOfWork registrado
-        // Este behavior resolve o IUnitOfWork apropriado para cada command
+        // 3. Transaction: Mais interno - envolve apenas o handler
         services.AddTransactionBehavior();
 
-        // Alternativa para cenários multi-módulo (use com cautela, geralmente evite)
-        // services.AddMultiModuleTransactionBehavior();
+        // Opcional: Performance logging para detectar requests lentos
+        // services.AddPerformanceLoggingBehavior(slowRequestThresholdMs: 500);
 
-        // Detailed Logging Behavior - Apenas para desenvolvimento/debug (verbose)
-        // NÃO use em produção (impacta performance e loga dados sensíveis)
-        // services.AddDetailedLoggingBehavior();
+        // ===============================================================
+        // FluentValidation
+        // ===============================================================
+        // Registra validators dos módulos quando implementados:
+        // services.AddValidatorsFromAssembly(typeof(Users.Application.AssemblyReference).Assembly);
+
+        return services;
     }
 }

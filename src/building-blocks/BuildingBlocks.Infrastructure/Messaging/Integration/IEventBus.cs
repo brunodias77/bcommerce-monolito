@@ -3,70 +3,27 @@ using BuildingBlocks.Domain.Events;
 namespace BuildingBlocks.Infrastructure.Messaging.Integration;
 
 /// <summary>
-/// Interface para publicação de Integration Events entre módulos.
+/// Interface para o Event Bus que publica Integration Events entre módulos.
 /// </summary>
 /// <remarks>
-/// Integration Events vs Domain Events:
+/// No monolito modular, Integration Events são usados para comunicação entre módulos:
 /// 
-/// Domain Events (IDomainEvent):
-/// - Internos ao módulo
-/// - Processados sincronamente via MediatR
-/// - Exemplo: ProductCreatedEvent dentro de Catalog
+/// - Domain Events: Internos ao módulo, processados de forma síncrona via MediatR
+/// - Integration Events: Entre módulos, processados de forma assíncrona via Outbox/Event Bus
 /// 
-/// Integration Events (IIntegrationEvent):
-/// - Entre módulos diferentes
-/// - Salvos no Outbox (shared.domain_events)
-/// - Processados assincronamente
-/// - Exemplo: PaymentCapturedIntegrationEvent (Payments → Orders)
-/// 
-/// Fluxo típico:
-/// 1. Handler de Domain Event converte para Integration Event
-/// 2. Publica via IEventBus
-/// 3. Salvo no Outbox (mesma transação)
-/// 4. OutboxProcessor processa
-/// 5. Handlers de outros módulos recebem
-/// 
-/// Exemplo de uso:
+/// Exemplos de uso:
 /// <code>
-/// // No módulo Payments
-/// internal class PaymentCapturedEventHandler 
-///     : INotificationHandler&lt;PaymentCapturedEvent&gt;
-/// {
-///     private readonly IEventBus _eventBus;
-///     
-///     public async Task Handle(PaymentCapturedEvent domainEvent, CancellationToken ct)
-///     {
-///         // Converter para Integration Event
-///         var integrationEvent = new PaymentCapturedIntegrationEvent(
-///             domainEvent.PaymentId,
-///             domainEvent.OrderId,
-///             domainEvent.Amount,
-///             DateTime.UtcNow
-///         );
-///         
-///         // Publicar (salva no Outbox)
-///         await _eventBus.PublishAsync(integrationEvent, ct);
-///     }
-/// }
+/// // Publicar um evento
+/// await eventBus.PublishAsync(new UserCreatedIntegrationEvent(userId, email));
 /// 
-/// // No módulo Orders
-/// internal class PaymentCapturedIntegrationEventHandler
-///     : INotificationHandler&lt;PaymentCapturedIntegrationEvent&gt;
-/// {
-///     public async Task Handle(PaymentCapturedIntegrationEvent @event, CancellationToken ct)
-///     {
-///         // Atualizar pedido
-///         var order = await _repository.GetByIdAsync(@event.OrderId);
-///         order.MarkAsPaid(@event.CapturedAt);
-///         await _unitOfWork.SaveChangesAsync(ct);
-///     }
-/// }
+/// // Assinar eventos (configurado no Startup)
+/// eventBus.Subscribe&lt;UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler&gt;();
 /// </code>
 /// </remarks>
 public interface IEventBus
 {
     /// <summary>
-    /// Publica um Integration Event no Outbox.
+    /// Publica um Integration Event de forma assíncrona.
     /// </summary>
     /// <typeparam name="TEvent">Tipo do evento</typeparam>
     /// <param name="event">Evento a ser publicado</param>
@@ -75,9 +32,42 @@ public interface IEventBus
         where TEvent : IIntegrationEvent;
 
     /// <summary>
-    /// Publica múltiplos Integration Events no Outbox.
+    /// Publica múltiplos Integration Events de forma assíncrona.
     /// </summary>
-    Task PublishAsync(
-        IEnumerable<IIntegrationEvent> events,
-        CancellationToken cancellationToken = default);
+    /// <param name="events">Eventos a serem publicados</param>
+    /// <param name="cancellationToken">Token de cancelamento</param>
+    Task PublishManyAsync(IEnumerable<IIntegrationEvent> events, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registra um handler para um tipo de evento.
+    /// </summary>
+    /// <typeparam name="TEvent">Tipo do evento</typeparam>
+    /// <typeparam name="THandler">Tipo do handler</typeparam>
+    void Subscribe<TEvent, THandler>()
+        where TEvent : IIntegrationEvent
+        where THandler : IIntegrationEventHandler<TEvent>;
+
+    /// <summary>
+    /// Remove a assinatura de um handler para um tipo de evento.
+    /// </summary>
+    /// <typeparam name="TEvent">Tipo do evento</typeparam>
+    /// <typeparam name="THandler">Tipo do handler</typeparam>
+    void Unsubscribe<TEvent, THandler>()
+        where TEvent : IIntegrationEvent
+        where THandler : IIntegrationEventHandler<TEvent>;
+}
+
+/// <summary>
+/// Interface para handlers de Integration Events.
+/// </summary>
+/// <typeparam name="TEvent">Tipo do evento</typeparam>
+public interface IIntegrationEventHandler<in TEvent>
+    where TEvent : IIntegrationEvent
+{
+    /// <summary>
+    /// Processa o evento.
+    /// </summary>
+    /// <param name="event">Evento a ser processado</param>
+    /// <param name="cancellationToken">Token de cancelamento</param>
+    Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
 }

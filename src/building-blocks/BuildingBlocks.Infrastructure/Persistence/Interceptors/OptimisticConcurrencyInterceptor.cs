@@ -1,142 +1,149 @@
-using BuildingBlocks.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
 /// <summary>
-/// Interceptor que incrementa automaticamente a versão para Optimistic Concurrency Control.
+/// Interceptor para tratamento de erros de concorrência otimista.
 /// </summary>
 /// <remarks>
-/// Este interceptor funciona EM CONJUNTO com o trigger do PostgreSQL:
+/// Este interceptor:
+/// - Intercepta DbUpdateConcurrencyException
+/// - Loga informações detalhadas sobre o conflito
+/// - Pode ser configurado para retry automático (opcional)
 /// 
-/// PostgreSQL Trigger (seu schema):
-/// - CREATE TRIGGER trg_xxx_version BEFORE UPDATE
-/// - EXECUTE FUNCTION shared.trigger_increment_version()
+/// No PostgreSQL, a concorrência otimista é implementada via:
+/// - Coluna 'version' com trigger shared.trigger_increment_version()
+/// - EF Core detecta conflitos comparando a versão
 /// 
-/// Este Interceptor (EF Core):
-/// - Incrementa version ANTES de salvar
-/// - EF Core usa IsConcurrencyToken() para detectar conflitos
-/// - Se version no banco ≠ version esperada → DbUpdateConcurrencyException
-/// 
-/// Fluxo de Concorrência Otimista:
-/// 
-/// Thread A                          Thread B
-/// ────────                          ────────
-/// 1. Lê Order (version=1)           1. Lê Order (version=1)
-/// 2. Modifica Order                 2. Modifica Order
-/// 3. SaveChanges()                  3. SaveChanges()
-///    → version=2 ✓                     → ERRO! (version esperada=1, real=2)
-///    
-/// Vantagens:
-/// - Sem locks pessimistas
-/// - Alto throughput
-/// - Detecta conflitos automaticamente
-/// 
-/// Exemplo de tratamento:
+/// Configuração:
 /// <code>
-/// try
-/// {
-///     await dbContext.SaveChangesAsync();
-/// }
-/// catch (DbUpdateConcurrencyException ex)
-/// {
-///     // Recarregar entidade e tentar novamente
-///     await entry.ReloadAsync();
-///     // Reaplicar mudanças ou notificar usuário
-/// }
+/// options.AddInterceptors(new OptimisticConcurrencyInterceptor(logger));
 /// </code>
 /// </remarks>
-public sealed class OptimisticConcurrencyInterceptor : SaveChangesInterceptor
+public class OptimisticConcurrencyInterceptor : SaveChangesInterceptor
 {
-    public override InterceptionResult<int> SavingChanges(
-        DbContextEventData eventData,
-        InterceptionResult<int> result)
+    private readonly ILogger<OptimisticConcurrencyInterceptor>? _logger;
+    private readonly int _maxRetries;
+
+    public OptimisticConcurrencyInterceptor(
+        ILogger<OptimisticConcurrencyInterceptor>? logger = null,
+        int maxRetries = 0)
     {
-        IncrementVersion(eventData.Context);
-        return base.SavingChanges(eventData, result);
+        _logger = logger;
+        _maxRetries = maxRetries;
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        IncrementVersion(eventData.Context);
-        return base.SavingChangesAsync(eventData, result, cancellationToken);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private static void IncrementVersion(DbContext? context)
+    public override void SaveChangesFailed(
+        DbContextErrorEventData eventData)
+    {
+        if (eventData.Exception is DbUpdateConcurrencyException concurrencyException)
+        {
+            HandleConcurrencyException(eventData.Context, concurrencyException);
+        }
+
+        base.SaveChangesFailed(eventData);
+    }
+
+    public override Task SaveChangesFailedAsync(
+        DbContextErrorEventData eventData,
+        CancellationToken cancellationToken = default)
+    {
+        if (eventData.Exception is DbUpdateConcurrencyException concurrencyException)
+        {
+            HandleConcurrencyException(eventData.Context, concurrencyException);
+        }
+
+        return base.SaveChangesFailedAsync(eventData, cancellationToken);
+    }
+
+    private void HandleConcurrencyException(
+        DbContext? context,
+        DbUpdateConcurrencyException exception)
     {
         if (context is null)
             return;
 
-        foreach (var entry in context.ChangeTracker.Entries<AggregateRoot>())
+        var entries = exception.Entries;
+
+        foreach (var entry in entries)
         {
-            if (entry.State == EntityState.Modified)
+            var entityType = entry.Entity.GetType().Name;
+            var entityId = entry.Property("Id").CurrentValue;
+
+            _logger?.LogWarning(
+                "Concurrency conflict detected for {EntityType} with Id {EntityId}. " +
+                "The entity was modified by another user or process.",
+                entityType,
+                entityId);
+
+            // Log das propriedades em conflito
+            var proposedValues = entry.CurrentValues;
+            var databaseValues = entry.GetDatabaseValues();
+
+            if (databaseValues != null)
             {
-                // Incrementa version
-                var currentVersion = entry.Property("Version").CurrentValue as int? ?? 1;
-                entry.Property("Version").CurrentValue = currentVersion + 1;
+                foreach (var property in proposedValues.Properties)
+                {
+                    var proposedValue = proposedValues[property];
+                    var databaseValue = databaseValues[property];
+
+                    if (!Equals(proposedValue, databaseValue))
+                    {
+                        _logger?.LogDebug(
+                            "Property {PropertyName}: Proposed={ProposedValue}, Database={DatabaseValue}",
+                            property.Name,
+                            proposedValue,
+                            databaseValue);
+                    }
+                }
             }
         }
     }
 }
 
 /// <summary>
-/// Extensões para trabalhar com Optimistic Concurrency.
+/// Interface para entidades com versionamento (concorrência otimista).
+/// </summary>
+public interface IVersionedEntity
+{
+    /// <summary>
+    /// Versão da entidade para controle de concorrência.
+    /// Incrementada automaticamente via trigger no PostgreSQL.
+    /// </summary>
+    int Version { get; }
+}
+
+/// <summary>
+/// Extensões para configurar concorrência otimista no EF Core.
 /// </summary>
 public static class OptimisticConcurrencyExtensions
 {
     /// <summary>
-    /// Recarrega a entidade do banco de dados (útil após concurrency exception).
+    /// Configura a propriedade Version como concurrency token.
     /// </summary>
-    public static async Task ReloadAsync<TEntity>(
-        this DbContext context,
-        TEntity entity,
-        CancellationToken cancellationToken = default)
-        where TEntity : AggregateRoot
+    /// <remarks>
+    /// Uso no EntityConfiguration:
+    /// <code>
+    /// builder.ConfigureOptimisticConcurrency();
+    /// </code>
+    /// </remarks>
+    public static void ConfigureOptimisticConcurrency<TEntity>(
+        this Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<TEntity> builder)
+        where TEntity : class, IVersionedEntity
     {
-        var entry = context.Entry(entity);
-        await entry.ReloadAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Tenta salvar com retry automático em caso de conflito de concorrência.
-    /// </summary>
-    public static async Task<bool> SaveChangesWithRetryAsync(
-        this DbContext context,
-        int maxRetries = 3,
-        CancellationToken cancellationToken = default)
-    {
-        var retries = 0;
-
-        while (retries < maxRetries)
-        {
-            try
-            {
-                await context.SaveChangesAsync(cancellationToken);
-                return true;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                retries++;
-
-                if (retries >= maxRetries)
-                    throw;
-
-                // Recarrega todas as entidades modificadas
-                foreach (var entry in context.ChangeTracker.Entries()
-                    .Where(e => e.State == EntityState.Modified))
-                {
-                    await entry.ReloadAsync(cancellationToken);
-                }
-
-                // Aguarda um pouco antes de tentar novamente
-                await Task.Delay(TimeSpan.FromMilliseconds(100 * retries), cancellationToken);
-            }
-        }
-
-        return false;
+        builder.Property(e => e.Version)
+            .HasColumnName("version")
+            .IsConcurrencyToken()
+            .HasDefaultValue(1);
     }
 }
