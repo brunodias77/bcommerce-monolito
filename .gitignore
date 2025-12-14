@@ -1,0 +1,39 @@
+.DS_Store
+Thumbs.db
+
+# IDE
+.vs/
+.idea/
+.vscode/
+*.sln.docstates
+*.sln.iml
+
+# User-specific
+*.user
+*.rsuser
+*.suo
+*.userosscache
+
+# Build outputs
+bin/
+obj/
+out/
+artifacts/
+TestResults/
+Debug/
+Release/
+x64/
+x86/
+publish/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Logs and caches
+*.log
+*.cache
+*.tmp
+*.bak
+
