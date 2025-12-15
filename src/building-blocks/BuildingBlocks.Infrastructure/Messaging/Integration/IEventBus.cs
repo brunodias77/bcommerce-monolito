@@ -3,22 +3,23 @@ using BuildingBlocks.Domain.Events;
 namespace BuildingBlocks.Infrastructure.Messaging.Integration;
 
 /// <summary>
-/// Interface para o Event Bus que publica Integration Events entre módulos.
+/// Interface para o barramento de eventos de integração (Event Bus).
+/// Responsável pela comunicação assíncrona entre módulos (Bounded Contexts) diferentes.
 /// </summary>
 /// <remarks>
-/// No monolito modular, Integration Events são usados para comunicação entre módulos:
+/// <strong>Domain Events vs Integration Events:</strong>
+/// 1. <strong>Domain Events (MediatR):</strong>
+///    - Ocorrem DENTRO de um mesmo módulo/transação.
+///    - Síncronos (geralmente).
+///    - Ex: 'OrderCreatedDomainEvent' dispara 'DecreaseStockHandler' (no mesmo DbContext).
 /// 
-/// - Domain Events: Internos ao módulo, processados de forma síncrona via MediatR
-/// - Integration Events: Entre módulos, processados de forma assíncrona via Outbox/Event Bus
+/// 2. <strong>Integration Events (IEventBus):</strong>
+///    - Ocorrem ENTRE módulos diferentes.
+///    - Assíncronos (Eventual Consistency).
+///    - Ex: 'OrderPaymentConfirmed' (Pagamentos) dispara 'ShipOrder' (Entregas).
 /// 
-/// Exemplos de uso:
-/// <code>
-/// // Publicar um evento
-/// await eventBus.PublishAsync(new UserCreatedIntegrationEvent(userId, email));
-/// 
-/// // Assinar eventos (configurado no Startup)
-/// eventBus.Subscribe&lt;UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler&gt;();
-/// </code>
+/// <strong>Pub/Sub Pattern:</strong>
+/// Permite desacoplamento total. O publicador não conhece os assinantes.
 /// </remarks>
 public interface IEventBus
 {
@@ -32,9 +33,13 @@ public interface IEventBus
         where TEvent : IIntegrationEvent;
 
     /// <summary>
-    /// Publica múltiplos Integration Events de forma assíncrona.
+    /// Publica múltiplos Integration Events em lote.
     /// </summary>
-    /// <param name="events">Eventos a serem publicados</param>
+    /// <remarks>
+    /// Útil para performance ao processar grandes volumes de eventos.
+    /// Em implementações com Outbox, isso permite salvar múltiplos eventos em uma única operação de banco.
+    /// </remarks>
+    /// <param name="events">Lista de eventos</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
     Task PublishManyAsync(IEnumerable<IIntegrationEvent> events, CancellationToken cancellationToken = default);
 

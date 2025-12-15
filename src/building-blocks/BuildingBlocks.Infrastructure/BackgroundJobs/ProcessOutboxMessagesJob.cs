@@ -11,10 +11,21 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// Background Service que processa mensagens do Outbox.
 /// </summary>
 /// <remarks>
-/// Este job:
-/// 1. Busca mensagens não processadas do Outbox (shared.domain_events)
-/// 2. Deserializa e publica para os handlers registrados
-/// 3. Marca como processadas ou incrementa retry_count em caso de erro
+/// <strong>O Padrão Outbox:</strong>
+/// O Outbox Pattern é utilizado para garantir consistência eventual em sistemas distribuídos.
+/// Ele resolve o problema de atomicidade entre salvar dados no banco (ex: Criar Pedido) e publicar eventos (ex: PedidoCriado).
+/// 
+/// <strong>Como funciona:</strong>
+/// 1. Durante a transação de negócio, o evento não é publicado diretamente. Ele é salvo na tabela 'outbox_messages'.
+/// 2. Se a transação falhar (rollback), o evento também é descartado (atomicidade garantida).
+/// 3. Se a transação for commitada, o evento é persistido.
+/// 4. <strong>Este Job</strong> roda em segundo plano, lê os eventos da tabela e os publica.
+/// 
+/// <strong>Fluxo deste Job:</strong>
+/// 1. Busca mensagens pendentes (ProcessedAt == null) em lotes.
+/// 2. Tenta processar cada mensagem (deserializa e executa handlers).
+/// 3. Se sucesso: Marca como processada (ProcessedAt = Now).
+/// 4. Se falha: Incrementa contador de retry e registra o erro.
 /// 
 /// Configuração:
 /// <code>
@@ -22,9 +33,9 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// </code>
 /// 
 /// Configurações recomendadas:
-/// - Intervalo de processamento: 1-5 segundos
-/// - Batch size: 10-100 mensagens
-/// - Max retries: 3-5
+/// - Intervalo de processamento: 1-5 segundos (balancear latência vs carga)
+/// - Batch size: 10-100 mensagens (evitar lock excessivo)
+/// - Max retries: 3-5 (após isso, intervenção manual pode ser necessária)
 /// </remarks>
 public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
     where TDbContext : DbContext
@@ -165,6 +176,9 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
                 continue;
             }
 
+            // O handler é resolvido via injeção de dependência.
+            // Note que usamos Reflection para invocar 'HandleAsync' porque o tipo do evento só é conhecido em tempo de execução.
+            // Isso permite que o OutboxProcessor seja genérico e funcione para qualquer tipo de evento.
             var handleMethod = handlerType.GetMethod("HandleAsync");
             if (handleMethod != null)
             {

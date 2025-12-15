@@ -7,23 +7,21 @@ using Newtonsoft.Json;
 namespace BuildingBlocks.Infrastructure.Messaging.Integration;
 
 /// <summary>
-/// Implementação do Event Bus baseada no Outbox Pattern.
+/// Event Bus transacional usando o padrão Outbox.
 /// </summary>
 /// <remarks>
-/// Esta implementação:
-/// 1. Salva eventos na tabela shared.domain_events (Outbox)
-/// 2. Eventos são processados posteriormente pelo ProcessOutboxMessagesJob
+/// <strong>Garantia de Atomicidade:</strong>
+/// Ao invés de enviar o evento imediatamente para um Broker (o que poderia falhar após o commit do banco),
+/// este Bus salva o evento na tabela `outbox_messages` dentro da MESMA transação do negócio.
 /// 
-/// Vantagens:
-/// - Garantia de entrega (at-least-once)
-/// - Atomicidade com a transação do banco
-/// - Resiliência a falhas
+/// <strong>Fluxo:</strong>
+/// 1. Negócio chama `PublishAsync`.
+/// 2. Evento é serializado e adicionado ao DbContext (State = Added).
+/// 3. Negócio chama `SaveChangesAsync`.
+/// 4. O banco grava (Atomic Commit) as alterações de negócio E o evento no Outbox.
 /// 
-/// Configuração:
-/// <code>
-/// services.AddScoped&lt;IEventBus, OutboxEventBus&gt;();
-/// services.AddHostedService&lt;ProcessOutboxMessagesJob&gt;();
-/// </code>
+/// <strong>Processamento Posterior:</strong>
+/// Um Job em background (ProcessOutboxMessagesJob) lê a tabela e despacha o evento.
 /// </remarks>
 public class OutboxEventBus : IEventBus
 {
@@ -188,6 +186,10 @@ public class OutboxEventBus : IEventBus
 
     private static string SerializeEvent(IIntegrationEvent @event)
     {
+        // Importante: TypeNameHandling.All é necessário para que, ao deserializar,
+        // o Json.NET saiba exatamente qual classe instanciar.
+        // Isso é crucial pois o campo 'EventType' na tabela pode não ter o assembly qualified name completo
+        // dependendo de como foi gravado ou migrado.
         return JsonConvert.SerializeObject(@event, new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.All,

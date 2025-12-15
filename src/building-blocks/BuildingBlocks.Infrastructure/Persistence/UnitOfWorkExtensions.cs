@@ -4,11 +4,16 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace BuildingBlocks.Infrastructure.Persistence;
 
 /// <summary>
-/// Extensões para trabalhar com UnitOfWork.
+/// Métodos de extensão para enriquecer <see cref="DbContext"/> com capacidades de UnitOfWork e Resiliência.
 /// </summary>
 /// <remarks>
-/// Estas extensões são úteis para DbContexts que não podem herdar de UnitOfWork,
-/// como o UsersDbContext que herda de IdentityDbContext.
+/// <strong>Cenário de Uso:</strong>
+/// Essencial para <see cref="DbContext"/>s que não podem herdar de <see cref="UnitOfWork"/> (ex: herança múltipla não permitida em C#, e classe já herda de <see cref="Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext"/>).
+/// 
+/// <strong>Funcionalidades:</strong>
+/// - Gestão de Transações (<see cref="ExecuteInTransactionAsync{TResult}"/>).
+/// - Resiliência e Retries (<see cref="ExecuteWithRetryAsync{TResult}"/>).
+/// - Manipulação segura do ChangeTracker.
 /// </remarks>
 public static class UnitOfWorkExtensions
 {
@@ -53,6 +58,9 @@ public static class UnitOfWorkExtensions
         Func<Task<TResult>> operation,
         CancellationToken cancellationToken = default)
     {
+        // Cria uma estratégia de execução (resiliência).
+        // Isso é crucial para conexões instáveis (cloud), permitindo retries automáticos
+        // se a conexão cair antes de iniciar a transação.
         var strategy = context.Database.CreateExecutionStrategy();
 
         return await strategy.ExecuteAsync(async () =>

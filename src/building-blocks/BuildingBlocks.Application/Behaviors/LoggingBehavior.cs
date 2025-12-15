@@ -6,6 +6,7 @@ using System.Diagnostics;
 
 namespace BuildingBlocks.Application.Behaviors;
 
+
 /// <summary>
 /// Behavior do MediatR para logging automático de requests e responses.
 /// Registra entrada, saída, duração e erros.
@@ -96,6 +97,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     }
 }
 
+
 /// <summary>
 /// Behavior de performance logging (alerta se exceder threshold).
 /// </summary>
@@ -140,6 +142,7 @@ public class PerformanceLoggingBehavior<TRequest, TResponse> : IPipelineBehavior
     }
 }
 
+
 /// <summary>
 /// Extensões para facilitar registro de logging behaviors.
 /// </summary>
@@ -154,9 +157,7 @@ public static class LoggingBehaviorExtensions
         return services;
     }
 
-    /// <summary>
-    /// Registra PerformanceLoggingBehavior.
-    /// </summary>
+
     public static IServiceCollection AddPerformanceLoggingBehavior(
         this IServiceCollection services,
         int slowRequestThresholdMs = 500)

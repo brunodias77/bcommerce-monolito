@@ -7,20 +7,21 @@ using Newtonsoft.Json;
 namespace BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
 /// <summary>
-/// Interceptor que salva domain events no Outbox durante SaveChanges.
+/// Interceptor responsável por implementar o padrão <strong>Transactional Outbox</strong>.
 /// </summary>
 /// <remarks>
-/// Este interceptor implementa o Outbox Pattern:
-/// 1. Coleta todos os domain events das entidades modificadas
-/// 2. Serializa e salva os eventos na tabela shared.domain_events
-/// 3. Limpa os eventos das entidades
+/// <strong>Mecanismo de Funcionamento:</strong>
+/// Durante o <see cref="DbContext.SaveChanges"/>, este interceptor:
+/// 1. Identifica todas as entidades rastreadas que possuem <see cref="IDomainEvent"/> pendentes.
+/// 2. Serializa esses eventos para JSON.
+/// 3. Cria novos registros na tabela <see cref="OutboxMessage"/> (State = Added).
+/// 4. Limpa os eventos das entidades (para não reprocessar).
 /// 
-/// Os eventos são processados posteriormente pelo ProcessOutboxMessagesJob.
+/// <strong>Garantia de Consistência:</strong>
+/// Como tudo ocorre *antes* do commit final do banco, as mudanças de estado (ex: Pedido Criado) e o evento (ex: OrderCreated)
+/// são comitados <strong>atomicamente</strong>. Ou ambos são salvos, ou nenhum.
 /// 
-/// Configuração:
-/// <code>
-/// options.AddInterceptors(new PublishDomainEventsInterceptor("users"));
-/// </code>
+/// <strong>Processamento:</strong> O <see cref="ProcessOutboxMessagesJob"/> lerá essa tabela posteriormente.
 /// </remarks>
 public class PublishDomainEventsInterceptor : SaveChangesInterceptor
 {
@@ -128,6 +129,9 @@ public class PublishDomainEventsInterceptor : SaveChangesInterceptor
 
     private static string SerializeEvent(IDomainEvent domainEvent)
     {
+        // ATENÇÃO: TypeNameHandling.All é mandatório aqui.
+        // O payload precisa conter a informação do tipo concreto (ex: "Namespace.OrderCreatedEvent")
+        // para que o Job de processamento consiga deserializar na classe correta usando Reflection.
         return JsonConvert.SerializeObject(domainEvent, new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.All,

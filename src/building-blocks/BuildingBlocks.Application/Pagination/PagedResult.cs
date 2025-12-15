@@ -2,8 +2,21 @@ namespace BuildingBlocks.Application.Pagination;
 
 /// <summary>
 /// Resultado paginado genérico.
+/// Encapsula a lista de itens e os metadados de navegação.
 /// </summary>
 /// <typeparam name="T">Tipo dos itens</typeparam>
+/// <remarks>
+/// Utilizado como retorno padrão para Queries que buscam listas.
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // No Repository ou Handler:
+/// var result = await query.Skip(skip).Take(take).ToListAsync();
+/// var total = await query.CountAsync();
+/// 
+/// return PagedResult&lt;ProductDto&gt;.Create(result, page, size, total);
+/// </code>
+/// </remarks>
 public sealed class PagedResult<T>
 {
     /// <summary>

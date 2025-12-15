@@ -10,11 +10,18 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// Background Service que limpa sessões expiradas.
 /// </summary>
 /// <remarks>
-/// Este job:
-/// 1. Busca sessões expiradas (expires_at &lt; NOW() e revoked_at IS NULL)
-/// 2. Marca como revogadas (revoked_at = NOW())
+/// <strong>Objetivo:</strong>
+/// Manter a tabela de sessões enxuta e segura, removendo/revogando tokens que já expiraram.
 /// 
-/// Tabela afetada: users.sessions
+/// <strong>Estratégia de Performance:</strong>
+/// 1. <strong>Native SQL Update:</strong> Executa um UPDATE direto no banco de dados.
+///    Isso é MUITO mais rápido do que carregar milhares de objetos Session na memória com EF Core.
+/// 2. <strong>Batch Processing:</strong> Usa a cláusula LIMIT para evitar travar a tabela (Table Lock) por muito tempo
+///    em bancos muito grandes.
+/// 
+/// <strong>Segurança:</strong>
+/// Ao revogar sessões expiradas, garantimos que tokens antigos não possam ser reutilizados indevidamente
+/// caso a validação de expiração falhe em algum ponto da aplicação.
 /// 
 /// Configuração:
 /// <code>
@@ -72,8 +79,10 @@ public class CleanupExpiredSessionsJob : BackgroundService
 
         var utcNow = dateTimeProvider.UtcNow;
 
-        // Executa SQL diretamente para performance
-        // A tabela é users.sessions
+        // Executa SQL diretamente por dois motivos:
+        // 1. Performance: Evita trazer milhares de registros para a memória (Change Tracker do EF Core).
+        // 2. Desacoplamento: Este Building Block não tem referência ao UsersDbContext ou à entidade Session.
+        //    O SQL Raw permite atuar na tabela 'users.sessions' sem conhecer a classe C# mapeada.
         var sql = @"
             UPDATE users.sessions 
             SET revoked_at = {0}, 

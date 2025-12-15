@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Application.Behaviors;
 
+
 /// <summary>
 /// Behavior do MediatR para gerenciamento automático de transações em Commands.
 /// Abre transação, executa handler, e faz commit/rollback automaticamente.
@@ -39,48 +40,6 @@ namespace BuildingBlocks.Application.Behaviors;
 /// // 3. Transação (mais interno - envolve apenas o handler)
 /// services.AddScoped(typeof(IPipelineBehavior&lt;,&gt;), typeof(TransactionBehavior&lt;,&gt;));
 /// </code>
-///
-/// ### Fluxo de Execução:
-/// <code>
-/// Request
-///   → LoggingBehavior (início)
-///     → ValidationBehavior (valida)
-///       → TransactionBehavior (abre transação)
-///         → Handler (executa lógica)
-///       ← TransactionBehavior (commit/rollback)
-///     ← ValidationBehavior
-///   ← LoggingBehavior (fim)
-/// Response
-/// </code>
-///
-/// ### Por que esta ordem?
-///
-/// 1. **LoggingBehavior primeiro**: Captura timing completo, incluindo validação e transação
-/// 2. **ValidationBehavior segundo**: Evita abrir transação para requests inválidos
-/// 3. **TransactionBehavior terceiro**: Envolve apenas a execução do handler
-///
-/// ### Usando os métodos de extensão:
-///
-/// <code>
-/// // Forma recomendada (ordem correta garantida):
-/// services.AddLoggingBehavior();
-/// services.AddValidationBehavior();
-/// services.AddTransactionBehavior();
-/// </code>
-///
-/// Exemplo de uso:
-/// <code>
-/// // Command abre transação automaticamente
-/// public record CreateOrderCommand(...) : ICommand&lt;Guid&gt;;
-///
-/// // Query NÃO abre transação (read-only)
-/// public record GetOrderByIdQuery(Guid OrderId) : IQuery&lt;OrderDto&gt;;
-/// </code>
-///
-/// No seu sistema modular monolith:
-/// - Cada módulo tem seu próprio DbContext
-/// - Transações são locais ao módulo (não distribuídas)
-/// - Comunicação entre módulos via Integration Events (Outbox)
 /// </remarks>
 public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
@@ -158,6 +117,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
                       i == typeof(ICommand)));
     }
 }
+
 
 /// <summary>
 /// Extensões para facilitar registro de transaction behaviors.
