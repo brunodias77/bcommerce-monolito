@@ -51,7 +51,7 @@ public class ExceptionHandlingFilter : IExceptionFilter
 
         // Log detalhado
         _logger.LogError(exception,
-            "Unhandled exception. Path: {Path}, Method: {Method}, TraceId: {TraceId}",
+            "Exceção não tratada. Path: {Path}, Method: {Method}, TraceId: {TraceId}",
             httpContext.Request.Path,
             httpContext.Request.Method,
             httpContext.TraceIdentifier);
@@ -63,11 +63,11 @@ public class ExceptionHandlingFilter : IExceptionFilter
         var problemDetails = new ProblemDetails
         {
             Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-            Title = "An error occurred while processing your request",
+            Title = "Ocorreu um erro ao processar sua requisição",
             Status = statusCode,
             Detail = _environment.IsDevelopment()
                 ? exception.Message
-                : "An internal error occurred. Please try again later.",
+                : "Ocorreu um erro interno. Por favor, tente novamente mais tarde.",
             Instance = httpContext.Request.Path
         };
 
