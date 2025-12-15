@@ -50,8 +50,9 @@ public static class DependencyInjection
         // Registra o handler como tipo concreto (necessário para o InMemoryEventBus resolver)
         services.AddScoped<UserCreatedIntegrationEventHandler>();
 
-        // Registra subscrição para o InMemoryEventBus
+        // Registra subscrição para o InMemoryEventBus e OutboxEventBus (Job)
         InMemoryEventBus.RegisterHandler<UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler>();
+        OutboxEventBus.RegisterHandler<UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler>();
 
         return services;
     }

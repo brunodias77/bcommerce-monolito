@@ -2,6 +2,7 @@ using BuildingBlocks.Application.Abstractions;
 using BuildingBlocks.Application.Results;
 using BuildingBlocks.Infrastructure.Messaging.Integration;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Users.Contracts.Events;
 using Users.Core.Entities;
@@ -33,15 +34,15 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
 
     public RegisterUserCommandHandler(
         UserManager<User> userManager,
-        IProfileRepository profileRepository,
-        IEventBus eventBus,
+        [FromKeyedServices("users")] IEventBus eventBus,
         IEmailService emailService,
+        IProfileRepository profileRepository,
         ILogger<RegisterUserCommandHandler> logger)
     {
         _userManager = userManager;
-        _profileRepository = profileRepository;
         _eventBus = eventBus;
         _emailService = emailService;
+        _profileRepository = profileRepository;
         _logger = logger;
     }
 

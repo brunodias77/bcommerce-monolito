@@ -32,6 +32,30 @@ public class OutboxEventBus : IEventBus
     // Handlers são registrados para o ProcessOutboxMessagesJob
     private static readonly Dictionary<Type, List<Type>> _handlers = new();
 
+    /// <summary>
+    /// Registra um handler para um evento (static para ser acessível globalmente pelos Jobs).
+    /// </summary>
+    public static void RegisterHandler<TEvent, THandler>()
+        where TEvent : IIntegrationEvent
+        where THandler : IIntegrationEventHandler<TEvent>
+    {
+        var eventType = typeof(TEvent);
+        var handlerType = typeof(THandler);
+
+        lock (_handlers)
+        {
+            if (!_handlers.ContainsKey(eventType))
+            {
+                _handlers[eventType] = new List<Type>();
+            }
+
+            if (!_handlers[eventType].Contains(handlerType))
+            {
+                _handlers[eventType].Add(handlerType);
+            }
+        }
+    }
+
     public OutboxEventBus(
         DbContext dbContext,
         string moduleName,

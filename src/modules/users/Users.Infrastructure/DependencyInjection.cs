@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Users.Core.Entities;
 using Users.Core.Repositories;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
+using BuildingBlocks.Infrastructure.Messaging.Integration;
+using BuildingBlocks.Domain.Events;
 using Users.Infrastructure.Persistence;
 using Users.Infrastructure.Repositories;
 using Users.Infrastructure.Services;
@@ -86,6 +89,18 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<INotificationPreferencesRepository, NotificationPreferencesRepository>();
         services.AddScoped<ILoginHistoryRepository, LoginHistoryRepository>();
+
+        // ===============================================================
+        // MESSAGING (Event Bus)
+        // ===============================================================
+        // Registra o OutboxEventBus como Keyed Service para o módulo Users.
+        // Isso permite injetar IEventBus especificamente para este módulo usando [FromKeyedServices("users")]
+        services.AddKeyedScoped<IEventBus, OutboxEventBus>("users", (sp, key) =>
+        {
+            var dbContext = sp.GetRequiredService<UsersDbContext>();
+            var logger = sp.GetService<ILogger<OutboxEventBus>>(); // Opcional
+            return new OutboxEventBus(dbContext, "users", logger);
+        });
 
         // ===============================================================
         // DOMAIN SERVICES & INFRASTRUCTURE SERVICES
