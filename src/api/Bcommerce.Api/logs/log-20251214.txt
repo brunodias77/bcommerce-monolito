@@ -1,0 +1,11 @@
+[2025-12-14 22:22:31.489 -03:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:22:31.489 -03:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:26:48.719 -03:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:26:48.719 -03:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:27:09.868 -03:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 22:27:10.214 -03:00 INF] Registrando novo usuário: brunodias@admin.com <s:Users.Presentation.Controllers.UsersController>
+[2025-12-14 22:27:10.240 -03:00 INF] Handling RegisterUserCommand {"Email":"brunodias@admin.com","Password":"SenhaForte123*","FirstName":"Bruno","LastName":"Dias","$type":"RegisterUserCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 22:27:10.414 -03:00 WRN] Tentativa de registro com email já existente: brunodias@admin.com <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 22:27:10.415 -03:00 WRN] Transaction for RegisterUserCommand not committed due to failure: EMAIL_ALREADY_EXISTS <s:BuildingBlocks.Application.Behaviors.TransactionBehavior>
+[2025-12-14 22:27:10.415 -03:00 WRN] Handled RegisterUserCommand in 179ms with result: Failure - EMAIL_ALREADY_EXISTS: O e-mail informado já está cadastrado no sistema. <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 22:27:10.459 -03:00 WRN] HTTP POST /api/users/register responded 409 in 608ms [TraceId: 0HNHRF48HVF30:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
