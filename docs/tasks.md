@@ -6,10 +6,10 @@
 
 ## 📊 Resumo por Papel
 
-| Papel | Commands | Queries | Total de Operações |
-|-------|----------|---------|-------------------|
-| **CUSTOMER** | 22 | 18 | 40 |
-| **ADMIN** | 28 | 13 | 41 |
+| Papel        | Commands | Queries | Total de Operações |
+| ------------ | -------- | ------- | ------------------ |
+| **CUSTOMER** | 22       | 18      | 40                 |
+| **ADMIN**    | 28       | 13      | 41                 |
 
 ---
 
@@ -21,10 +21,12 @@
 
 ---
 
-#### 1. `RegisterUserCommand`
+#### 1. `RegisterUserCommand` ✅
+
 **Descrição**: Registrar novo usuário na plataforma.
 
 **Algoritmo**:
+
 ```
 1. RECEBER email, password, firstName, lastName
 2. VALIDAR formato do email
@@ -42,14 +44,17 @@
 ```
 
 **Integration Events**:
+
 - **Publica**: `UserCreatedIntegrationEvent` → Cart Module
 
 ---
 
-#### 2. `LoginCommand`
+#### 2. `LoginCommand` ✅
+
 **Descrição**: Autenticar usuário e criar sessão.
 
 **Algoritmo**:
+
 ```
 1. RECEBER email, password, deviceInfo
 2. BUSCAR usuário por email
@@ -74,9 +79,11 @@
 ---
 
 #### 3. `RefreshTokenCommand`
+
 **Descrição**: Renovar tokens de acesso.
 
 **Algoritmo**:
+
 ```
 1. RECEBER refreshToken
 2. VALIDAR assinatura do refresh token
@@ -96,9 +103,11 @@
 ---
 
 #### 4. `LogoutCommand`
+
 **Descrição**: Encerrar sessão atual.
 
 **Algoritmo**:
+
 ```
 1. RECEBER sessionId do token atual
 2. BUSCAR sessão por ID
@@ -112,9 +121,11 @@
 ---
 
 #### 5. `CreateProfileCommand`
+
 **Descrição**: Criar perfil estendido após registro.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, firstName, lastName, birthDate, cpf, gender
 2. VERIFICAR se perfil já existe para userId
@@ -131,9 +142,11 @@
 ---
 
 #### 6. `UpdateProfileCommand`
+
 **Descrição**: Atualizar dados do perfil.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, campos a atualizar
 2. BUSCAR perfil por userId
@@ -150,9 +163,11 @@
 ---
 
 #### 7. `AddAddressCommand`
+
 **Descrição**: Adicionar novo endereço.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, label, recipientName, street, number, complement, neighborhood, city, state, postalCode, isDefault
 2. VALIDAR formato do CEP
@@ -169,9 +184,11 @@
 ---
 
 #### 8. `UpdateAddressCommand`
+
 **Descrição**: Atualizar endereço existente.
 
 **Algoritmo**:
+
 ```
 1. RECEBER addressId, userId, novos dados
 2. BUSCAR endereço por ID
@@ -189,9 +206,11 @@
 ---
 
 #### 9. `DeleteAddressCommand`
+
 **Descrição**: Remover endereço (soft delete).
 
 **Algoritmo**:
+
 ```
 1. RECEBER addressId, userId
 2. BUSCAR endereço por ID
@@ -208,9 +227,11 @@
 ---
 
 #### 10. `ChangePasswordCommand`
+
 **Descrição**: Alterar senha do usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, currentPassword, newPassword
 2. BUSCAR usuário por ID
@@ -226,10 +247,12 @@
 
 ---
 
-#### 11. `ConfirmEmailCommand`
+#### 11. `ConfirmEmailCommand` ✅
+
 **Descrição**: Confirmar email via token.
 
 **Algoritmo**:
+
 ```
 1. RECEBER token de confirmação
 2. VALIDAR e decodificar token
@@ -241,17 +264,19 @@
 7. PERSISTIR alterações
 8. RETORNAR sucesso
 ```
-use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); e await _userManager.ConfirmEmailAsync(user, token) do identity
----
+
+## use os os metodos await \_userManager.GenerateEmailConfirmationTokenAsync(user); e await \_userManager.ConfirmEmailAsync(user, token) do identity
 
 ### Queries - Customer (Users)
 
 ---
 
 #### 1. `GetUserProfileQuery`
+
 **Descrição**: Buscar perfil completo do usuário logado.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId do token
 2. BUSCAR perfil com JOIN em User
@@ -262,9 +287,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetUserAddressesQuery`
+
 **Descrição**: Listar endereços do usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId
 2. BUSCAR endereços WHERE userId = X AND deletedAt IS NULL
@@ -276,9 +303,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `GetActiveSessionsQuery`
+
 **Descrição**: Listar sessões ativas.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId
 2. BUSCAR sessões WHERE userId = X AND revokedAt IS NULL AND expiresAt > now()
@@ -289,9 +318,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 4. `GetNotificationsQuery`
+
 **Descrição**: Listar notificações (paginado).
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, page, pageSize
 2. BUSCAR notificações WHERE userId = X
@@ -309,9 +340,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `AddToFavoritesCommand`
+
 **Descrição**: Adicionar produto aos favoritos.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, productId
 2. BUSCAR produto por ID
@@ -327,9 +360,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `RemoveFromFavoritesCommand`
+
 **Descrição**: Remover produto dos favoritos.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, productId
 2. BUSCAR favorito por userId e productId
@@ -341,9 +376,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `CreateReviewCommand`
+
 **Descrição**: Criar avaliação de produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, productId, rating, title, comment
 2. BUSCAR produto por ID
@@ -366,9 +403,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetProductByIdQuery`
+
 **Descrição**: Buscar detalhes de um produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId
 2. BUSCAR produto com JOINs (category, brand, images)
@@ -382,9 +421,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `SearchProductsQuery`
+
 **Descrição**: Buscar produtos com filtros.
 
 **Algoritmo**:
+
 ```
 1. RECEBER query, categoryId, minPrice, maxPrice, sortBy, page, pageSize
 2. CONSTRUIR query base (status = ACTIVE)
@@ -400,9 +441,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `GetCategoriesQuery`
+
 **Descrição**: Listar árvore de categorias.
 
 **Algoritmo**:
+
 ```
 1. BUSCAR categorias WHERE isActive = true AND deletedAt IS NULL
 2. ORDENAR por sortOrder
@@ -413,9 +456,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 4. `GetProductReviewsQuery`
+
 **Descrição**: Listar avaliações de um produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId, page, pageSize
 2. BUSCAR reviews WHERE productId = X AND isApproved = true
@@ -428,9 +473,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 5. `GetUserFavoritesQuery`
+
 **Descrição**: Listar produtos favoritos do usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, page, pageSize
 2. BUSCAR favoritos com JOIN em Product
@@ -449,9 +496,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `AddItemToCartCommand`
+
 **Descrição**: Adicionar item ao carrinho.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId OU sessionId, productId, quantity
 2. BUSCAR carrinho ativo do usuário/sessão
@@ -470,14 +519,17 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration (Consome)**:
+
 - `Catalog.GetProductByIdQuery` via Mediator
 
 ---
 
 #### 2. `UpdateCartItemCommand`
+
 **Descrição**: Alterar quantidade de item.
 
 **Algoritmo**:
+
 ```
 1. RECEBER cartId, itemId, newQuantity
 2. BUSCAR cart e verificar ownership
@@ -496,9 +548,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `RemoveItemFromCartCommand`
+
 **Descrição**: Remover item do carrinho.
 
 **Algoritmo**:
+
 ```
 1. RECEBER cartId, itemId
 2. BUSCAR cart e verificar ownership
@@ -514,9 +568,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 4. `ApplyCouponCommand`
+
 **Descrição**: Aplicar cupom de desconto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER cartId, couponCode
 2. BUSCAR cart e verificar ownership
@@ -531,15 +587,18 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration (Consome)**:
+
 - `Coupons.ValidateCouponCommand` via Mediator
 - `Coupons.ReserveCouponCommand` via Mediator
 
 ---
 
 #### 5. `RemoveCouponCommand`
+
 **Descrição**: Remover cupom do carrinho.
 
 **Algoritmo**:
+
 ```
 1. RECEBER cartId
 2. BUSCAR cart e verificar ownership
@@ -553,9 +612,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 6. `MergeCartsCommand`
+
 **Descrição**: Mesclar carrinho anônimo após login.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, sessionId
 2. BUSCAR carrinho anônimo por sessionId
@@ -576,9 +637,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 7. `CheckoutCommand`
+
 **Descrição**: Iniciar processo de checkout.
 
 **Algoritmo**:
+
 ```
 1. RECEBER cartId, addressId, paymentMethodType
 2. BUSCAR cart e verificar ownership
@@ -594,6 +657,7 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration Events**:
+
 - **Publica**: `CartCheckoutStartedIntegrationEvent` → Orders Module
 - **Consome**: `Catalog.ReserveStockCommand` via Mediator
 
@@ -604,9 +668,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetCartQuery`
+
 **Descrição**: Buscar carrinho atual.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId OU sessionId
 2. BUSCAR carrinho ativo com itens
@@ -626,9 +692,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `CreateOrderCommand`
+
 **Descrição**: Criar pedido a partir do checkout.
 
 **Algoritmo**:
+
 ```
 1. RECEBER checkoutToken, cartId, shippingAddressId, billingAddressId, paymentMethodType
 2. VALIDAR checkoutToken
@@ -651,14 +719,17 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration Events**:
+
 - **Publica**: `OrderCreatedIntegrationEvent` → Payments, Cart, Coupons
 
 ---
 
 #### 2. `CancelOrderCommand`
+
 **Descrição**: Cancelar pedido (apenas status permitidos).
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId, reason
 2. BUSCAR order e verificar ownership
@@ -677,14 +748,17 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration Events**:
+
 - **Publica**: `OrderCancelledIntegrationEvent` → Payments, Catalog, Coupons
 
 ---
 
 #### 3. `RequestRefundCommand`
+
 **Descrição**: Solicitar reembolso de pedido entregue.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId, reason, amount
 2. BUSCAR order e verificar ownership
@@ -705,9 +779,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetUserOrdersQuery`
+
 **Descrição**: Listar pedidos do usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, status (opcional), page, pageSize
 2. CONSTRUIR query base WHERE userId = X
@@ -720,9 +796,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetOrderByIdQuery`
+
 **Descrição**: Buscar detalhes de um pedido.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId
 2. BUSCAR order com JOINs (items, statusHistory)
@@ -734,9 +812,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `GetOrderTrackingQuery`
+
 **Descrição**: Buscar eventos de rastreamento.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId
 2. VERIFICAR ownership
@@ -754,9 +834,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `ProcessPaymentCommand`
+
 **Descrição**: Processar pagamento do pedido.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId, paymentMethodType, paymentMethodId (se existente), cardData (se novo)
 2. BUSCAR Payment pendente do order
@@ -783,9 +865,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GeneratePixCommand`
+
 **Descrição**: Gerar QR Code PIX para pagamento.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId
 2. BUSCAR Payment pendente
@@ -800,9 +884,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `GenerateBoletoCommand`
+
 **Descrição**: Gerar boleto para pagamento.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId
 2. BUSCAR Payment pendente
@@ -817,9 +903,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 4. `SavePaymentMethodCommand`
+
 **Descrição**: Salvar método de pagamento.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, cardData
 2. CHAMAR gateway: tokenize
@@ -833,9 +921,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 5. `RemovePaymentMethodCommand`
+
 **Descrição**: Remover método de pagamento salvo.
 
 **Algoritmo**:
+
 ```
 1. RECEBER paymentMethodId, userId
 2. BUSCAR método e verificar ownership
@@ -854,9 +944,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetUserPaymentMethodsQuery`
+
 **Descrição**: Listar métodos de pagamento salvos.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId
 2. BUSCAR métodos WHERE userId = X AND deletedAt IS NULL
@@ -868,9 +960,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetPaymentStatusQuery`
+
 **Descrição**: Buscar status do pagamento.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, userId
 2. BUSCAR payment do order
@@ -889,9 +983,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `BlockUserCommand`
+
 **Descrição**: Bloquear usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, reason, duration
 2. BUSCAR usuário por ID
@@ -906,9 +1002,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `UnblockUserCommand`
+
 **Descrição**: Desbloquear usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId
 2. BUSCAR usuário por ID
@@ -921,9 +1019,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `AssignRoleCommand`
+
 **Descrição**: Atribuir role a usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId, roleName
 2. BUSCAR usuário e role
@@ -940,9 +1040,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `SearchUsersQuery`
+
 **Descrição**: Buscar usuários com filtros.
 
 **Algoritmo**:
+
 ```
 1. RECEBER query, role, status, page, pageSize
 2. CONSTRUIR query base
@@ -954,9 +1056,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetUserDetailsQuery`
+
 **Descrição**: Ver detalhes completos de um usuário.
 
 **Algoritmo**:
+
 ```
 1. RECEBER userId
 2. BUSCAR user com JOINs (profile, addresses, roles, orders summary)
@@ -972,9 +1076,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `CreateProductCommand`
+
 **Descrição**: Criar novo produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productData (name, sku, price, categoryId, etc)
 2. VALIDAR SKU único
@@ -990,9 +1096,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `UpdateProductCommand`
+
 **Descrição**: Atualizar produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId, novos dados
 2. BUSCAR produto
@@ -1007,14 +1115,17 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration Events**:
+
 - **Publica**: `ProductUpdatedIntegrationEvent` → Cart (atualizar snapshots)
 
 ---
 
 #### 3. `UpdateProductPriceCommand`
+
 **Descrição**: Alterar preço do produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId, newPrice, compareAtPrice
 2. BUSCAR produto
@@ -1028,14 +1139,17 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration Events**:
+
 - **Publica**: `ProductPriceChangedIntegrationEvent` → Cart (alertar mudança de preço)
 
 ---
 
 #### 4. `PublishProductCommand`
+
 **Descrição**: Publicar produto (tornar ativo).
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId
 2. BUSCAR produto
@@ -1054,9 +1168,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 5. `DeactivateProductCommand`
+
 **Descrição**: Desativar produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId
 2. BUSCAR produto
@@ -1069,14 +1185,17 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ```
 
 **Integration Events**:
+
 - **Publica**: `ProductDeactivatedIntegrationEvent` → Cart (remover de carrinhos)
 
 ---
 
-#### 6. `CreateCategoryCommand`
+#### 6. `CreateCategoryCommand`✅
+
 **Descrição**: Criar categoria.
 
 **Algoritmo**:
+
 ```
 1. RECEBER name, parentId (opcional), description
 2. GERAR slug
@@ -1093,9 +1212,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 7. `UpdateCategoryCommand`
+
 **Descrição**: Atualizar categoria.
 
 **Algoritmo**:
+
 ```
 1. RECEBER categoryId, novos dados
 2. BUSCAR categoria
@@ -1111,9 +1232,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 8. `AdjustStockCommand`
+
 **Descrição**: Ajustar estoque manualmente.
 
 **Algoritmo**:
+
 ```
 1. RECEBER productId, quantity (pode ser negativo), reason
 2. BUSCAR produto
@@ -1130,9 +1253,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 9. `ApproveReviewCommand`
+
 **Descrição**: Aprovar avaliação de produto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER reviewId
 2. BUSCAR review
@@ -1145,9 +1270,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 10. `DeleteReviewCommand`
+
 **Descrição**: Remover avaliação (soft delete).
 
 **Algoritmo**:
+
 ```
 1. RECEBER reviewId
 2. BUSCAR review
@@ -1164,9 +1291,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetProductsAdminQuery`
+
 **Descrição**: Listar produtos (incluindo inativos).
 
 **Algoritmo**:
+
 ```
 1. RECEBER filters, page, pageSize
 2. BUSCAR produtos (todos status)
@@ -1177,9 +1306,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetLowStockProductsQuery`
+
 **Descrição**: Listar produtos com estoque baixo.
 
 **Algoritmo**:
+
 ```
 1. BUSCAR produtos WHERE stock <= low_stock_threshold AND status = ACTIVE
 2. ORDENAR por stock ASC
@@ -1189,9 +1320,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `GetPendingReviewsQuery`
+
 **Descrição**: Listar avaliações pendentes de aprovação.
 
 **Algoritmo**:
+
 ```
 1. BUSCAR reviews WHERE isApproved = false AND deletedAt IS NULL
 2. ORDENAR por createdAt ASC
@@ -1207,9 +1340,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `PrepareOrderCommand`
+
 **Descrição**: Marcar pedido como em preparação.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId
 2. BUSCAR order
@@ -1223,9 +1358,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `ShipOrderCommand`
+
 **Descrição**: Registrar envio do pedido.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, trackingCode, shippingCarrier, estimatedDeliveryAt
 2. BUSCAR order
@@ -1241,9 +1378,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `MarkDeliveredCommand`
+
 **Descrição**: Confirmar entrega do pedido.
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId
 2. BUSCAR order
@@ -1259,9 +1398,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 4. `AdminCancelOrderCommand`
+
 **Descrição**: Cancelar pedido (admin pode em qualquer status).
 
 **Algoritmo**:
+
 ```
 1. RECEBER orderId, reason, notes
 2. BUSCAR order
@@ -1276,9 +1417,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 5. `ApproveRefundCommand`
+
 **Descrição**: Aprovar solicitação de reembolso.
 
 **Algoritmo**:
+
 ```
 1. RECEBER refundId
 2. BUSCAR refund
@@ -1295,9 +1438,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `SearchOrdersQuery`
+
 **Descrição**: Buscar pedidos com filtros avançados.
 
 **Algoritmo**:
+
 ```
 1. RECEBER filters (status, dateRange, userId, orderNumber)
 2. CONSTRUIR query dinâmica
@@ -1308,9 +1453,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetPendingOrdersQuery`
+
 **Descrição**: Listar pedidos pendentes de ação.
 
 **Algoritmo**:
+
 ```
 1. USAR view orders.v_orders_pending_action
 2. FILTRAR por alert_status != 'OK'
@@ -1320,9 +1467,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `GetOrderMetricsQuery`
+
 **Descrição**: Métricas de pedidos por período.
 
 **Algoritmo**:
+
 ```
 1. RECEBER startDate, endDate
 2. CALCULAR totais por status
@@ -1340,9 +1489,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `ProcessRefundCommand`
+
 **Descrição**: Processar reembolso aprovado.
 
 **Algoritmo**:
+
 ```
 1. RECEBER refundId
 2. BUSCAR refund
@@ -1360,9 +1511,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `RespondChargebackCommand`
+
 **Descrição**: Responder a chargeback com evidências.
 
 **Algoritmo**:
+
 ```
 1. RECEBER chargebackId, evidences
 2. BUSCAR chargeback
@@ -1379,9 +1532,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetPaymentMetricsQuery`
+
 **Descrição**: Métricas de pagamentos.
 
 **Algoritmo**:
+
 ```
 1. USAR view payments.v_payment_metrics
 2. FILTRAR por período
@@ -1392,9 +1547,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetPendingChargebacksQuery`
+
 **Descrição**: Listar chargebacks pendentes.
 
 **Algoritmo**:
+
 ```
 1. BUSCAR chargebacks WHERE status = 'OPEN'
 2. ORDENAR por evidence_due_at ASC
@@ -1410,9 +1567,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `CreateCouponCommand`
+
 **Descrição**: Criar cupom de desconto.
 
 **Algoritmo**:
+
 ```
 1. RECEBER couponData
 2. VALIDAR código único (case-insensitive)
@@ -1431,9 +1590,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `UpdateCouponCommand`
+
 **Descrição**: Atualizar cupom.
 
 **Algoritmo**:
+
 ```
 1. RECEBER couponId, novos dados
 2. BUSCAR cupom
@@ -1447,9 +1608,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 3. `ActivateCouponCommand`
+
 **Descrição**: Ativar cupom.
 
 **Algoritmo**:
+
 ```
 1. RECEBER couponId
 2. BUSCAR cupom
@@ -1463,9 +1626,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 4. `DeactivateCouponCommand`
+
 **Descrição**: Desativar cupom.
 
 **Algoritmo**:
+
 ```
 1. RECEBER couponId
 2. BUSCAR cupom
@@ -1482,9 +1647,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 1. `GetCouponsQuery`
+
 **Descrição**: Listar todos os cupons.
 
 **Algoritmo**:
+
 ```
 1. RECEBER filters (status, type)
 2. BUSCAR cupons
@@ -1495,9 +1662,11 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 ---
 
 #### 2. `GetCouponMetricsQuery`
+
 **Descrição**: Métricas de uso do cupom.
 
 **Algoritmo**:
+
 ```
 1. RECEBER couponId
 2. USAR view coupons.v_coupon_metrics
@@ -1510,30 +1679,30 @@ use os os metodos await _userManager.GenerateEmailConfirmationTokenAsync(user); 
 
 ## Domain Events (Internos)
 
-| Módulo | Event | Handler | Ação |
-|--------|-------|---------|------|
-| Users | `UserCreatedEvent` | `UserCreatedEventHandler` | Cria Profile, dispara integration event |
-| Users | `SessionCreatedEvent` | `SessionCreatedEventHandler` | Registra LoginHistory |
-| Users | `UserLockedEvent` | `UserLockedEventHandler` | Envia notificação de segurança |
-| Catalog | `ProductCreatedEvent` | `ProductCreatedEventHandler` | Indexa no ElasticSearch |
-| Catalog | `StockReservedEvent` | `StockReservedEventHandler` | Verifica alerta de estoque baixo |
-| Catalog | `LowStockAlertEvent` | `LowStockAlertEventHandler` | Notifica administradores |
-| Cart | `ItemAddedToCartEvent` | `CartActivityEventHandler` | Registra no ActivityLog |
-| Orders | `OrderCreatedEvent` | `OrderCreatedEventHandler` | Registra histórico de status |
+| Módulo  | Event                  | Handler                      | Ação                                    |
+| ------- | ---------------------- | ---------------------------- | --------------------------------------- |
+| Users   | `UserCreatedEvent`     | `UserCreatedEventHandler`    | Cria Profile, dispara integration event |
+| Users   | `SessionCreatedEvent`  | `SessionCreatedEventHandler` | Registra LoginHistory                   |
+| Users   | `UserLockedEvent`      | `UserLockedEventHandler`     | Envia notificação de segurança          |
+| Catalog | `ProductCreatedEvent`  | `ProductCreatedEventHandler` | Indexa no ElasticSearch                 |
+| Catalog | `StockReservedEvent`   | `StockReservedEventHandler`  | Verifica alerta de estoque baixo        |
+| Catalog | `LowStockAlertEvent`   | `LowStockAlertEventHandler`  | Notifica administradores                |
+| Cart    | `ItemAddedToCartEvent` | `CartActivityEventHandler`   | Registra no ActivityLog                 |
+| Orders  | `OrderCreatedEvent`    | `OrderCreatedEventHandler`   | Registra histórico de status            |
 
 ## Integration Events (Entre Módulos)
 
-| Event | Publicado Por | Consumido Por | Handler | Ação |
-|-------|---------------|---------------|---------|------|
-| `UserCreatedIntegrationEvent` | Users | Cart | `UserCreatedIntegrationEventHandler` | Cria carrinho vazio |
-| `ProductPriceChangedIntegrationEvent` | Catalog | Cart | `ProductPriceChangedIntegrationEventHandler` | Atualiza currentPrice em itens |
-| `ProductDeactivatedIntegrationEvent` | Catalog | Cart | `ProductDeactivatedIntegrationEventHandler` | Remove item de carrinhos |
-| `CartCheckoutStartedIntegrationEvent` | Cart | Orders | `CartCheckoutStartedIntegrationEventHandler` | Inicia criação do pedido |
-| `OrderCreatedIntegrationEvent` | Orders | Payments, Cart, Coupons | - | Criar Payment, converter cart, confirmar cupom |
-| `OrderCancelledIntegrationEvent` | Orders | Payments, Catalog, Coupons | - | Estornar, liberar estoque, reverter cupom |
-| `PaymentCapturedIntegrationEvent` | Payments | Orders | `PaymentCapturedIntegrationEventHandler` | Atualiza status para PAID |
-| `PaymentFailedIntegrationEvent` | Payments | Orders | `PaymentFailedIntegrationEventHandler` | Atualiza status para FAILED |
-| `RefundCompletedIntegrationEvent` | Payments | Orders | `RefundCompletedIntegrationEventHandler` | Atualiza status para REFUNDED |
+| Event                                 | Publicado Por | Consumido Por              | Handler                                      | Ação                                           |
+| ------------------------------------- | ------------- | -------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| `UserCreatedIntegrationEvent`         | Users         | Cart                       | `UserCreatedIntegrationEventHandler`         | Cria carrinho vazio                            |
+| `ProductPriceChangedIntegrationEvent` | Catalog       | Cart                       | `ProductPriceChangedIntegrationEventHandler` | Atualiza currentPrice em itens                 |
+| `ProductDeactivatedIntegrationEvent`  | Catalog       | Cart                       | `ProductDeactivatedIntegrationEventHandler`  | Remove item de carrinhos                       |
+| `CartCheckoutStartedIntegrationEvent` | Cart          | Orders                     | `CartCheckoutStartedIntegrationEventHandler` | Inicia criação do pedido                       |
+| `OrderCreatedIntegrationEvent`        | Orders        | Payments, Cart, Coupons    | -                                            | Criar Payment, converter cart, confirmar cupom |
+| `OrderCancelledIntegrationEvent`      | Orders        | Payments, Catalog, Coupons | -                                            | Estornar, liberar estoque, reverter cupom      |
+| `PaymentCapturedIntegrationEvent`     | Payments      | Orders                     | `PaymentCapturedIntegrationEventHandler`     | Atualiza status para PAID                      |
+| `PaymentFailedIntegrationEvent`       | Payments      | Orders                     | `PaymentFailedIntegrationEventHandler`       | Atualiza status para FAILED                    |
+| `RefundCompletedIntegrationEvent`     | Payments      | Orders                     | `RefundCompletedIntegrationEventHandler`     | Atualiza status para REFUNDED                  |
 
 ---
 

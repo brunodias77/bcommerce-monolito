@@ -168,7 +168,7 @@ Aqui está a documentação técnica detalhada para o Command `ConfirmEmailComma
   }
 }
 ```
-
+======================================================================================================================================
 Aqui está a documentação técnica detalhada para o Command `LoginCommand`, seguindo a estrutura e o algoritmo solicitados.
 
 ---
