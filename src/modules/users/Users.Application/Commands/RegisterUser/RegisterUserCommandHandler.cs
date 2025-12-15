@@ -56,7 +56,7 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
         if (existingUser != null)
         {
             _logger.LogWarning(
-                "Tentativa de registro com email já existente: {Email}",
+                "⚠️ [users] Tentativa de registro com email já existente: {Email}",
                 command.Email);
 
             return Result.Fail<Guid>(Error.Conflict(
@@ -84,7 +84,7 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
         {
             var errors = string.Join("; ", createResult.Errors.Select(e => e.Description));
             _logger.LogError(
-                "Falha ao criar usuário {Email}: {Errors}",
+                "❌ [users] Falha ao criar usuário {Email}: {Errors}",
                 command.Email,
                 errors);
 
@@ -94,13 +94,9 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
         }
 
         _logger.LogInformation(
-            "Usuário criado com sucesso: {UserId} - {Email}",
+            "✅ [users] Usuário criado com sucesso: {UserId} - {Email}",
             user.Id,
             command.Email);
-
-        // TODO: REMOVER EM PRODUÇÃO - Log temporário para teste de confirmação de email
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        _logger.LogWarning(">>> TOKEN DE CONFIRMAÇÃO PARA {Email}: {Token}", command.Email, token);
 
         // ========================================
         // Passo 5: Criação do Perfil (RN-05)
@@ -116,7 +112,7 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
             await _profileRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation(
-                "Perfil criado para usuário {UserId}: {FirstName} {LastName}",
+                "✅ [users] Perfil criado para usuário {UserId}: {FirstName} {LastName}",
                 user.Id,
                 command.FirstName,
                 command.LastName);
@@ -136,29 +132,36 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
         await _eventBus.PublishAsync(integrationEvent, cancellationToken);
 
         _logger.LogInformation(
-            "UserCreatedIntegrationEvent publicado para módulo Cart: {UserId}",
+            "📤 [users] UserCreatedIntegrationEvent publicado para módulo Cart: {UserId}",
             user.Id);
 
+        var displayName = !string.IsNullOrEmpty(command.FirstName) 
+            ? command.FirstName 
+            : command.Email.Split('@')[0];
+
         // ========================================
-        // Passo 7: Notificação - Email de Boas-Vindas
+        // Passo 7: Notificação - Email de Confirmação
         // ========================================
         try
         {
-            var displayName = !string.IsNullOrEmpty(command.FirstName) 
-                ? command.FirstName 
-                : command.Email.Split('@')[0];
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = System.Net.WebUtility.UrlEncode(token);
+            var confirmationLink = $"http://localhost:5020/api/users/confirm-email?userId={user.Id}&token={encodedToken}";
 
-            await _emailService.SendWelcomeEmailAsync(
+            // TODO: Em produção, remover este log e deixar apenas o envio de email
+            _logger.LogWarning("📧 [users] Link de confirmação para {Email}: {ConfirmationLink}", command.Email, confirmationLink);
+
+            await _emailService.SendEmailConfirmationAsync(
                 command.Email,
                 displayName,
+                confirmationLink,
                 cancellationToken);
         }
         catch (Exception ex)
         {
-            // Não falha o registro se o email não for enviado
             _logger.LogWarning(
                 ex,
-                "Falha ao enviar email de boas-vindas para {Email}",
+                "⚠️ [users] Falha ao enviar email de confirmação para {Email}",
                 command.Email);
         }
 

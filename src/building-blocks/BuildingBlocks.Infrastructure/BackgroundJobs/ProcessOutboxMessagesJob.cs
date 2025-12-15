@@ -62,7 +62,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Outbox Processor started for {DbContext}. Interval: {Interval}s, BatchSize: {BatchSize}",
+        _logger.LogInformation("🚀 [background-job] Processador de Outbox iniciado para {DbContext}. Intervalo: {Interval}s, BatchSize: {BatchSize}",
             typeof(TDbContext).Name, _processInterval.TotalSeconds, _batchSize);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -73,13 +73,13 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing outbox messages");
+                _logger.LogError(ex, "❌ [background-job] Erro ao processar mensagens do outbox");
             }
 
             await Task.Delay(_processInterval, stoppingToken);
         }
 
-        _logger.LogInformation("Outbox Processor stopped");
+        _logger.LogInformation("🛑 [background-job] Processador de Outbox parado");
     }
 
     private async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken)
@@ -100,7 +100,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
             if (!messages.Any())
                 return;
 
-            _logger.LogDebug("Processing {Count} outbox messages", messages.Count);
+            _logger.LogDebug("📦 [background-job] Processando {Count} mensagens do outbox", messages.Count);
 
             foreach (var message in messages)
             {
@@ -111,7 +111,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
                     message.ProcessedAt = DateTime.UtcNow;
                     message.ErrorMessage = null;
 
-                    _logger.LogDebug("Processed outbox message {MessageId} of type {EventType}",
+                    _logger.LogDebug("✅ [background-job] Mensagem {MessageId} ({EventType}) processada com sucesso",
                         message.Id, message.EventType);
                 }
                 catch (Exception ex)
@@ -120,13 +120,13 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
                     message.ErrorMessage = ex.Message;
 
                     _logger.LogWarning(ex,
-                        "Error processing outbox message {MessageId}. Retry count: {RetryCount}",
+                        "⚠️ [background-job] Erro ao processar mensagem {MessageId}. Tentativa: {RetryCount}",
                         message.Id, message.RetryCount);
 
                     if (message.RetryCount >= _maxRetries)
                     {
                         _logger.LogError(
-                            "Max retries reached for outbox message {MessageId}. Moving to dead letter.",
+                            "💀 [background-job] Max retries atingido para mensagem {MessageId}. Movendo para dead letter.",
                             message.Id);
                     }
                 }
@@ -137,7 +137,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
         catch (InvalidOperationException)
         {
             // OutboxMessage não está mapeada neste DbContext, ignorar silenciosamente
-            _logger.LogDebug("{DbContext} does not have OutboxMessage mapped, skipping", typeof(TDbContext).Name);
+            _logger.LogDebug("ℹ️ [background-job] {DbContext} não possui OutboxMessage mapeada, pulando", typeof(TDbContext).Name);
         }
     }
 

@@ -53,7 +53,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         {
             // Log início da execução
             _logger.LogInformation(
-                "Handling {RequestName} {@Request}",
+                "📥 [api] Recebendo {RequestName} {@Request}",
                 requestName,
                 request);
 
@@ -66,14 +66,14 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             if (response.IsSuccess)
             {
                 _logger.LogInformation(
-                    "Handled {RequestName} in {ElapsedMilliseconds}ms with result: Success",
+                    "✅ [api] Processado {RequestName} em {ElapsedMilliseconds}ms",
                     requestName,
                     stopwatch.ElapsedMilliseconds);
             }
             else
             {
                 _logger.LogWarning(
-                    "Handled {RequestName} in {ElapsedMilliseconds}ms with result: Failure - {ErrorCode}: {ErrorMessage}",
+                    "⚠️ [api] Processado {RequestName} (Falha) em {ElapsedMilliseconds}ms - {ErrorCode}: {ErrorMessage}",
                     requestName,
                     stopwatch.ElapsedMilliseconds,
                     response.Error.Code,
@@ -88,7 +88,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
 
             _logger.LogError(
                 ex,
-                "Error handling {RequestName} after {ElapsedMilliseconds}ms",
+                "❌ [api] Erro ao processar {RequestName} após {ElapsedMilliseconds}ms",
                 requestName,
                 stopwatch.ElapsedMilliseconds);
 
@@ -131,7 +131,7 @@ public class PerformanceLoggingBehavior<TRequest, TResponse> : IPipelineBehavior
         if (stopwatch.ElapsedMilliseconds > _slowRequestThresholdMs)
         {
             _logger.LogWarning(
-                "SLOW REQUEST: {RequestName} took {ElapsedMilliseconds}ms (threshold: {ThresholdMs}ms) {@Request}",
+                "🐢 [api] Request Lento: {RequestName} levou {ElapsedMilliseconds}ms (limite: {ThresholdMs}ms) {@Request}",
                 requestName,
                 stopwatch.ElapsedMilliseconds,
                 _slowRequestThresholdMs,
