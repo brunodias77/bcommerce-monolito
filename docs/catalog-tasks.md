@@ -80,3 +80,108 @@ Este comando é responsável por criar uma nova categoria no catálogo de produt
 ```
 
 *********************************************************************************************************************************************************
+
+Com base na análise do código-fonte fornecido (`Product.cs`, `ProductConfiguration.cs`, `ProductStatus.cs`) e nos requisitos do sistema, segue a documentação técnica detalhada para o comando `CreateProductCommand`.
+
+---
+
+#CMD-01: CreateProduct (CreateProductCommand)**Descrição**
+Este comando é responsável pela criação de um novo produto no catálogo. Ele atua como o ponto de entrada para a instancialização do *Aggregate Root* `Product`. O comando garante que o produto seja criado com o status inicial de `Draft` (Rascunho), assegura a unicidade de identificadores comerciais (SKU) e de navegação (Slug), e dispara eventos de domínio para integração com outros contextos (como indexação em mecanismos de busca).
+
+##Request (Input)A requisição deve ser enviada para o endpoint de produtos (ex: `POST /api/v1/products`).
+
+###Estrutura de Dados| Campo | Tipo | Obrigatório | Descrição |
+| --- | --- | --- | --- |
+| `name` | `string` | **Sim** | Nome comercial do produto. Utilizado para gerar o *slug*. Máximo de 150 caracteres. |
+| `sku` | `string` | **Sim** | *Stock Keeping Unit*. Código único identificador do produto. Máximo de 100 caracteres. |
+| `price` | `decimal` | **Sim** | Preço de venda base do produto. Deve ser maior ou igual a zero. |
+| `description` | `string` | Não | Descrição detalhada do produto (HTML ou Texto). |
+| `initialStock` | `int` | Não | Quantidade inicial em estoque. Padrão é 0. Não pode ser negativo. |
+| `categoryId` | `Guid?` | Não | ID da categoria à qual o produto pertence. |
+| `brandId` | `Guid?` | Não | ID da marca do produto. |
+
+###Exemplo de JSON (Request)```json
+{
+  "name": "Smartphone XYZ Pro 128GB",
+  "sku": "SP-XYZ-128-BLK",
+  "price": 2499.90,
+  "description": "O mais novo smartphone da linha XYZ com processador de última geração.",
+  "initialStock": 50,
+  "categoryId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+  "brandId": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+}
+
+```
+
+##Regras de Negócio (Business Rules)* **RN-01 (Identidade Única de SKU):** O código SKU fornecido deve ser único em todo o sistema. A tentativa de criar um produto com SKU existente deve resultar em erro de conflito.
+* **RN-02 (Geração e Unicidade de Slug):** O sistema deve gerar um *slug* (URL-friendly) a partir do `name`. Este *slug* deve ser único. Caso o *slug* gerado já exista, o sistema deve tratar a colisão (retornando erro ou sufixando, conforme política definida, neste caso assume-se erro de validação).
+* **RN-03 (Valores Monetários):** O `price` não pode ser negativo.
+* **RN-04 (Estoque Inicial):** O `initialStock` não pode ser negativo.
+* **RN-05 (Status Inicial):** Todo novo produto deve ser criado obrigatoriamente com o status `Draft` (Rascunho), garantindo que não apareça na vitrine até ser explicitamente publicado.
+* **RN-06 (Integridade Relacional):** Caso `categoryId` ou `brandId` sejam informados, as respectivas entidades devem existir no banco de dados.
+
+##Fluxo de Processamento (Workflow)1. **Validação de Contrato (Fail-Fast):** O `CreateProductCommandValidator` verifica a presença dos campos obrigatórios (`name`, `sku`, `price`) e limites de caracteres.
+2. **Verificação de Unicidade:**
+* O *Handler* consulta o `IProductRepository` para verificar se já existe um produto com o `sku` informado.
+* *Exceção:* Retorna erro se o SKU já estiver em uso.
+
+
+3. **Geração e Verificação de Slug:**
+* O *Handler* simula a geração do *slug* (ou delega para a entidade posteriormente, mas verifica a pré-existência).
+* Consulta o repositório para garantir que o *slug* derivado do nome é único.
+
+
+4. **Instanciação do Domínio:** O método estático factory `Product.Create(...)` é invocado.
+* Define `Status = ProductStatus.Draft` (0).
+* Define datas de criação (`CreatedAt`).
+* Aplica regras de negócio internas (RN-03 e RN-04).
+* Gera o Evento de Domínio: `ProductCreatedEvent`.
+
+
+5. **Persistência:** A nova entidade é adicionada ao `IProductRepository`.
+6. **Commit:** O `IUnitOfWork.CommitAsync` persiste os dados transacionalmente.
+7. **Pós-Processamento (Eventos):**
+* O `ProductCreatedEvent` é despachado (via `MediatR` ou *Message Broker*).
+* Listeners reagem ao evento para indexar o novo produto no **ElasticSearch** (para busca textual) e/ou atualizar réplicas de leitura.
+
+
+8. **Retorno:** O ID do novo produto é retornado.
+
+##Response (Output)###Sucesso (201 Created)Retorna o identificador único do produto criado.
+
+```json
+{
+  "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+
+```
+
+###Erro (400 Bad Request / 409 Conflict)Exemplo de erro de validação de domínio (ex: preço negativo) ou conflito de SKU.
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "Business Validation Error",
+  "status": 400,
+  "detail": "Price cannot be negative.",
+  "errors": {
+    "Price": [
+      "The value '-10.00' is not valid for Price."
+    ]
+  }
+}
+
+```
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "Conflict Error",
+  "status": 409,
+  "detail": "Product with SKU 'SP-XYZ-128-BLK' already exists."
+}
+
+```
+
+
+*********************************************************************************************************************************************************

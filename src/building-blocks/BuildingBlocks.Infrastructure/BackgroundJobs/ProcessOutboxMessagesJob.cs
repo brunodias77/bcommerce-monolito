@@ -148,6 +148,15 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
     {
         // Deserializa o evento
         var eventType = Type.GetType(message.EventType);
+        
+        // Fallback: Se não encontrar pelo nome (ex: sem assembly name), procura nos assemblies carregados
+        if (eventType == null)
+        {
+            eventType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .FirstOrDefault(t => t.FullName == message.EventType || t.Name == message.EventType);
+        }
+
         if (eventType == null)
         {
             throw new InvalidOperationException($"Event type not found: {message.EventType}");

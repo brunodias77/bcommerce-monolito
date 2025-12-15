@@ -98,6 +98,10 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
             user.Id,
             command.Email);
 
+        // TODO: REMOVER EM PRODUÇÃO - Log temporário para teste de confirmação de email
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        _logger.LogWarning(">>> TOKEN DE CONFIRMAÇÃO PARA {Email}: {Token}", command.Email, token);
+
         // ========================================
         // Passo 5: Criação do Perfil (RN-05)
         // ========================================

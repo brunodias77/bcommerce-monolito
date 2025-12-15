@@ -92,7 +92,7 @@ public class PublishDomainEventsInterceptor : SaveChangesInterceptor
                 Module = ModuleName,
                 AggregateType = GetAggregateType(item.Event),
                 AggregateId = item.Event.AggregateId,
-                EventType = item.Event.GetType().FullName ?? item.Event.GetType().Name,
+                EventType = item.Event.GetType().AssemblyQualifiedName ?? item.Event.GetType().FullName!,
                 Payload = SerializeEvent(item.Event),
                 CreatedAt = item.Event.OccurredOn
             };
