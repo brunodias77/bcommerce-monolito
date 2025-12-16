@@ -6,6 +6,18 @@ namespace BuildingBlocks.Application.Results;
 /// </summary>
 /// <remarks>
 /// Separa código de erro (para lógica) de mensagem (para UI/logs).
+/// 
+/// Como usar:
+/// 1. Defina erros estáticos nas entidades ou use Error.Validation/NotFound
+/// 2. Retorne Result.Fail(Error) em vez de lançar exceções para erros de domínio
+/// 
+/// Exemplo:
+/// <code>
+/// public static class DomainErrors
+/// {
+///     public static readonly Error InvalidEmail = Error.Validation("User.InvalidEmail", "Email format is invalid");
+/// }
+/// </code>
 /// </remarks>
 public sealed record Error
 {

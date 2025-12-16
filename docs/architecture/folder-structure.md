@@ -465,5 +465,72 @@ bcommerce/
 │   │   │   ├── Orders.Contracts/
 │   │   │   │   ├── Events/
 │   │   │   │   │   ├── OrderCreatedIntegrationEvent.cs
-│   │   │   │   │   └── OrderPaidInteg
+│   │   │   │   │   └── OrderPaidIntegrationEvent.cs
+│   │   │   │   └── Orders.Contracts.csproj
+│   │   │   │
+│   │   ├── payments/                             # 💳 MÓDULO DE PAGAMENTOS (A IMPLEMENTAR)
+│   │   │   │
+│   │   │   ├── Payments.Core/
+│   │   │   │   ├── Entities/
+│   │   │   │   │   ├── Payment.cs
+│   │   │   │   │   ├── PaymentTransaction.cs
+│   │   │   │   │   ├── UserPaymentMethod.cs
+│   │   │   │   │   ├── PaymentRefund.cs
+│   │   │   │   │   ├── Chargeback.cs
+│   │   │   │   │   └── PaymentWebhook.cs
+│   │   │   │   ├── Enums/
+│   │   │   │   │   ├── PaymentStatus.cs
+│   │   │   │   │   ├── PaymentMethodType.cs
+│   │   │   │   │   ├── TransactionType.cs
+│   │   │   │   │   └── CardBrand.cs
+│   │   │   │   ├── Events/
+│   │   │   │   │   ├── PaymentAuthorizedEvent.cs
+│   │   │   │   │   ├── PaymentCapturedEvent.cs
+│   │   │   │   │   ├── PaymentFailedEvent.cs
+│   │   │   │   │   └── PaymentRefundedEvent.cs
+│   │   │   │   ├── Repositories/
+│   │   │   │   │   ├── IPaymentRepository.cs
+│   │   │   │   │   └── IUserPaymentMethodRepository.cs
+│   │   │   │   └── Payments.Core.csproj
+│   │   │   │
+│   │   │   ├── Payments.Application/
+│   │   │   │   ├── Commands/
+│   │   │   │   │   ├── AuthorizePayment/
+│   │   │   │   │   ├── CapturePayment/
+│   │   │   │   │   ├── CancelPayment/
+│   │   │   │   │   ├── RefundPayment/
+│   │   │   │   │   └── ProcessWebhook/
+│   │   │   │   ├── Queries/
+│   │   │   │   │   ├── GetPaymentById/
+│   │   │   │   │   ├── GetPaymentsByOrder/
+│   │   │   │   │   └── GetUserPaymentMethods/
+│   │   │   │   ├── Services/
+│   │   │   │   │   └── IPaymentGatewayService.cs
+│   │   │   │   └── Payments.Application.csproj
+│   │   │   │
+│   │   │   ├── Payments.Infrastructure/
+│   │   │   │   ├── Persistence/
+│   │   │   │   │   ├── Configurations/
+│   │   │   │   │   ├── Migrations/
+│   │   │   │   │   └── PaymentsDbContext.cs
+│   │   │   │   ├── Gateways/
+│   │   │   │   │   ├── StripeGateway.cs
+│   │   │   │   │   └── PagarMeGateway.cs
+│   │   │   │   ├── Repositories/
+│   │   │   │   ├── DependencyInjection.cs
+│   │   │   │   └── Payments.Infrastructure.csproj
+│   │   │   │
+│   │   │   ├── Payments.Contracts/
+│   │   │   │   ├── Events/
+│   │   │   │   │   ├── PaymentAuthorizedIntegrationEvent.cs
+│   │   │   │   │   └── PaymentFailedIntegrationEvent.cs
+│   │   │   │   └── Payments.Contracts.csproj
+│   │   │   │
+│   │   │   └── Payments.Presentation/
+│   │   │       ├── Controllers/
+│   │   │       │   ├── PaymentsController.cs
+│   │   │       │   ├── PaymentMethodsController.cs
+│   │   │       │   └── WebhooksController.cs
+│   │   │       ├── DependencyInjection.cs
+│   │   │       └── Payments.Presentation.csproj
 ```

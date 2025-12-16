@@ -138,13 +138,13 @@ public abstract class ApiControllerBase : ControllerBase
 
     private static string GetErrorTitle(ErrorType errorType) => errorType switch
     {
-        ErrorType.Validation => "Validation Error",
-        ErrorType.NotFound => "Resource Not Found",
-        ErrorType.Conflict => "Conflict",
-        ErrorType.Unauthorized => "Unauthorized",
-        ErrorType.Forbidden => "Forbidden",
-        ErrorType.Failure => "Internal Server Error",
-        _ => "An error occurred"
+        ErrorType.Validation => "Erro de Validação",
+        ErrorType.NotFound => "Recurso Não Encontrado",
+        ErrorType.Conflict => "Conflito",
+        ErrorType.Unauthorized => "Não Autorizado",
+        ErrorType.Forbidden => "Proibido",
+        ErrorType.Failure => "Erro Interno do Servidor",
+        _ => "Ocorreu um erro"
     };
 
     private static string GetErrorTypeUri(ErrorType errorType) => errorType switch

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Users.Application.Commands.RegisterUser;
+using Users.Application.Commands.ConfirmEmail;
 using Users.Presentation.Requests;
 
 namespace Users.Presentation.Controllers;
@@ -92,13 +93,19 @@ public class UsersController : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConfirmEmail(
+        [FromQuery] Guid userId,
         [FromQuery] string token,
         CancellationToken cancellationToken)
     {
-        // TODO: Enviar ConfirmEmailCommand via MediatR
-        // var result = await _mediator.Send(new ConfirmEmailCommand(token), cancellationToken);
+        var command = new ConfirmEmailCommand(userId, token);
+        var result = await Mediator.Send(command, cancellationToken);
 
-        return StatusCode(StatusCodes.Status501NotImplemented, new { message = "ConfirmEmailCommand não implementado" });
+        if (result.IsFailure)
+        {
+            return HandleError(result.Error);
+        }
+
+        return Ok(new { message = "Email confirmed successfully" });
     }
 
     /// <summary>

@@ -63,7 +63,7 @@ public class RequestLoggingMiddleware
         if (_options.LogRequestStart)
         {
             _logger.LogDebug(
-                "HTTP {Method} {Path} started [TraceId: {TraceId}]",
+                "HTTP {Method} {Path} iniciado [TraceId: {TraceId}]",
                 context.Request.Method,
                 GetPath(context.Request),
                 traceId);
@@ -90,7 +90,7 @@ public class RequestLoggingMiddleware
         var logLevel = GetLogLevel(statusCode, elapsedMs);
 
         _logger.Log(logLevel,
-            "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds}ms [TraceId: {TraceId}]",
+            "HTTP {Method} {Path} respondeu {StatusCode} em {ElapsedMilliseconds}ms [TraceId: {TraceId}]",
             method,
             path,
             statusCode,
@@ -101,7 +101,7 @@ public class RequestLoggingMiddleware
         if (elapsedMs > _options.SlowRequestThresholdMs)
         {
             _logger.LogWarning(
-                "SLOW REQUEST: {Method} {Path} took {ElapsedMilliseconds}ms (threshold: {Threshold}ms) [TraceId: {TraceId}]",
+                "REQUISIÇÃO LENTA: {Method} {Path} levou {ElapsedMilliseconds}ms (limite: {Threshold}ms) [TraceId: {TraceId}]",
                 method,
                 path,
                 elapsedMs,

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Behaviors;
 
+
 /// <summary>
 /// Behavior do MediatR para validação automática de requests usando FluentValidation.
 /// </summary>
@@ -38,29 +39,9 @@ namespace BuildingBlocks.Application.Behaviors;
 ///         RuleFor(x => x.CustomerId)
 ///             .NotEmpty()
 ///             .WithMessage("Customer ID is required");
-///
-///         RuleFor(x => x.Items)
-///             .NotEmpty()
-///             .WithMessage("Order must have at least one item");
 ///     }
 /// }
 /// </code>
-///
-/// ## Registro de Validators
-///
-/// Registre todos os validators do assembly:
-/// <code>
-/// services.AddValidatorsFromAssembly(typeof(CreateOrderCommandValidator).Assembly);
-/// </code>
-///
-/// ## Formato do Erro Retornado
-///
-/// Quando a validação falha, retorna um Error com:
-/// - Code: "VALIDATION_ERROR"
-/// - Type: ErrorType.Validation
-/// - Message: Lista de erros concatenados
-///
-/// Isso permite que o controller retorne 400 Bad Request automaticamente.
 /// </remarks>
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
@@ -117,6 +98,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         return await next();
     }
 
+
     /// <summary>
     /// Cria um Result de erro de validação do tipo correto (Result ou Result&lt;T&gt;).
     /// </summary>
@@ -139,6 +121,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     }
 }
 
+
 /// <summary>
 /// Extensões para facilitar registro do ValidationBehavior.
 /// </summary>
@@ -149,17 +132,6 @@ public static class ValidationBehaviorExtensions
     /// </summary>
     /// <remarks>
     /// IMPORTANTE: Registre ANTES do TransactionBehavior.
-    ///
-    /// <code>
-    /// services.AddLoggingBehavior();
-    /// services.AddValidationBehavior();    // ← Antes da transação
-    /// services.AddTransactionBehavior();
-    /// </code>
-    ///
-    /// Não esqueça de registrar os validators:
-    /// <code>
-    /// services.AddValidatorsFromAssembly(typeof(MyValidator).Assembly);
-    /// </code>
     /// </remarks>
     public static IServiceCollection AddValidationBehavior(this IServiceCollection services)
     {

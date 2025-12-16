@@ -72,7 +72,7 @@ public class ExceptionHandlingMiddleware
     {
         // Log completo da exceção
         _logger.LogError(exception,
-            "Unhandled exception occurred. " +
+            "Ocorreu uma exceção não tratada. " +
             "TraceId: {TraceId}, Path: {Path}, Method: {Method}, User: {User}",
             context.TraceIdentifier,
             context.Request.Path,
@@ -120,47 +120,47 @@ public class ExceptionHandlingMiddleware
             ArgumentNullException => (
                 StatusCodes.Status400BadRequest,
                 "ARGUMENT_NULL",
-                "A required argument was not provided."),
+                "Um argumento obrigatório não foi fornecido."),
 
             ArgumentException => (
                 StatusCodes.Status400BadRequest,
                 "ARGUMENT_INVALID",
-                "An argument has an invalid value."),
+                "Um argumento tem um valor inválido."),
 
             UnauthorizedAccessException => (
                 StatusCodes.Status401Unauthorized,
                 "UNAUTHORIZED",
-                "Authentication is required."),
+                "Autenticação é necessária."),
 
             InvalidOperationException => (
                 StatusCodes.Status409Conflict,
                 "INVALID_OPERATION",
-                "The operation is not valid for the current state."),
+                "A operação não é válida para o estado atual."),
 
             KeyNotFoundException => (
                 StatusCodes.Status404NotFound,
                 "NOT_FOUND",
-                "The requested resource was not found."),
+                "O recurso solicitado não foi encontrado."),
 
             NotSupportedException => (
                 StatusCodes.Status405MethodNotAllowed,
                 "NOT_SUPPORTED",
-                "The operation is not supported."),
+                "A operação não é suportada."),
 
             TimeoutException => (
                 StatusCodes.Status504GatewayTimeout,
                 "TIMEOUT",
-                "The operation timed out."),
+                "A operação expirou."),
 
             OperationCanceledException => (
                 499, // Client Closed Request
                 "CANCELLED",
-                "The request was cancelled."),
+                "A requisição foi cancelada."),
 
             _ => (
                 StatusCodes.Status500InternalServerError,
                 "INTERNAL_ERROR",
-                "An internal error occurred. Please try again later.")
+                "Ocorreu um erro interno. Por favor, tente novamente mais tarde.")
         };
     }
 
@@ -179,15 +179,15 @@ public class ExceptionHandlingMiddleware
 
     private static string GetTitle(int statusCode) => statusCode switch
     {
-        400 => "Bad Request",
-        401 => "Unauthorized",
-        403 => "Forbidden",
-        404 => "Not Found",
-        405 => "Method Not Allowed",
-        409 => "Conflict",
-        499 => "Client Closed Request",
-        504 => "Gateway Timeout",
-        _ => "Internal Server Error"
+        400 => "Requisição Inválida",
+        401 => "Não Autorizado",
+        403 => "Proibido",
+        404 => "Não Encontrado",
+        405 => "Método Não Permitido",
+        409 => "Conflito",
+        499 => "Cliente Fechou a Requisição",
+        504 => "Tempo Limite de Gateway",
+        _ => "Erro Interno do Servidor"
     };
 }
 

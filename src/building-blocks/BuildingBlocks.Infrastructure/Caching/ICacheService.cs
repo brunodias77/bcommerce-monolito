@@ -1,27 +1,27 @@
 namespace BuildingBlocks.Infrastructure.Caching;
 
 /// <summary>
-/// Interface para serviço de cache.
+/// Interface para serviço de cache distribuído ou local.
+/// Define os contratos para operações de cache agnósticas à implementação.
 /// </summary>
 /// <remarks>
-/// Abstração sobre diferentes provedores de cache:
-/// - IMemoryCache (in-process)
-/// - Redis (distributed)
-/// - SQL Server (distributed)
+/// <strong>Arquitetura de Caching:</strong>
+/// Esta interface permite alternar entre implementações (Memory, Redis, SQL) sem alterar o código de negócio.
 /// 
-/// Uso:
+/// <strong>Padrões Suportados:</strong>
+/// 1. <strong>Cache-Aside (Lazy Loading):</strong> O padrão mais comum, suportado via <see cref="GetOrCreateAsync{T}"/>.
+///    - A aplicação tenta ler do cache.
+///    - Se não encontrar (Miss), a aplicação busca na fonte de dados (Banco).
+///    - A aplicação salva no cache e retorna o dado.
+/// 2. <strong>Explicit Caching:</strong> Controle manual via <see cref="SetAsync{T}"/> e <see cref="GetAsync{T}"/>.
+/// 
+/// <strong>Exemplo de uso (Cache-Aside):</strong>
 /// <code>
-/// // Obter ou criar
-/// var user = await cacheService.GetOrCreateAsync(
-///     $"user:{userId}",
-///     async () => await userRepository.GetByIdAsync(userId),
-///     TimeSpan.FromMinutes(5));
-/// 
-/// // Remover
-/// await cacheService.RemoveAsync($"user:{userId}");
-/// 
-/// // Remover por padrão
-/// await cacheService.RemoveByPrefixAsync("user:");
+/// // O método GetOrCreateAsync encapsula toda a lógica do Cache-Aside
+/// var product = await _cacheService.GetOrCreateAsync(
+///     key: $"product:{id}",
+///     factory: async () => await _repository.GetByIdAsync(id),
+///     expiration: TimeSpan.FromMinutes(10));
 /// </code>
 /// </remarks>
 public interface ICacheService
@@ -50,14 +50,18 @@ public interface ICacheService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Obtém um valor do cache ou cria se não existir.
+    /// Obtém um valor do cache ou cria/busca na fonte se não existir (Cache-Aside Pattern).
     /// </summary>
+    /// <remarks>
+    /// <strong>Cache Stampede Protection:</strong>
+    /// Implementações ideais devem prevenir que múltiplas threads executem a 'factory' simultaneamente para a mesma chave.
+    /// </remarks>
     /// <typeparam name="T">Tipo do valor</typeparam>
-    /// <param name="key">Chave do cache</param>
-    /// <param name="factory">Função para criar o valor</param>
-    /// <param name="expiration">Tempo de expiração (opcional)</param>
+    /// <param name="key">Chave única do cache</param>
+    /// <param name="factory">Função assíncrona que busca o dado na fonte original (ex: Database)</param>
+    /// <param name="expiration">Tempo de expiração (TTL).</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
-    /// <returns>Valor do cache ou criado</returns>
+    /// <returns>O valor do cache (Hit) ou o novo valor gerado pela factory (Miss)</returns>
     Task<T?> GetOrCreateAsync<T>(
         string key,
         Func<Task<T>> factory,

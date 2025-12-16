@@ -7,23 +7,21 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
 /// <summary>
-/// Interceptor que converte operações DELETE em soft delete.
+/// Interceptor que implementa o padrão de <strong>Exclusão Lógica (Soft Delete)</strong>.
 /// </summary>
 /// <remarks>
-/// Para entidades que implementam ISoftDeletable:
-/// - Operações de DELETE são convertidas em UPDATE
-/// - O campo DeletedAt é preenchido com a data/hora atual
-/// - O estado da entidade muda de Deleted para Modified
+/// <strong>Mecanismo:</strong>
+/// Ao detectar uma entidade marcada como <see cref="EntityState.Deleted"/> no Change Tracker:
+/// 1. Intercepta a operação.
+/// 2. Muda o estado para <see cref="EntityState.Modified"/>.
+/// 3. Preenche o campo <c>DeletedAt</c> com a data atual.
 /// 
-/// Configuração no DbContext:
-/// <code>
-/// options.AddInterceptors(new SoftDeleteInterceptor(dateTimeProvider));
-/// </code>
-/// 
-/// IMPORTANTE: Configure também um Query Filter global no OnModelCreating:
+/// <strong>Requisito Crítico:</strong>
+/// Para que o Soft Delete funcione corretamente, você <strong>DEVE</strong> configurar um Query Filter global no <c>OnModelCreating</c>:
 /// <code>
 /// builder.HasQueryFilter(e => e.DeletedAt == null);
 /// </code>
+/// Sem isso, as entidades deletadas continuarão aparecendo nas consultas normais.
 /// </remarks>
 public class SoftDeleteInterceptor : SaveChangesInterceptor
 {

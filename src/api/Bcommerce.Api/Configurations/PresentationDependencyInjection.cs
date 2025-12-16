@@ -15,19 +15,19 @@ public static class PresentationDependencyInjection
     public static IMvcBuilder AddPresentation(this IMvcBuilder mvcBuilder)
     {
         // ===============================================================
-        // Módulos de Apresentação
+        // MÓDULOS DE APRESENTAÇÃO
         // ===============================================================
+        // Como estamos usando Arquitetura Modular, os Controllers não estão no projeto API,
+        // mas sim nos projetos de cada módulo (Presentation).
+        // Precisamos registrar explicitamente cada módulo aqui.
         
-        // Users Module
+        // Users Module: Registra Users.Presentation assembly
         mvcBuilder.AddUsersPresentationModule();
 
-        // Adicione aqui os módulos de apresentação quando implementados:
+        // TODO: Adicione aqui os módulos de apresentação quando implementados:
         // mvcBuilder.AddCatalogPresentationModule();
         // mvcBuilder.AddOrdersPresentationModule();
-        // mvcBuilder.AddPaymentsPresentationModule();
-        // mvcBuilder.AddShippingPresentationModule();
-        // mvcBuilder.AddReviewsPresentationModule();
-
+        
         return mvcBuilder;
     }
 }

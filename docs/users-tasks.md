@@ -168,7 +168,7 @@ Aqui está a documentação técnica detalhada para o Command `ConfirmEmailComma
   }
 }
 ```
-
+======================================================================================================================================
 Aqui está a documentação técnica detalhada para o Command `LoginCommand`, seguindo a estrutura e o algoritmo solicitados.
 
 ---
@@ -291,3 +291,131 @@ Aqui está a documentação técnica detalhada para o Command `LoginCommand`, se
   "instance": "/api/users/login"
 }
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+====================================================================================
+Com base na análise do repositório `bcommerce-monolito` e no algoritmo fornecido, segue a documentação técnica detalhada para o `AddAddressCommand`.
+
+---
+
+#CMD-07: Adicionar Endereço (AddAddressCommand)**Descrição:**
+Este comando é responsável por registrar um novo endereço de entrega vinculado a um usuário específico no sistema. Ele encapsula a lógica de criação da entidade de endereço, validação de Value Objects (como CEP), e a regra de negócio para manutenção de unicidade do endereço padrão (default). O fluxo segue o padrão CQRS, garantindo a consistência através de transações e disparo de eventos de domínio.
+
+##1. Request (Input)A requisição deve conter os dados necessários para a composição do endereço e identificação do usuário proprietário.
+
+| Campo | Tipo | Obrigatório | Descrição |
+| --- | --- | --- | --- |
+| `UserId` | `Guid` | Sim | Identificador único do usuário (Owner). Geralmente extraído do contexto de autenticação ou passado explicitamente. |
+| `Label` | `String` | Sim | Identificador amigável do endereço (ex: "Casa", "Trabalho"). |
+| `RecipientName` | `String` | Sim | Nome da pessoa responsável por receber a encomenda. |
+| `PostalCode` | `String` | Sim | Código postal (CEP). Deve seguir o formato válido (ex: 12345-678). |
+| `Street` | `String` | Sim | Logradouro (Rua, Avenida, etc.). |
+| `Number` | `String` | Sim | Número do endereço. |
+| `Complement` | `String` | Não | Complemento do endereço (ex: "Apto 101"). |
+| `Neighborhood` | `String` | Sim | Bairro. |
+| `City` | `String` | Sim | Cidade. |
+| `State` | `String` | Sim | Sigla da Unidade Federativa (UF). Deve conter 2 caracteres. |
+| `IsDefault` | `Boolean` | Sim | Indica se este será o endereço principal do usuário. |
+
+###Exemplo de JSON (Request)```json
+{
+  "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "label": "Casa",
+  "recipientName": "Bruno Dias",
+  "postalCode": "17500-000",
+  "street": "Rua Exemplo",
+  "number": "123",
+  "complement": "Sobrado",
+  "neighborhood": "Centro",
+  "city": "Marília",
+  "state": "SP",
+  "isDefault": true
+}
+
+```
+
+##2. Regras de Negócio (Business Rules)As seguintes regras devem ser garantidas durante a execução do comando:
+
+* **RN-01 (Validação de CEP):** O campo `PostalCode` deve ser validado conforme as regras do Value Object `PostalCode` (formato XXXXX-XXX ou 8 dígitos numéricos). O sistema não deve aceitar CEPs mal formatados.
+* **RN-02 (Validação de UF):** O campo `State` deve conter estritamente 2 letras maiúsculas correspondentes a uma UF válida.
+* **RN-03 (Unicidade de Endereço Padrão):** Um usuário só pode ter um endereço marcado como `IsDefault = true`. Se o novo endereço for marcado como padrão, o sistema deve buscar qualquer endereço padrão existente para este usuário e remover a flag `IsDefault` do mesmo antes de persistir o novo.
+* **RN-04 (Vínculo de Usuário):** É obrigatório que o `UserId` corresponda a um usuário existente e ativo na base de dados (validado via repositório ou serviço de domínio).
+
+##3. Fluxo de Processamento (Workflow)1. **Validação Sintática:** O `AddAddressCommandValidator` (FluentValidation) verifica se todos os campos obrigatórios estão preenchidos e se respeitam os limites de caracteres.
+2. **Verificação de Existência do Usuário:** O Handler consulta o `IUserRepository` para garantir que o `UserId` informado existe. Caso contrário, retorna erro `UserNotFound`.
+3. **Instanciação e Validação de Domínio:**
+* Criação do Value Object `PostalCode`. Se inválido, lança exceção ou retorna erro de domínio.
+* Instanciação da entidade `Address`.
+
+
+4. **Gestão de Endereço Padrão (Regra RN-03):**
+* Verifica se `IsDefault` é `true`.
+* Se sim, consulta o `IAddressRepository` buscando o endereço atual marcado como padrão para este `UserId`.
+* Se existir um endereço padrão anterior, atualiza a entidade antiga definindo `IsDefault = false`.
+
+
+5. **Adição da Entidade:** Adiciona o novo objeto `Address` ao contexto através do `IAddressRepository.Add()`.
+6. **Registro de Evento:** Adiciona o evento de domínio `AddressAddedEvent` à lista de eventos da entidade ou publica via `IMediator` (dependendo da estratégia de consistência eventual vs transacional).
+7. **Persistência:** Invoca o `IUnitOfWork.CommitAsync()` para persistir as alterações (novo endereço e atualização do antigo padrão, se houver) em uma única transação atômica.
+8. **Retorno:** Retorna o `Id` (Guid) do endereço recém-criado envolto em um objeto `Result`.
+
+##4. Response (Output)###Sucesso (HTTP 200/201)Retorna o ID do recurso criado.
+
+```json
+{
+  "value": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "isSuccess": true,
+  "isFailure": false,
+  "error": {
+    "code": "None",
+    "message": ""
+  }
+}
+
+```
+
+###Erro (HTTP 400 - Bad Request)Exemplo de erro de validação de domínio (CEP Inválido).
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "PostalCode": [
+      "O formato do CEP é inválido."
+    ]
+  },
+  "traceId": "00-9823654..."
+}
+
+```
+
+###Erro (HTTP 404 - Not Found)Exemplo caso o usuário não seja encontrado.
+
+```json
+{
+  "value": null,
+  "isSuccess": false,
+  "isFailure": true,
+  "error": {
+    "code": "User.NotFound",
+    "message": "O usuário informado não foi encontrado."
+  }
+}
+
+```
+
+
+====================================================================================

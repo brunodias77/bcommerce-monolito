@@ -2,11 +2,15 @@ namespace BuildingBlocks.Application.Results;
 
 /// <summary>
 /// Representa o resultado de uma operação sem valor de retorno.
-/// Versão aprimorada que usa Error ao invés de string.
+/// Implementa o padrão "Railway Oriented Programming" para tratamento de erros funcional.
 /// </summary>
 /// <remarks>
-/// Esta é uma versão específica para Application Layer que usa Error tipado.
-/// Para casos simples, BuildingBlocks.Domain.Models.Result ainda pode ser usado.
+/// Características:
+/// - Explicitamente define Sucesso ou Falha
+/// - Evita o uso de Exceptions para controle de fluxo (try/catch custoso)
+/// - Permite composição functional (OnSuccess, OnFailure)
+/// 
+/// Versão específica para Application Layer que usa Error tipado.
 /// </remarks>
 public class Result
 {
@@ -105,6 +109,7 @@ public class Result
 
 /// <summary>
 /// Representa o resultado de uma operação com valor de retorno.
+/// Suporta operações monádicas (Map, Bind) para encadeamento.
 /// </summary>
 public class Result<T> : Result
 {

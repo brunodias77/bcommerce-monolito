@@ -14,20 +14,22 @@ public static class WebApiDependencyInjection
     public static IServiceCollection AddWebApi(this IServiceCollection services)
     {
         // ===============================================================
-        // Controllers
+        // CONTROLLERS & FILTERS
         // ===============================================================
         services.AddControllers(options =>
         {
+            // Filtro Global de Exceção (Fallback caso o Middleware falhe ou para tratar erros específicos de MVC)
             options.Filters.Add<ExceptionHandlingFilter>();
         })
-        .AddPresentation(); // Registra controllers dos módulos
+        .AddPresentation(); // Chama a extensão que registra os controllers dos módulos
 
-        // Registrar ExceptionHandlingFilter no DI
+        // Registrar ExceptionHandlingFilter no DI para que ele possa injetar ILogger, etc.
         services.AddScoped<ExceptionHandlingFilter>();
 
         // ===============================================================
-        // Swagger/OpenAPI
+        // SWAGGER / OPENAPI
         // ===============================================================
+        // Gera a especificação OpenAPI (swagger.json) a partir dos Controllers e Models.
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
@@ -35,13 +37,19 @@ public static class WebApiDependencyInjection
             {
                 Title = "BCommerce API",
                 Version = "v1",
-                Description = "API do BCommerce - Modular Monolith com DDD"
+                Description = "API do BCommerce - Modular Monolith com DDD\n\n" +
+                              "Módulos disponíveis:\n" +
+                              "- **Users**: Gestão de usuários, auth e perfis.\n" +
+                              "- **Catalog**: Produtos, categorias e gestão de estoque.\n" +
+                              "- **Cart**: Carrinho de compras e checkout.\n"
             });
 
-            // Adicionar XML comments se necessário
+            // Permite anotações via XML Comments (/// <summary>) nos controllers
             // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             // options.IncludeXmlComments(xmlPath);
+            
+            // TODO: Configurar JWT Bearer Auth no Swagger quando implementar autenticação
         });
 
         return services;

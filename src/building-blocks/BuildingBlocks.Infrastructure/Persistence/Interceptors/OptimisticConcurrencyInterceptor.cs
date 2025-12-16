@@ -5,22 +5,20 @@ using Microsoft.Extensions.Logging;
 namespace BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
 /// <summary>
-/// Interceptor para tratamento de erros de concorrência otimista.
+/// Interceptor para diagnóstico de erros de <strong>Concorrência Otimista</strong>.
 /// </summary>
 /// <remarks>
-/// Este interceptor:
-/// - Intercepta DbUpdateConcurrencyException
-/// - Loga informações detalhadas sobre o conflito
-/// - Pode ser configurado para retry automático (opcional)
+/// <strong>Mecanismo do EF Core (PostgreSQL - xmin/version):</strong>
+/// Ao configurar um token de concorrência (`builder.IsConcurrencyToken()`), o EF gera SQL assim:
+/// `UPDATE Tabela SET Coluna = @Nova, Version = @NovaVersao WHERE Id = @Id AND Version = @VersaoOriginal;`
 /// 
-/// No PostgreSQL, a concorrência otimista é implementada via:
-/// - Coluna 'version' com trigger shared.trigger_increment_version()
-/// - EF Core detecta conflitos comparando a versão
+/// Se outro processo alterou o registro, a `VersãoOriginal` não existe mais.
+/// O banco retorna "0 linhas afetadas".
+/// O EF Core detecta isso e lança <see cref="DbUpdateConcurrencyException"/>.
 /// 
-/// Configuração:
-/// <code>
-/// options.AddInterceptors(new OptimisticConcurrencyInterceptor(logger));
-/// </code>
+/// <strong>Função deste Interceptor:</strong>
+/// Captura essa exceção para LOGAR detalhadamente quais valores entraram em conflito (Valor Tentado vs Valor no Banco),
+/// facilitando o debug em ambientes concorrentes.
 /// </remarks>
 public class OptimisticConcurrencyInterceptor : SaveChangesInterceptor
 {
@@ -141,6 +139,8 @@ public static class OptimisticConcurrencyExtensions
         this Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<TEntity> builder)
         where TEntity : class, IVersionedEntity
     {
+        // Define a coluna 'version' como token de concorrência.
+        // O EF Core incluirá essa coluna na cláusula WHERE de todos os UPDATEs e DELETEs.
         builder.Property(e => e.Version)
             .HasColumnName("version")
             .IsConcurrencyToken()
