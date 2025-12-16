@@ -162,7 +162,7 @@
 
 ---
 
-#### 7. `AddAddressCommand`
+#### 7. `AddAddressCommand` ✅
 
 **Descrição**: Adicionar novo endereço.
 
