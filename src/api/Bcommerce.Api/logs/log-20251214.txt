@@ -1,0 +1,190 @@
+[2025-12-14 22:22:31.489 -03:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:22:31.489 -03:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:26:48.719 -03:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:26:48.719 -03:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 22:27:09.868 -03:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 22:27:10.214 -03:00 INF] Registrando novo usuário: brunodias@admin.com <s:Users.Presentation.Controllers.UsersController>
+[2025-12-14 22:27:10.240 -03:00 INF] Handling RegisterUserCommand {"Email":"brunodias@admin.com","Password":"SenhaForte123*","FirstName":"Bruno","LastName":"Dias","$type":"RegisterUserCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 22:27:10.414 -03:00 WRN] Tentativa de registro com email já existente: brunodias@admin.com <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 22:27:10.415 -03:00 WRN] Transaction for RegisterUserCommand not committed due to failure: EMAIL_ALREADY_EXISTS <s:BuildingBlocks.Application.Behaviors.TransactionBehavior>
+[2025-12-14 22:27:10.415 -03:00 WRN] Handled RegisterUserCommand in 179ms with result: Failure - EMAIL_ALREADY_EXISTS: O e-mail informado já está cadastrado no sistema. <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 22:27:10.459 -03:00 WRN] HTTP POST /api/users/register responded 409 in 608ms [TraceId: 0HNHRF48HVF30:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 14:59:28.201 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 14:59:28.201 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:00:31.671 -08:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 15:00:31.769 -08:00 INF] Registrando novo usuário: bruno@admin.com <s:Users.Presentation.Controllers.UsersController>
+[2025-12-14 15:00:31.794 -08:00 INF] Handling RegisterUserCommand {"Email":"bruno@admin.com","Password":"SenhaForte123*","FirstName":"Bruno","LastName":"Dias","$type":"RegisterUserCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:00:32.155 -08:00 INF] Usuário criado com sucesso: "b1e98e27-f1ac-4534-ad5e-802f0797f294" - bruno@admin.com <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 15:00:32.158 -08:00 WRN] >>> TOKEN DE CONFIRMAÇÃO PARA bruno@admin.com: CfDJ8DDLJNxcFcJPlCbHTlO1KCqF+nRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY+TUWq7kGpDa+qnVOZnwWoSAn1jw1+criYyMEPXkvbEyOQbjo7Y++ytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg== <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 15:00:32.348 -08:00 INF] Perfil criado para usuário "b1e98e27-f1ac-4534-ad5e-802f0797f294": Bruno Dias <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 15:00:32.355 -08:00 INF] Processando UserCreatedIntegrationEvent para usuário "b1e98e27-f1ac-4534-ad5e-802f0797f294" - bruno@admin.com <s:Cart.Application.IntegrationEventHandlers.UserCreatedIntegrationEventHandler>
+[2025-12-14 15:00:32.539 -08:00 INF] Carrinho "a6f8b20b-8d22-4c90-a190-a73a4ce80d79" criado com sucesso para usuário "b1e98e27-f1ac-4534-ad5e-802f0797f294" <s:Cart.Application.IntegrationEventHandlers.UserCreatedIntegrationEventHandler>
+[2025-12-14 15:00:32.539 -08:00 INF] UserCreatedIntegrationEvent publicado para módulo Cart: "b1e98e27-f1ac-4534-ad5e-802f0797f294" <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 15:00:32.540 -08:00 INF] Enviando email para bruno@admin.com com assunto 'Bem-vindo à BCommerce!' <s:Users.Infrastructure.Services.EmailService>
+[2025-12-14 15:00:32.642 -08:00 INF] Email enviado com sucesso para bruno@admin.com <s:Users.Infrastructure.Services.EmailService>
+[2025-12-14 15:00:32.644 -08:00 INF] Handled RegisterUserCommand in 853ms with result: Success <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:00:32.683 -08:00 INF] HTTP POST /api/users/register respondeu 201 em 1024ms [TraceId: 0HNHRCIAGAUT6:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 15:06:14.868 -08:00 INF] Handling ConfirmEmailCommand {"UserId":"b1e98e27-f1ac-4534-ad5e-802f0797f294","Token":"CfDJ8DDLJNxcFcJPlCbHTlO1KCqF nRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY TUWq7kGpDa qnVOZnwWoSAn1jw1 criYyMEPXkvbEyOQbjo7Y  ytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg==","$type":"ConfirmEmailCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:06:14.999 -08:00 WRN] Handled ConfirmEmailCommand in 131ms with result: Failure - Identity.ConfirmEmailFailed: Invalid token. <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:06:15.029 -08:00 WRN] HTTP POST /api/users/confirm-email?userId=b1e98e27-f1ac-4534-ad5e-802f0797f294&token=CfDJ8DDLJNxcFcJPlCbHTlO1KCqF+nRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY+TUWq7kGpDa+qnVOZnwWoSAn1jw1+criYyMEPXkvbEyOQbjo7Y++ytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg== respondeu 400 em 174ms [TraceId: 0HNHRCIAGAUT8:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 15:10:25.773 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:10:25.773 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:10:41.614 -08:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 15:10:41.668 -08:00 INF] Handling ConfirmEmailCommand {"UserId":"b1e98e27-f1ac-4534-ad5e-802f0797f294","Token":"CfDJ8DDLJNxcFcJPlCbHTlO1KCqF nRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY TUWq7kGpDa qnVOZnwWoSAn1jw1 criYyMEPXkvbEyOQbjo7Y  ytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg==","$type":"ConfirmEmailCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:10:41.897 -08:00 WRN] Handled ConfirmEmailCommand in 230ms with result: Failure - Identity.ConfirmEmailFailed: Invalid token. <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:10:41.982 -08:00 WRN] HTTP POST /api/users/confirm-email?userId=b1e98e27-f1ac-4534-ad5e-802f0797f294&token=CfDJ8DDLJNxcFcJPlCbHTlO1KCqF+nRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY+TUWq7kGpDa+qnVOZnwWoSAn1jw1+criYyMEPXkvbEyOQbjo7Y++ytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg== respondeu 400 em 380ms [TraceId: 0HNHRCO097RFI:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 15:11:52.093 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:11:52.093 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:11:52.150 -08:00 ERR] Hosting failed to start <s:Microsoft.Extensions.Hosting.Internal.Host>
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5020: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Address already in use
+ ---> System.Net.Sockets.SocketException (48): Address already in use
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+[2025-12-14 15:14:12.478 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:14:12.478 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 15:14:23.523 -08:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 15:14:23.575 -08:00 INF] Handling ConfirmEmailCommand {"UserId":"b1e98e27-f1ac-4534-ad5e-802f0797f294","Token":"CfDJ8DDLJNxcFcJPlCbHTlO1KCqF+nRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY+TUWq7kGpDa+qnVOZnwWoSAn1jw1+criYyMEPXkvbEyOQbjo7Y++ytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg==","$type":"ConfirmEmailCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:14:23.898 -08:00 WRN] No handlers registered for event UserEmailConfirmedIntegrationEvent <s:BuildingBlocks.Infrastructure.Messaging.Integration.InMemoryEventBus>
+[2025-12-14 15:14:23.900 -08:00 INF] Handled ConfirmEmailCommand in 327ms with result: Success <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 15:14:23.967 -08:00 INF] HTTP POST /api/users/confirm-email?userId=b1e98e27-f1ac-4534-ad5e-802f0797f294&token=CfDJ8DDLJNxcFcJPlCbHTlO1KCqF%2BnRF9ZhLsj27KNQf6xovkvaXHuemV2yW9Gw/oc0PRRVFhD/Dg/V2cqgTEWy9acLcCkZy9djev0wY%2BTUWq7kGpDa%2BqnVOZnwWoSAn1jw1%2BcriYyMEPXkvbEyOQbjo7Y%2B%2BytVuu/0zHzQjOs10LmOtJNdB9EpTrlEY7zlDoUbvqEDXW6FOPdbmhN7HPbsaX0tGALCIVVljK6bdDHe4VevHzjN1oWn9dydoKsO8FUOvcg== respondeu 200 em 456ms [TraceId: 0HNHRCQ2DG2EM:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 16:16:42.258 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:16:42.258 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:17:28.458 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:17:28.458 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:17:28.515 -08:00 ERR] Hosting failed to start <s:Microsoft.Extensions.Hosting.Internal.Host>
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5020: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Address already in use
+ ---> System.Net.Sockets.SocketException (48): Address already in use
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+[2025-12-14 16:18:28.328 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:18:28.328 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:18:28.388 -08:00 ERR] Hosting failed to start <s:Microsoft.Extensions.Hosting.Internal.Host>
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5020: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Address already in use
+ ---> System.Net.Sockets.SocketException (48): Address already in use
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+[2025-12-14 16:18:55.252 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:18:55.252 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:19:20.121 -08:00 INF] Outbox Processor started for CatalogDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:19:20.121 -08:00 INF] Outbox Processor started for UsersDbContext. Interval: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:22:19.798 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para UsersDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:22:19.798 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para CatalogDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:22:51.920 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para CatalogDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:22:51.920 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para UsersDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:22:51.987 -08:00 ERR] Hosting failed to start <s:Microsoft.Extensions.Hosting.Internal.Host>
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5020: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Address already in use
+ ---> System.Net.Sockets.SocketException (48): Address already in use
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+[2025-12-14 16:23:09.783 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para UsersDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:23:09.783 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para CatalogDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:23:35.040 -08:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 16:23:35.236 -08:00 INF] Registrando novo usuário: brunodias@admin.com <s:Users.Presentation.Controllers.UsersController>
+[2025-12-14 16:23:35.269 -08:00 INF] 📥 [api] Recebendo RegisterUserCommand {"Email":"brunodias@admin.com","Password":"SenhaForte123*","FirstName":"Bruno","LastName":"Dias","$type":"RegisterUserCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 16:23:35.751 -08:00 INF] ✅ [users] Usuário criado com sucesso: "bba9382b-b365-43f4-bb58-7b122ac53b40" - brunodias@admin.com <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:23:36.096 -08:00 INF] ✅ [users] Perfil criado para usuário "bba9382b-b365-43f4-bb58-7b122ac53b40": Bruno Dias <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:23:36.108 -08:00 INF] Processando UserCreatedIntegrationEvent para usuário "bba9382b-b365-43f4-bb58-7b122ac53b40" - brunodias@admin.com <s:Cart.Application.IntegrationEventHandlers.UserCreatedIntegrationEventHandler>
+[2025-12-14 16:23:36.302 -08:00 INF] Carrinho "3945401e-dd1f-44e7-8493-fc33fa24d761" criado com sucesso para usuário "bba9382b-b365-43f4-bb58-7b122ac53b40" <s:Cart.Application.IntegrationEventHandlers.UserCreatedIntegrationEventHandler>
+[2025-12-14 16:23:36.302 -08:00 INF] 📤 [users] UserCreatedIntegrationEvent publicado para módulo Cart: "bba9382b-b365-43f4-bb58-7b122ac53b40" <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:23:36.308 -08:00 WRN] 📧 [users] Link de confirmação para brunodias@admin.com: http://localhost:5020/api/users/confirm-email?userId=bba9382b-b365-43f4-bb58-7b122ac53b40&token=CfDJ8DDLJNxcFcJPlCbHTlO1KCoZ%2BG3pQsYUbiRL8qhEnzyK2gUmO%2F0%2BjtUDV7y8Csb7xZXANXHgCCBB%2FApuSX7ycfUrXww8qAptAu5Udr8rom%2Fwk8cT6pnjfpUgFg5pdfbeqAu%2BzTDIgBuZCJVhQXfE0Vdt5qnOo0iG8t90R5%2Fi%2BrRYoB9d0P52T0U9ISeSU645ba6evUL5Mg2d6KVoCupMHyxl9H1cUVdSx3NXq%2BK%2BgB%2BXVciyyqlr1J4TQ3OTFSHfVA%3D%3D <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:23:36.310 -08:00 INF] Enviando email para brunodias@admin.com com assunto 'Confirme seu email - BCommerce' <s:Users.Infrastructure.Services.EmailService>
+[2025-12-14 16:23:36.411 -08:00 INF] Email enviado com sucesso para brunodias@admin.com <s:Users.Infrastructure.Services.EmailService>
+[2025-12-14 16:23:36.413 -08:00 INF] ✅ [api] Processado RegisterUserCommand em 1146ms <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 16:23:36.463 -08:00 INF] HTTP POST /api/users/register respondeu 201 em 1450ms [TraceId: 0HNHRE0NL0C3A:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 16:24:52.410 -08:00 INF] 📥 [api] Recebendo ConfirmEmailCommand {"UserId":"bba9382b-b365-43f4-bb58-7b122ac53b40","Token":"CfDJ8DDLJNxcFcJPlCbHTlO1KCoZ+G3pQsYUbiRL8qhEnzyK2gUmO/0+jtUDV7y8Csb7xZXANXHgCCBB/ApuSX7ycfUrXww8qAptAu5Udr8rom/wk8cT6pnjfpUgFg5pdfbeqAu+zTDIgBuZCJVhQXfE0Vdt5qnOo0iG8t90R5/i+rRYoB9d0P52T0U9ISeSU645ba6evUL5Mg2d6KVoCupMHyxl9H1cUVdSx3NXq+K+gB+XVciyyqlr1J4TQ3OTFSHfVA==","$type":"ConfirmEmailCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 16:24:52.499 -08:00 WRN] No handlers registered for event UserEmailConfirmedIntegrationEvent <s:BuildingBlocks.Infrastructure.Messaging.Integration.InMemoryEventBus>
+[2025-12-14 16:24:52.500 -08:00 INF] ✅ [api] Processado ConfirmEmailCommand em 89ms <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 16:24:52.510 -08:00 INF] HTTP POST /api/users/confirm-email?userId=bba9382b-b365-43f4-bb58-7b122ac53b40&token=CfDJ8DDLJNxcFcJPlCbHTlO1KCoZ%2BG3pQsYUbiRL8qhEnzyK2gUmO%2F0%2BjtUDV7y8Csb7xZXANXHgCCBB%2FApuSX7ycfUrXww8qAptAu5Udr8rom%2Fwk8cT6pnjfpUgFg5pdfbeqAu%2BzTDIgBuZCJVhQXfE0Vdt5qnOo0iG8t90R5%2Fi%2BrRYoB9d0P52T0U9ISeSU645ba6evUL5Mg2d6KVoCupMHyxl9H1cUVdSx3NXq%2BK%2BgB%2BXVciyyqlr1J4TQ3OTFSHfVA%3D%3D respondeu 200 em 119ms [TraceId: 0HNHRE0NL0C3C:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>
+[2025-12-14 16:32:26.989 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para CatalogDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:32:26.989 -08:00 INF] 🚀 [background-job] Processador de Outbox iniciado para UsersDbContext. Intervalo: 2s, BatchSize: 20 <s:BuildingBlocks.Infrastructure.BackgroundJobs.ProcessOutboxMessagesJob>
+[2025-12-14 16:33:03.927 -08:00 WRN] Failed to determine the https port for redirect. <s:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware>
+[2025-12-14 16:33:04.044 -08:00 INF] Registrando novo usuário: brunodias2@admin.com <s:Users.Presentation.Controllers.UsersController>
+[2025-12-14 16:33:04.072 -08:00 INF] 📥 [api] Recebendo RegisterUserCommand {"Email":"brunodias2@admin.com","Password":"SenhaForte123*","FirstName":"Bruno","LastName":"Dias","$type":"RegisterUserCommand"} <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 16:33:04.535 -08:00 INF] ✅ [users] Usuário criado com sucesso: "e6f0aae0-d466-4ee9-bedd-eaf161a0f7b6" - brunodias2@admin.com <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:33:04.709 -08:00 INF] ✅ [users] Perfil criado para usuário "e6f0aae0-d466-4ee9-bedd-eaf161a0f7b6": Bruno Dias <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:33:04.714 -08:00 INF] 📤 [users] UserCreatedIntegrationEvent publicado para módulo Cart: "e6f0aae0-d466-4ee9-bedd-eaf161a0f7b6" <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:33:04.718 -08:00 WRN] 📧 [users] Link de confirmação para brunodias2@admin.com: http://localhost:5020/api/users/confirm-email?userId=e6f0aae0-d466-4ee9-bedd-eaf161a0f7b6&token=CfDJ8DDLJNxcFcJPlCbHTlO1KCrJTodcKMMcpfnXFjQcvXQEYaRfrMsIQksnifgkYYhrWeGJAHl%2B3bwDmupZhpHo20wpA%2BCnleLflV6oKLHTPiGkgg9BXIhSwUXLiR%2FalLp2BRnmUUcmrRNKKZJUw%2BAE8WbTTSyt9VoGhN34KoPKyCKjR6IK6l6DvyTW%2FZnG3%2FBcg4o0aewACKqVfJ1UMcGYTTmziwU7P1ieXHRw1h5ipFUVLbSIOxMVOFYLCBQ74J%2BFmg%3D%3D <s:Users.Application.Commands.RegisterUser.RegisterUserCommandHandler>
+[2025-12-14 16:33:04.720 -08:00 INF] Enviando email para brunodias2@admin.com com assunto 'Confirme seu email - BCommerce' <s:Users.Infrastructure.Services.EmailService>
+[2025-12-14 16:33:04.821 -08:00 INF] Email enviado com sucesso para brunodias2@admin.com <s:Users.Infrastructure.Services.EmailService>
+[2025-12-14 16:33:04.822 -08:00 INF] ✅ [api] Processado RegisterUserCommand em 753ms <s:BuildingBlocks.Application.Behaviors.LoggingBehavior>
+[2025-12-14 16:33:04.863 -08:00 INF] HTTP POST /api/users/register respondeu 201 em 949ms [TraceId: 0HNHRE616MTJO:00000001] <s:BuildingBlocks.Presentation.Middleware.RequestLoggingMiddleware>

@@ -6,6 +6,7 @@ using System.Diagnostics;
 
 namespace BuildingBlocks.Application.Behaviors;
 
+
 /// <summary>
 /// Behavior do MediatR para logging automático de requests e responses.
 /// Registra entrada, saída, duração e erros.
@@ -52,7 +53,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         {
             // Log início da execução
             _logger.LogInformation(
-                "Handling {RequestName} {@Request}",
+                "📥 [api] Recebendo {RequestName} {@Request}",
                 requestName,
                 request);
 
@@ -65,14 +66,14 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             if (response.IsSuccess)
             {
                 _logger.LogInformation(
-                    "Handled {RequestName} in {ElapsedMilliseconds}ms with result: Success",
+                    "✅ [api] Processado {RequestName} em {ElapsedMilliseconds}ms",
                     requestName,
                     stopwatch.ElapsedMilliseconds);
             }
             else
             {
                 _logger.LogWarning(
-                    "Handled {RequestName} in {ElapsedMilliseconds}ms with result: Failure - {ErrorCode}: {ErrorMessage}",
+                    "⚠️ [api] Processado {RequestName} (Falha) em {ElapsedMilliseconds}ms - {ErrorCode}: {ErrorMessage}",
                     requestName,
                     stopwatch.ElapsedMilliseconds,
                     response.Error.Code,
@@ -87,7 +88,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
 
             _logger.LogError(
                 ex,
-                "Error handling {RequestName} after {ElapsedMilliseconds}ms",
+                "❌ [api] Erro ao processar {RequestName} após {ElapsedMilliseconds}ms",
                 requestName,
                 stopwatch.ElapsedMilliseconds);
 
@@ -95,6 +96,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         }
     }
 }
+
 
 /// <summary>
 /// Behavior de performance logging (alerta se exceder threshold).
@@ -129,7 +131,7 @@ public class PerformanceLoggingBehavior<TRequest, TResponse> : IPipelineBehavior
         if (stopwatch.ElapsedMilliseconds > _slowRequestThresholdMs)
         {
             _logger.LogWarning(
-                "SLOW REQUEST: {RequestName} took {ElapsedMilliseconds}ms (threshold: {ThresholdMs}ms) {@Request}",
+                "🐢 [api] Request Lento: {RequestName} levou {ElapsedMilliseconds}ms (limite: {ThresholdMs}ms) {@Request}",
                 requestName,
                 stopwatch.ElapsedMilliseconds,
                 _slowRequestThresholdMs,
@@ -139,6 +141,7 @@ public class PerformanceLoggingBehavior<TRequest, TResponse> : IPipelineBehavior
         return response;
     }
 }
+
 
 /// <summary>
 /// Extensões para facilitar registro de logging behaviors.
@@ -154,9 +157,7 @@ public static class LoggingBehaviorExtensions
         return services;
     }
 
-    /// <summary>
-    /// Registra PerformanceLoggingBehavior.
-    /// </summary>
+
     public static IServiceCollection AddPerformanceLoggingBehavior(
         this IServiceCollection services,
         int slowRequestThresholdMs = 500)

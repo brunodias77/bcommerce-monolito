@@ -7,17 +7,18 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
 /// <summary>
-/// Interceptor que preenche automaticamente CreatedAt e UpdatedAt.
+/// Interceptor responsável pela <strong>Auditoria Básica</strong> dos registros.
 /// </summary>
 /// <remarks>
-/// Para entidades que implementam IAuditableEntity:
-/// - CreatedAt é definido quando a entidade é Added
-/// - UpdatedAt é atualizado quando a entidade é Added ou Modified
+/// <strong>Objetivo:</strong>
+/// Centralizar a lógica de preenchimento de metadados temporais (<c>CreatedAt</c>, <c>UpdatedAt</c>).
+/// Isso tira a responsabilidade das camadas de aplicação/domínio e garante consistência.
 /// 
-/// Configuração no DbContext:
-/// <code>
-/// options.AddInterceptors(new AuditableEntityInterceptor(dateTimeProvider));
-/// </code>
+/// <strong>Funcionamento:</strong>
+/// - <strong>Insert:</strong> Define <c>CreatedAt</c> e <c>UpdatedAt</c> com UTC Now.
+/// - <strong>Update:</strong> Atualiza <c>UpdatedAt</c> com UTC Now.
+/// 
+/// Depende de <see cref="IDateTimeProvider"/> para facilitar testes (evitando DateTime.UtcNow direto).
 /// </remarks>
 public class AuditableEntityInterceptor : SaveChangesInterceptor
 {

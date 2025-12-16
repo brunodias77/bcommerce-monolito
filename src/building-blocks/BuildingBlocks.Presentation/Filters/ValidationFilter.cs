@@ -41,9 +41,9 @@ public class ValidationFilter : IActionFilter
             var problemDetails = new ValidationProblemDetails(context.ModelState)
             {
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                Title = "Validation Failed",
+                Title = "Falha na Validação",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred.",
+                Detail = "Ocorreu um ou mais erros de validação.",
                 Instance = context.HttpContext.Request.Path
             };
 
@@ -89,15 +89,15 @@ public class AsyncValidationFilter : IAsyncActionFilter
                 kvp => kvp.Key,
                 kvp => kvp.Value!.Errors.Select(e =>
                     string.IsNullOrEmpty(e.ErrorMessage)
-                        ? e.Exception?.Message ?? "Invalid value"
+                        ? e.Exception?.Message ?? "Valor inválido"
                         : e.ErrorMessage).ToArray());
 
         return new ValidationProblemDetails(errors)
         {
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            Title = "Validation Failed",
+            Title = "Falha na Validação",
             Status = StatusCodes.Status400BadRequest,
-            Detail = $"{errors.Sum(e => e.Value.Length)} validation error(s) occurred.",
+            Detail = $"{errors.Sum(e => e.Value.Length)} erros de validação ocorreram.",
             Instance = context.HttpContext.Request.Path,
             Extensions =
             {

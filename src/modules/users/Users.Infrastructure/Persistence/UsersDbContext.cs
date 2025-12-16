@@ -62,6 +62,12 @@ public class UsersDbContext : IdentityDbContext<
 
         // Aplica todas as configurações de entidades do assembly
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // Mapeamento da tabela Outbox
+        builder.Entity<BuildingBlocks.Infrastructure.Persistence.Interceptors.OutboxMessage>(b =>
+        {
+            b.ToTable("outbox_messages");
+        });
     }
 
     // ========================================

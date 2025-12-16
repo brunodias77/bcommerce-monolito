@@ -5,28 +5,21 @@ using Microsoft.Extensions.Logging;
 namespace BuildingBlocks.Infrastructure.Messaging.Integration;
 
 /// <summary>
-/// Implementação in-memory do Event Bus.
+/// Implementação in-memory do Event Bus (Barramento de Eventos Local).
 /// </summary>
 /// <remarks>
-/// Esta implementação é adequada para:
-/// - Desenvolvimento local
-/// - Testes de integração
-/// - Monolitos simples onde todos os handlers estão no mesmo processo
+/// <strong>Arquitetura de Desenvolvimento:</strong>
+/// - Processa eventos na mesma Thread/Task (ou threads do Pool local).
+/// - <strong>Sem Persistência:</strong> Se a aplicação cair antes de processar, o evento é PERDIDO.
 /// 
-/// Para produção em ambiente distribuído, use uma implementação baseada em
-/// message broker (RabbitMQ, Azure Service Bus, etc.) ou o OutboxEventBus.
+/// <strong>Casos de Uso:</strong>
+/// - Ambientes de Desenvolvimento (Dev/Local).
+/// - Testes unitários/integração.
+/// - Cenários onde a perda de eventos é tolerável.
 /// 
-/// Configuração:
-/// <code>
-/// services.AddSingleton&lt;IEventBus, InMemoryEventBus&gt;();
-/// 
-/// // Registrar handlers estaticamente (recomendado para módulos)
-/// InMemoryEventBus.RegisterHandler&lt;UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler&gt;();
-/// 
-/// // Ou via instância
-/// var eventBus = app.Services.GetRequiredService&lt;IEventBus&gt;();
-/// eventBus.Subscribe&lt;UserCreatedIntegrationEvent, UserCreatedIntegrationEventHandler&gt;();
-/// </code>
+/// <strong>Estratégia de Handlers Estáticos:</strong>
+/// Usa um dicionário estático (_staticHandlers) para permitir que os módulos registrem seus interesses (Subscribe)
+/// durante a inicialização (AddModule), mesmo antes do container de DI estar totalmente construído.
 /// </remarks>
 public class InMemoryEventBus : IEventBus
 {
@@ -113,6 +106,9 @@ public class InMemoryEventBus : IEventBus
         {
             try
             {
+                // CRÍTICO: Resolve o handler dentro de um novo escopo.
+                // Isso permite que o handler use DbContexts e outros serviços Scoped
+                // sem conflitar com o escopo original da requisição (se houver).
                 var handler = scope.ServiceProvider.GetService(handlerType);
 
                 if (handler == null)
@@ -146,7 +142,8 @@ public class InMemoryEventBus : IEventBus
                     eventType.Name,
                     handlerType.Name);
 
-                // Em produção, considere implementar retry ou dead letter queue
+                // Em produção real, exceções aqui parariam o processamento dos próximos handlers.
+                // No InMemory, estamos relançando para dar visibilidade do erro.
                 throw;
             }
         }

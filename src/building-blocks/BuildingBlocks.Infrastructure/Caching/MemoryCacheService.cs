@@ -7,25 +7,24 @@ using Microsoft.Extensions.Options;
 namespace BuildingBlocks.Infrastructure.Caching;
 
 /// <summary>
-/// Implementação do ICacheService usando IMemoryCache.
+/// Implementação em memória (In-Process) do ICacheService.
 /// </summary>
 /// <remarks>
-/// Esta implementação:
-/// - Usa IMemoryCache do .NET (in-process)
-/// - Mantém rastreamento de chaves para suportar RemoveByPrefix
-/// - Suporta sliding e absolute expiration
+/// <strong>Estratégia de Key Tracking:</strong>
+/// O <see cref="IMemoryCache"/> nativo do .NET Core NÃO suporta get ou remove por padrão/prefixo.
+/// Para contornar isso, esta implementação mantém um <see cref="ConcurrentDictionary{TKey,TValue}"/> auxiliar (_keys)
+/// que registra todas as chaves ativas.
 /// 
-/// Limitações:
-/// - Cache não é compartilhado entre instâncias
-/// - Dados perdidos ao reiniciar a aplicação
+/// <strong>Ciclo de Vida:</strong>
+/// 1. Ao adicionar (Set): A chave é adicionada ao dicionário auxiliar.
+/// 2. Ao remover (Remove): A chave é removida do dicionário auxiliar.
+/// 3. Ao expirar (Eviction): Um callback (PostEvictionCallback) limpa a chave do dicionário auxiliar.
 /// 
-/// Para ambientes distribuídos, use Redis ou outro cache distribuído.
+/// <strong>Limitações:</strong>
+/// - A memória é do processo local (não compartilhado em cluster).
+/// - Reiniciar a aplicação limpa todo o cache.
 /// 
-/// Configuração:
-/// <code>
-/// services.AddMemoryCache();
-/// services.AddSingleton&lt;ICacheService, MemoryCacheService&gt;();
-/// </code>
+/// Ideal para: Dados de referência pequenos, tabelas de domínio estáticas, tokens de curta duração.
 /// </remarks>
 public class MemoryCacheService : ICacheService
 {
@@ -77,7 +76,10 @@ public class MemoryCacheService : ICacheService
             cacheOptions.AbsoluteExpirationRelativeToNow = effectiveExpiration;
         }
 
-        // Callback para remover da lista de chaves quando expirar
+        // Callback CRÍTICO para gerenciamento de memória:
+        // Quando o item expira ou é removido por pressão de memória do IMemoryCache,
+        // ele DEVE ser removido do nosso dicionário de chaves (_keys).
+        // Se isso não ocorrer, teremos um memory leak no dicionário _keys.
         cacheOptions.RegisterPostEvictionCallback((evictedKey, _, _, _) =>
         {
             _keys.TryRemove(evictedKey.ToString()!, out _);
@@ -128,6 +130,10 @@ public class MemoryCacheService : ICacheService
     public Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
     {
         var fullPrefix = GetFullKey(prefix);
+        
+        // CUIDADO: Esta operação é O(N) onde N é o número total de chaves no cache.
+        // Em um cache muito grande, isso pode ser lento.
+        // O uso do ConcurrentDictionary ajuda na thread-safety, mas não elimina o custo de iteração.
         var keysToRemove = _keys.Keys
             .Where(k => k.StartsWith(fullPrefix))
             .ToList();

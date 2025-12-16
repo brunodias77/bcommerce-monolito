@@ -73,7 +73,7 @@ public static class ProblemDetailsExtensions
         var problemDetails = new ValidationProblemDetails
         {
             Type = ErrorTypeUris[ErrorType.Validation],
-            Title = "Validation Error",
+            Title = "Erro de Validação",
             Status = StatusCodes.Status400BadRequest,
             Detail = error.Message,
             Instance = httpContext?.Request.Path
@@ -107,7 +107,7 @@ public static class ProblemDetailsExtensions
         var problemDetails = new ProblemDetails
         {
             Type = ErrorTypeUris[ErrorType.Failure],
-            Title = "An unexpected error occurred",
+            Title = "Ocorreu um erro inesperado",
             Status = StatusCodes.Status500InternalServerError,
             Detail = exception.Message,
             Instance = httpContext?.Request.Path
@@ -146,13 +146,13 @@ public static class ProblemDetailsExtensions
 
     private static string GetTitle(ErrorType errorType) => errorType switch
     {
-        ErrorType.Validation => "Validation Error",
-        ErrorType.NotFound => "Resource Not Found",
-        ErrorType.Conflict => "Conflict",
-        ErrorType.Unauthorized => "Unauthorized",
-        ErrorType.Forbidden => "Forbidden",
-        ErrorType.Failure => "Internal Server Error",
-        _ => "An error occurred"
+        ErrorType.Validation => "Erro de Validação",
+        ErrorType.NotFound => "Recurso Não Encontrado",
+        ErrorType.Conflict => "Conflito",
+        ErrorType.Unauthorized => "Não Autorizado",
+        ErrorType.Forbidden => "Proibido",
+        ErrorType.Failure => "Erro Interno do Servidor",
+        _ => "Ocorreu um erro"
     };
 
     private static Dictionary<string, List<string>> ParseValidationErrors(string message)

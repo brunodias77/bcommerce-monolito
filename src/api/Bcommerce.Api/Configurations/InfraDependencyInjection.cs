@@ -29,21 +29,25 @@ public static class InfraDependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // ===============================================================
-        // Serviços Compartilhados
+        // SERVIÇOS COMPARTILHADOS (SHARED KERNEL)
         // ===============================================================
-        services.AddDateTimeProvider();
-        services.AddHttpContextAccessor();
-        services.AddCurrentUserService();
+        // Serviços utilitários usados por toda a aplicação.
+        services.AddDateTimeProvider();      // IDateTimeProvider (facilita testes de tempo)
+        services.AddHttpContextAccessor();   // Acesso ao HttpContext atual
+        services.AddCurrentUserService();    // ICurrentUserService (identifica o usuário logado)
 
         // ===============================================================
-        // EF Core Interceptors (Singletons para reutilização)
+        // EF CORE INTERCEPTORS
         // ===============================================================
-        services.AddSingleton<AuditableEntityInterceptor>();
-        services.AddSingleton<SoftDeleteInterceptor>();
-        services.AddSingleton<OptimisticConcurrencyInterceptor>();
+        // Interceptam operações de SaveChanges para aplicar lógica transversal.
+        // Registrados como Singleton pois não mantêm estado.
+        
+        services.AddSingleton<AuditableEntityInterceptor>(); // Preenche CreatedAt/UpdatedAt
+        services.AddSingleton<SoftDeleteInterceptor>();      // Transforma Delete em Soft Delete (DeletedAt)
+        services.AddSingleton<OptimisticConcurrencyInterceptor>(); // Trata concorrência otimista (Version)
 
-        // PublishDomainEventsInterceptor é registrado por módulo com KeyedServices
-        // Cada módulo tem sua própria instância identificada pelo nome do módulo
+        // PublishDomainEventsInterceptor: Transforma Domain Events em Mensagens de Outbox.
+        // Registrado via Keyed Services porque cada módulo precisa de uma instância com o nome do seu Schema.
         services.AddKeyedSingleton("users", (sp, key) => new PublishDomainEventsInterceptor("users"));
         services.AddKeyedSingleton("catalog", (sp, key) => new PublishDomainEventsInterceptor("catalog"));
         services.AddKeyedSingleton("cart", (sp, key) => new PublishDomainEventsInterceptor("cart"));
@@ -52,15 +56,17 @@ public static class InfraDependencyInjection
         services.AddKeyedSingleton("coupons", (sp, key) => new PublishDomainEventsInterceptor("coupons"));
 
         // ===============================================================
-        // Event Bus
+        // EVENT BUS (Mensageria)
         // ===============================================================
-        // InMemoryEventBus para desenvolvimento/testes
-        // Para produção, use OutboxEventBus + ProcessOutboxMessagesJob
+        // Responsável por enviar Integation Events entre módulos.
+        // - InMemoryEventBus: Síncrono, ideal para dev/testes, mas sem resiliência.
+        // - OutboxEventBus (Futuro): Assíncrono, grava no banco antes de enviar (RabbitMQ/Azure).
         services.AddScoped<IEventBus, InMemoryEventBus>();
 
         // ===============================================================
-        // Cache Service
+        // CACHE DISTRIBUÍDO
         // ===============================================================
+        // Abstração de cache (hoje MemoryCache, futuramente Redis).
         services.AddMemoryCacheService(options =>
         {
             options.DefaultExpiration = TimeSpan.FromMinutes(5);
@@ -68,10 +74,13 @@ public static class InfraDependencyInjection
         });
 
         // ===============================================================
-        // Background Jobs (descomente para habilitar)
+        // BACKGROUND JOBS (Tarefas em Segundo Plano)
         // ===============================================================
-        // Outbox Processor - processa domain events do Outbox
-        // Usa CatalogDbContext pois ele tem a tabela OutboxMessage mapeada
+        // Processadores que rodam em background (HostedServices).
+        
+        // Outbox Processor: Lê a tabela outbox_messages e publica os eventos pendentes.
+        // Atualmente configurado apenas para o CatalogDbContext.
+        // TODO: Configurar para outros módulos (Users, Orders) quando tiverem Outbox implementado.
         services.AddOutboxProcessor<Catalog.Infrastructure.Persistence.CatalogDbContext>(options =>
         {
             options.ProcessInterval = TimeSpan.FromSeconds(2);
@@ -79,41 +88,32 @@ public static class InfraDependencyInjection
             options.MaxRetries = 3;
         });
 
-        // Session Cleanup - limpa sessões expiradas
-        // services.AddSessionCleanupJob(options =>
-        // {
-        //     options.CleanupInterval = TimeSpan.FromMinutes(5);
-        //     options.BatchSize = 100;
-        // });
+        // Outbox Processor para Users
+        services.AddOutboxProcessor<Users.Infrastructure.Persistence.UsersDbContext>(options =>
+        {
+            options.ProcessInterval = TimeSpan.FromSeconds(2);
+            options.BatchSize = 20;
+            options.MaxRetries = 3;
+        });
 
         // ===============================================================
-        // Database Connection String
+        // DATABASE & MODULES
         // ===============================================================
+        
+        // Connection String principal
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        // ===============================================================
-        // DbContexts dos Módulos
-        // ===============================================================
-        // Cada módulo tem seu próprio DbContext com interceptors compartilhados
+        // Configuração de cada módulo (DbContexts, Repositories, etc.)
+        // Cada módulo é responsável por registrar suas próprias dependências.
 
-        // Users Module
-        services.AddUsersModule(configuration);
+        services.AddUsersModule(configuration);   // Módulo de Usuários
+        services.AddCatalogModule(configuration); // Módulo de Catálogo
+        services.AddCartModule(configuration);    // Módulo de Carrinho
 
-        // Catalog Module
-        services.AddCatalogModule(configuration);
-
-        // Cart Module
-        services.AddCartModule(configuration);
-
-        // Orders Module - TODO: Implementar OrdersDbContext
+        // TODO: Implementar e descomentar conforme novos módulos surgirem
         // services.AddOrdersModule(configuration);
-
-        // Payments Module - TODO: Implementar PaymentsDbContext
         // services.AddPaymentsModule(configuration);
-
-        // Coupons Module - TODO: Implementar CouponsDbContext
-        // services.AddCouponsModule(configuration);
 
         return services;
     }

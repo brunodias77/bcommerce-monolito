@@ -11,10 +11,21 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// Background Service que processa mensagens do Outbox.
 /// </summary>
 /// <remarks>
-/// Este job:
-/// 1. Busca mensagens não processadas do Outbox (shared.domain_events)
-/// 2. Deserializa e publica para os handlers registrados
-/// 3. Marca como processadas ou incrementa retry_count em caso de erro
+/// <strong>O Padrão Outbox:</strong>
+/// O Outbox Pattern é utilizado para garantir consistência eventual em sistemas distribuídos.
+/// Ele resolve o problema de atomicidade entre salvar dados no banco (ex: Criar Pedido) e publicar eventos (ex: PedidoCriado).
+/// 
+/// <strong>Como funciona:</strong>
+/// 1. Durante a transação de negócio, o evento não é publicado diretamente. Ele é salvo na tabela 'outbox_messages'.
+/// 2. Se a transação falhar (rollback), o evento também é descartado (atomicidade garantida).
+/// 3. Se a transação for commitada, o evento é persistido.
+/// 4. <strong>Este Job</strong> roda em segundo plano, lê os eventos da tabela e os publica.
+/// 
+/// <strong>Fluxo deste Job:</strong>
+/// 1. Busca mensagens pendentes (ProcessedAt == null) em lotes.
+/// 2. Tenta processar cada mensagem (deserializa e executa handlers).
+/// 3. Se sucesso: Marca como processada (ProcessedAt = Now).
+/// 4. Se falha: Incrementa contador de retry e registra o erro.
 /// 
 /// Configuração:
 /// <code>
@@ -22,9 +33,9 @@ namespace BuildingBlocks.Infrastructure.BackgroundJobs;
 /// </code>
 /// 
 /// Configurações recomendadas:
-/// - Intervalo de processamento: 1-5 segundos
-/// - Batch size: 10-100 mensagens
-/// - Max retries: 3-5
+/// - Intervalo de processamento: 1-5 segundos (balancear latência vs carga)
+/// - Batch size: 10-100 mensagens (evitar lock excessivo)
+/// - Max retries: 3-5 (após isso, intervenção manual pode ser necessária)
 /// </remarks>
 public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
     where TDbContext : DbContext
@@ -51,7 +62,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Outbox Processor started for {DbContext}. Interval: {Interval}s, BatchSize: {BatchSize}",
+        _logger.LogInformation("🚀 [background-job] Processador de Outbox iniciado para {DbContext}. Intervalo: {Interval}s, BatchSize: {BatchSize}",
             typeof(TDbContext).Name, _processInterval.TotalSeconds, _batchSize);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -62,13 +73,13 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing outbox messages");
+                _logger.LogError(ex, "❌ [background-job] Erro ao processar mensagens do outbox");
             }
 
             await Task.Delay(_processInterval, stoppingToken);
         }
 
-        _logger.LogInformation("Outbox Processor stopped");
+        _logger.LogInformation("🛑 [background-job] Processador de Outbox parado");
     }
 
     private async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken)
@@ -89,7 +100,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
             if (!messages.Any())
                 return;
 
-            _logger.LogDebug("Processing {Count} outbox messages", messages.Count);
+            _logger.LogDebug("📦 [background-job] Processando {Count} mensagens do outbox", messages.Count);
 
             foreach (var message in messages)
             {
@@ -100,7 +111,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
                     message.ProcessedAt = DateTime.UtcNow;
                     message.ErrorMessage = null;
 
-                    _logger.LogDebug("Processed outbox message {MessageId} of type {EventType}",
+                    _logger.LogDebug("✅ [background-job] Mensagem {MessageId} ({EventType}) processada com sucesso",
                         message.Id, message.EventType);
                 }
                 catch (Exception ex)
@@ -109,13 +120,13 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
                     message.ErrorMessage = ex.Message;
 
                     _logger.LogWarning(ex,
-                        "Error processing outbox message {MessageId}. Retry count: {RetryCount}",
+                        "⚠️ [background-job] Erro ao processar mensagem {MessageId}. Tentativa: {RetryCount}",
                         message.Id, message.RetryCount);
 
                     if (message.RetryCount >= _maxRetries)
                     {
                         _logger.LogError(
-                            "Max retries reached for outbox message {MessageId}. Moving to dead letter.",
+                            "💀 [background-job] Max retries atingido para mensagem {MessageId}. Movendo para dead letter.",
                             message.Id);
                     }
                 }
@@ -126,7 +137,7 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
         catch (InvalidOperationException)
         {
             // OutboxMessage não está mapeada neste DbContext, ignorar silenciosamente
-            _logger.LogDebug("{DbContext} does not have OutboxMessage mapped, skipping", typeof(TDbContext).Name);
+            _logger.LogDebug("ℹ️ [background-job] {DbContext} não possui OutboxMessage mapeada, pulando", typeof(TDbContext).Name);
         }
     }
 
@@ -137,6 +148,15 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
     {
         // Deserializa o evento
         var eventType = Type.GetType(message.EventType);
+        
+        // Fallback: Se não encontrar pelo nome (ex: sem assembly name), procura nos assemblies carregados
+        if (eventType == null)
+        {
+            eventType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .FirstOrDefault(t => t.FullName == message.EventType || t.Name == message.EventType);
+        }
+
         if (eventType == null)
         {
             throw new InvalidOperationException($"Event type not found: {message.EventType}");
@@ -165,6 +185,9 @@ public class ProcessOutboxMessagesJob<TDbContext> : BackgroundService
                 continue;
             }
 
+            // O handler é resolvido via injeção de dependência.
+            // Note que usamos Reflection para invocar 'HandleAsync' porque o tipo do evento só é conhecido em tempo de execução.
+            // Isso permite que o OutboxProcessor seja genérico e funcione para qualquer tipo de evento.
             var handleMethod = handlerType.GetMethod("HandleAsync");
             if (handleMethod != null)
             {

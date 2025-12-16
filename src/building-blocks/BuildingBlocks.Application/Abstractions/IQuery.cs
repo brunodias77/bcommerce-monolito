@@ -48,4 +48,7 @@ namespace BuildingBlocks.Application.Abstractions;
 /// </remarks>
 public interface IQuery<TResponse> : IRequest<Result<TResponse>>
 {
+    // Queries representam operações SÓ DE LEITURA (Read-Only).
+    // Elas NÃO devem causar efeitos colaterais (side-effects) no sistema.
+    // Usamos Result<TResponse> para padronizar o retorno, inclusive para casos de "Not Found".
 }

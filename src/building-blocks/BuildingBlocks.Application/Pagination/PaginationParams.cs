@@ -40,6 +40,7 @@ public sealed class PaginationParams
     public int PageNumber
     {
         get => _pageNumber;
+        // Proteção: Garante que a página nunca seja menor que 1
         set => _pageNumber = value < 1 ? DefaultPageNumber : value;
     }
 
@@ -49,6 +50,8 @@ public sealed class PaginationParams
     public int PageSize
     {
         get => _pageSize;
+        // Proteção: Clamp entre 1 e MaxPageSize (100)
+        // Evita sobrecarga do banco de dados com pages muito grandes
         set => _pageSize = value switch
         {
             < 1 => DefaultPageSize,
