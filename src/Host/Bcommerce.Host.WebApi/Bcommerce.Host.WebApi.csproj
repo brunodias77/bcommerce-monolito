@@ -10,9 +10,11 @@
     <ProjectReference Include="..\..\BuildingBlocks\Bcommerce.BuildingBlocks.Web\Bcommerce.BuildingBlocks.Web.csproj" />
     <ProjectReference Include="..\..\Modules\Users\Bcommerce.Modules.Users.Api\Bcommerce.Modules.Users.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Bcommerce.Modules.Catalog.Api\Bcommerce.Modules.Catalog.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Catalog\Bcommerce.Modules.Catalog.Infrastructure\Bcommerce.Modules.Catalog.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
   </ItemGroup>

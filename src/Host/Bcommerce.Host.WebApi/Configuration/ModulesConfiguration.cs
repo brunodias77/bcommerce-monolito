@@ -1,5 +1,6 @@
 using Bcommerce.Modules.Users.Api.Extensions;
 using Bcommerce.Modules.Catalog.Api.Extensions;
+using Bcommerce.Modules.Catalog.Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,7 @@ public static class ModulesConfiguration
         
         // Register Catalog Module (assuming generic extension for now as I haven't seen the specific file, but following pattern)
         services.AddCatalogModule(configuration);
+        services.AddCatalogInfrastructure(configuration);
         
         return services;
     }
