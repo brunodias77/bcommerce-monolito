@@ -2,6 +2,19 @@ using System.Security.Cryptography;
 
 namespace Bcommerce.BuildingBlocks.Security.Authentication;
 
+/// <summary>
+/// Implementação padrão de hash de senhas.
+/// </summary>
+/// <remarks>
+/// Utiliza PBKDF2 com SHA256 para segurança.
+/// - Gera salt aleatório para cada hash
+/// - Verifica senha contra hash armazenado (tempo constante)
+/// 
+/// Exemplo de uso:
+/// <code>
+/// var hash = _passwordHasher.Hash("senha123");
+/// </code>
+/// </remarks>
 public class PasswordHasher : IPasswordHasher
 {
     private const int SaltSize = 16;

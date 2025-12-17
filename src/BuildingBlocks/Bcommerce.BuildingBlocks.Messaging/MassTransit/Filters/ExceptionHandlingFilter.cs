@@ -3,6 +3,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Bcommerce.BuildingBlocks.Messaging.MassTransit.Filters;
 
+/// <summary>
+/// Filtro de pipeline para tratamento centralizado de exceções.
+/// </summary>
+/// <typeparam name="T">Tipo da mensagem.</typeparam>
+/// <remarks>
+/// Captura erros não tratados no consumo de mensagens.
+/// - Loga a exceção com contexto
+/// - Re-lança o erro para permitir retry do middleware superior
+/// 
+/// Exemplo de uso:
+/// <code>
+/// cfg.UseConsumeFilter(typeof(ExceptionHandlingFilter&lt;&gt;), context);
+/// </code>
+/// </remarks>
 public class ExceptionHandlingFilter<T>(ILogger<ExceptionHandlingFilter<T>> logger) : IFilter<ConsumeContext<T>>
     where T : class
 {

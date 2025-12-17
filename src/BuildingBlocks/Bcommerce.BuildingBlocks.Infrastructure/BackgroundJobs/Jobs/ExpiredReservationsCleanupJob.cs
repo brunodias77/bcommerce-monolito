@@ -3,7 +3,20 @@ using Quartz;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.BackgroundJobs.Jobs;
 
-// Placeholder para lógica de limpeza de reservas expiradas de estoque
+/// <summary>
+/// Job recorrente para limpeza de reservas de estoque orfãs.
+/// </summary>
+/// <remarks>
+/// Remove reservas temporárias que não foram convertidas em pedidos.
+/// - Previne "estoque preso" indefinidamente
+/// - Complementar ao ExpiredPaymentsJob
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Configurado para rodar a cada hora
+/// q.AddJob&lt;ExpiredReservationsCleanupJob&gt;(...);
+/// </code>
+/// </remarks>
 public class ExpiredReservationsCleanupJob(ILogger<ExpiredReservationsCleanupJob> logger) : IJob
 {
     private readonly ILogger<ExpiredReservationsCleanupJob> _logger = logger;

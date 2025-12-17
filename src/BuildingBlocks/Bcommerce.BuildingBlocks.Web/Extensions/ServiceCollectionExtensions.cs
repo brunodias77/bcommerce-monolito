@@ -4,6 +4,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Bcommerce.BuildingBlocks.Web.Extensions;
 
+/// <summary>
+/// Extensões para registro de serviços Web no DI.
+/// </summary>
+/// <remarks>
+/// Configura a infraestrutura web básica.
+/// - Registra Middlewares customizados
+/// - Configura Controllers e Filtros de validação
+/// 
+/// Exemplo de uso:
+/// <code>
+/// services.AddBuildingBlocksWeb();
+/// </code>
+/// </remarks>
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBuildingBlocksWeb(this IServiceCollection services)

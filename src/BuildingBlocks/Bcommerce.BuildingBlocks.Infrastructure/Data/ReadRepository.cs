@@ -4,6 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data;
 
+/// <summary>
+/// Implementação genérica de repositório para operações de leitura.
+/// </summary>
+/// <remarks>
+/// Otimizada para consultas sem rastreamento de mudanças (NoTracking).
+/// - Implementa cache-aside ou leitura direta
+/// - Utiliza AsNoTracking() por padrão para performance
+/// - Suporta Specifications para filtros complexos
+/// 
+/// Exemplo de uso:
+/// <code>
+/// var produto = await _readRepo.GetByIdAsync(id, ct);
+/// </code>
+/// </remarks>
 public class ReadRepository<TEntity, TContext>(TContext dbContext) : IReadRepository<TEntity>
     where TEntity : class, IEntity
     where TContext : DbContext // Pode ser DbContext puro para leitura

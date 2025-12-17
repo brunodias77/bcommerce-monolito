@@ -5,6 +5,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Bcommerce.BuildingBlocks.Application.Behaviors;
 
+/// <summary>
+/// Behavior do MediatR para monitoramento de performance.
+/// </summary>
+/// <remarks>
+/// Identifica requisições lentas que excedem um limiar (ex: 500ms).
+/// - Dispara warning no log para requisições lentas
+/// - Auxilia na identificação de gargalos de performance
+/// - Transparente para a regra de negócio
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Se Demorar > 500ms:
+/// // [WARN] Longa Duração na Requisição: RelatorioQuery (850 milissegundos)
+/// </code>
+/// </remarks>
 public class PerformanceBehavior<TRequest, TResponse>(
     ILogger<PerformanceBehavior<TRequest, TResponse>> logger,
     ICurrentUserService currentUserService)
@@ -15,6 +30,7 @@ public class PerformanceBehavior<TRequest, TResponse>(
     private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly Stopwatch _timer = new();
 
+    /// <inheritdoc />
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         _timer.Start();

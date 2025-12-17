@@ -8,6 +8,20 @@ using Newtonsoft.Json;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Inbox.Processors;
 
+/// <summary>
+/// Serviço responsável por processar mensagens pendentes na tabela Inbox.
+/// </summary>
+/// <remarks>
+/// Lê mensagens não processadas e despacha os eventos correspondentes internamente.
+/// - Desserializa o conteúdo JSON para o tipo de evento correto
+/// - Publica o evento via MediatR (IPublisher)
+/// - Marca a mensagem como processada ou registra erro
+/// 
+/// Exemplo de uso:
+/// <code>
+/// await _processor.ProcessAsync(cancellationToken);
+/// </code>
+/// </remarks>
 public class InboxProcessor(
     BaseDbContext dbContext,
     IPublisher publisher,
@@ -19,6 +33,10 @@ public class InboxProcessor(
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<InboxProcessor> _logger = logger;
 
+    /// <summary>
+    /// Executa o ciclo de processamento de mensagens pendentes.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var messages = await _dbContext.Set<InboxMessage>()

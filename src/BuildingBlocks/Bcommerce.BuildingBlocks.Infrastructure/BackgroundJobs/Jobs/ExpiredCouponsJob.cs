@@ -3,7 +3,20 @@ using Quartz;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.BackgroundJobs.Jobs;
 
-// Placeholder para inativação de cupons expirados
+/// <summary>
+/// Job recorrente para inativação de cupons expirados.
+/// </summary>
+/// <remarks>
+/// Verifica e atualiza status de cupons com data de validade vencida.
+/// - Garante consistência da base de dados
+/// - Evita uso acidental de cupons inválidos em validações simples
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Configurado no Startup
+/// q.AddJob&lt;ExpiredCouponsJob&gt;(...);
+/// </code>
+/// </remarks>
 public class ExpiredCouponsJob(ILogger<ExpiredCouponsJob> logger) : IJob
 {
     private readonly ILogger<ExpiredCouponsJob> _logger = logger;

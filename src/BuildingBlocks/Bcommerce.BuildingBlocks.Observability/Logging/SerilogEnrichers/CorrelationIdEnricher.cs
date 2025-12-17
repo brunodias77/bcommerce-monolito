@@ -4,6 +4,19 @@ using Serilog.Events;
 
 namespace Bcommerce.BuildingBlocks.Observability.Logging.SerilogEnrichers;
 
+/// <summary>
+/// Enriquecedor do Serilog para adicionar o TraceIdentifier (CorrelationId) aos logs.
+/// </summary>
+/// <remarks>
+/// Extrai o ID de correlação do HttpContext.
+/// - Permite rastrear requisições através de múltiplos logs
+/// - Adiciona a propriedade "CorrelationId" se disponível
+/// 
+/// Exemplo de uso:
+/// <code>
+/// .Enrich.With&lt;CorrelationIdEnricher&gt;()
+/// </code>
+/// </remarks>
 public class CorrelationIdEnricher : ILogEventEnricher
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

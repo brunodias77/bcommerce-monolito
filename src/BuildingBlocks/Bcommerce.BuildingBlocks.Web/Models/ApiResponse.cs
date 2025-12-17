@@ -1,5 +1,19 @@
 namespace Bcommerce.BuildingBlocks.Web.Models;
 
+/// <summary>
+/// Wrapper padrão para respostas da API.
+/// </summary>
+/// <typeparam name="T">Tipo do dado retornado.</typeparam>
+/// <remarks>
+/// Unifica a estrutura de respostas de sucesso e erro.
+/// - Facilita o consumo pelo frontend
+/// - Encapsula dados e metadados de erro
+/// 
+/// Exemplo de uso:
+/// <code>
+/// return ApiResponse&lt;UserDto&gt;.Ok(user);
+/// </code>
+/// </remarks>
 public class ApiResponse<T>
 {
     public bool Success { get; }

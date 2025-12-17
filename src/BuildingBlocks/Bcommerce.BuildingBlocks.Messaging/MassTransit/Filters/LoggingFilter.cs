@@ -3,6 +3,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Bcommerce.BuildingBlocks.Messaging.MassTransit.Filters;
 
+/// <summary>
+/// Filtro para logging detalhado do ciclo de vida da mensagem.
+/// </summary>
+/// <typeparam name="T">Tipo da mensagem.</typeparam>
+/// <remarks>
+/// Registra o início e fim do processamento de cada mensagem.
+/// - Auxilia na rastreabilidade e debug
+/// - Loga IDs de correlação e tipo de mensagem
+/// 
+/// Exemplo de uso:
+/// <code>
+/// cfg.UseConsumeFilter(typeof(LoggingFilter&lt;&gt;), context);
+/// </code>
+/// </remarks>
 public class LoggingFilter<T>(ILogger<LoggingFilter<T>> logger) : IFilter<ConsumeContext<T>>
     where T : class
 {

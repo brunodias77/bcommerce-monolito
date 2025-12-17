@@ -2,6 +2,19 @@ using Microsoft.AspNetCore.Http;
 
 namespace Bcommerce.BuildingBlocks.Web.Middleware;
 
+/// <summary>
+/// Middleware para gerenciar IDs de correlação.
+/// </summary>
+/// <remarks>
+/// Garante que toda requisição tenha um identificador único de rastreamento.
+/// - Lê header X-Correlation-Id ou gera novo GUID
+/// - Propaga o ID para a resposta HTTP
+/// 
+/// Exemplo de uso:
+/// <code>
+/// app.UseMiddleware&lt;CorrelationIdMiddleware&gt;();
+/// </code>
+/// </remarks>
 public class CorrelationIdMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;

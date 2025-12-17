@@ -15,8 +15,28 @@ using Quartz;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Extensions;
 
+/// <summary>
+/// Métodos de extensão para configuração de serviços de infraestrutura no DI.
+/// </summary>
+/// <remarks>
+/// Centraliza a injeção de dependência dos Building Blocks.
+/// - Registra interceptores do EF Core
+/// - Configura Repositórios de Inbox/Outbox e AuditLog
+/// - Inicializa e configura o Quartz para Jobs em background
+/// 
+/// Exemplo de uso:
+/// <code>
+/// builder.Services.AddBuildingBlocksInfrastructure(configuration.GetConnectionString("Db"));
+/// </code>
+/// </remarks>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Adiciona os serviços de infraestrutura (Interceptors, Jobs, Repositórios Base).
+    /// </summary>
+    /// <param name="services">Coleção de serviços.</param>
+    /// <param name="connectionString">String de conexão (não usada diretamente aqui, mas pode ser útil para futuras extensões).</param>
+    /// <returns>A mesma coleção de serviços para encadeamento.</returns>
     public static IServiceCollection AddBuildingBlocksInfrastructure(this IServiceCollection services, string connectionString)
     {
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();

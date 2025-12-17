@@ -11,6 +11,20 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Bcommerce.BuildingBlocks.Security.Extensions;
 
+/// <summary>
+/// Extensões para configuração de segurança no DI.
+/// </summary>
+/// <remarks>
+/// Registra serviços de autenticação e autorização.
+/// - Configura JWT Bearer Authentication
+/// - Registra policies e handlers de autorização
+/// - Configura serviços utilitários (PasswordHasher, TokenGenerator)
+/// 
+/// Exemplo de uso:
+/// <code>
+/// services.AddSecurityServices(configuration);
+/// </code>
+/// </remarks>
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddSecurityServices(this IServiceCollection services, IConfiguration configuration)

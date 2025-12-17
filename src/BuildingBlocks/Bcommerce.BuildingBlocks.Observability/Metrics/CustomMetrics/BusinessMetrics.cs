@@ -2,6 +2,19 @@ using System.Diagnostics.Metrics;
 
 namespace Bcommerce.BuildingBlocks.Observability.Metrics.CustomMetrics;
 
+/// <summary>
+/// Container para métricas de negócio customizadas.
+/// </summary>
+/// <remarks>
+/// Encapsula a criação de contadores e histogramas de domínio.
+/// - Usado para rastrear KPIs (Vendas, Cadastros, Erros de negócio)
+/// - Abstrai a criação direta de objetos Meter
+/// 
+/// Exemplo de uso:
+/// <code>
+/// _businessMetrics.CreateCounter("orders_placed_total").Add(1);
+/// </code>
+/// </remarks>
 public class BusinessMetrics
 {
     private readonly Meter _meter;

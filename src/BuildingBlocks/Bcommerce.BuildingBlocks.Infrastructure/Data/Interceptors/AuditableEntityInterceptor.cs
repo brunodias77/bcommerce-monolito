@@ -5,6 +5,21 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data.Interceptors;
 
+/// <summary>
+/// Interceptor do EF Core para preenchimento automático de auditoria.
+/// </summary>
+/// <remarks>
+/// Gerencia as propriedades CreatedAt e UpdatedAt.
+/// - Define CreatedAt na inserção
+/// - Atualiza UpdatedAt na modificação
+/// - Funciona para qualquer entidade que implemente IEntity
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Registrado automaticamente no BaseDbContext
+/// optionsBuilder.AddInterceptors(auditableEntityInterceptor);
+/// </code>
+/// </remarks>
 public class AuditableEntityInterceptor(IDateTimeProvider dateTimeProvider) : SaveChangesInterceptor
 {
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;

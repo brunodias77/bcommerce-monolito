@@ -6,6 +6,19 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Bcommerce.BuildingBlocks.Security.Authentication;
 
+/// <summary>
+/// Implementação de gerador de tokens JWT.
+/// </summary>
+/// <remarks>
+/// Cria tokens JWT assinados com base nas configurações.
+/// - Adiciona claims padrão (sub, email, jti)
+/// - Inclui permissões e roles no payload
+/// 
+/// Exemplo de uso:
+/// <code>
+/// var jwt = _jwtTokenGenerator.GenerateToken(user.Id, ...);
+/// </code>
+/// </remarks>
 public class JwtTokenGenerator : ITokenGenerator
 {
     private readonly JwtSettings _jwtSettings;

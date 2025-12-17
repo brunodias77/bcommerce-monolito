@@ -4,6 +4,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Bcommerce.BuildingBlocks.Application.Behaviors;
 
+/// <summary>
+/// Behavior do MediatR para logging estruturado de requisições.
+/// </summary>
+/// <remarks>
+/// Registra automaticamente a entrada e saída de cada requisição.
+/// - Loga nome do comando/query e payload (cuidado com dados sensíveis)
+/// - Loga ID do usuário e Tenant se disponíveis
+/// - Mede tempo total de execução implicitamente pelos timestamps
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Output no console/Seq:
+/// // [INFO] Processando requisição: CriarPedidoCommand { UserId: "123" } ...
+/// // [INFO] Requisição processada: CriarPedidoCommand
+/// </code>
+/// </remarks>
 public class LoggingBehavior<TRequest, TResponse>(
     ILogger<LoggingBehavior<TRequest, TResponse>> logger,
     ICurrentUserService currentUserService)
@@ -13,6 +29,7 @@ public class LoggingBehavior<TRequest, TResponse>(
     private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger = logger;
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
+    /// <inheritdoc />
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;

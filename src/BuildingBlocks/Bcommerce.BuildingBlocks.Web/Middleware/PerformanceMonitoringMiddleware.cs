@@ -4,6 +4,19 @@ using System.Diagnostics;
 
 namespace Bcommerce.BuildingBlocks.Web.Middleware;
 
+/// <summary>
+/// Middleware para monitoramento básico de latência.
+/// </summary>
+/// <remarks>
+/// Mede o tempo de execução de cada requisição.
+/// - Loga aviso se exceder limiar configurado (ex: 500ms)
+/// - Auxilia na identificação de endpoints lentos
+/// 
+/// Exemplo de uso:
+/// <code>
+/// app.UseMiddleware&lt;PerformanceMonitoringMiddleware&gt;();
+/// </code>
+/// </remarks>
 public class PerformanceMonitoringMiddleware(RequestDelegate next, ILogger<PerformanceMonitoringMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;

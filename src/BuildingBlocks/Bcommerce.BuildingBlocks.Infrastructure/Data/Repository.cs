@@ -4,6 +4,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data;
 
+/// <summary>
+/// Implementação base para repositórios de escrita (Commands).
+/// </summary>
+/// <remarks>
+/// Gerencia o ciclo de vida de Agregados.
+/// - Fornece acesso ao UnitOfWork
+/// - Abstrai operações básicas de CRUD do EF Core
+/// - Foca em AggregateRoots para garantir consistência
+/// 
+/// Exemplo de uso:
+/// <code>
+/// public class ProductRepository : Repository&lt;Product, CatalogDbContext&gt;, IProductRepository
+/// { ... }
+/// </code>
+/// </remarks>
 public class Repository<TEntity, TContext>(TContext dbContext) : IRepository<TEntity>
     where TEntity : class, IAggregateRoot
     where TContext : BaseDbContext

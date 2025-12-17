@@ -3,6 +3,27 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Bcommerce.BuildingBlocks.Caching.Memory;
 
+/// <summary>
+/// Implementação de cache em memória usando IMemoryCache.
+/// </summary>
+/// <remarks>
+/// Ideal para desenvolvimento e aplicações single-instance.
+/// - Dados não persistem entre reinicializações
+/// - Não compartilha cache entre múltiplas instâncias da aplicação
+/// - Mais rápido que Redis por não haver latência de rede
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Registrado automaticamente via AddCachingServices quando Redis não está configurado
+/// services.AddScoped&lt;ICacheService, MemoryCacheService&gt;();
+/// 
+/// // Uso via injeção:
+/// public class MeuServico
+/// {
+///     private readonly ICacheService _cache; // MemoryCacheService ou RedisCacheService
+/// }
+/// </code>
+/// </remarks>
 public class MemoryCacheService : ICacheService
 {
     private readonly IMemoryCache _memoryCache;

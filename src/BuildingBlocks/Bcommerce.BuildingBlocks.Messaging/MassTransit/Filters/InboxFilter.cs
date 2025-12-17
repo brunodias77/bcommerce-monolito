@@ -11,6 +11,20 @@ namespace Bcommerce.BuildingBlocks.Messaging.MassTransit.Filters;
 // Funciona verificando se a mensagem já foi processada no banco de dados.
 // NOTA: Este filtro assume que o contexto tem escopo com acesso ao IInboxRepository (registrado no Infrastucture)
 
+/// <summary>
+/// Filtro para implementação do padrão Inbox (Idempotência/Deduplicação).
+/// </summary>
+/// <typeparam name="T">Tipo da mensagem.</typeparam>
+/// <remarks>
+/// Verifica se a mensagem já foi processada.
+/// - Utiliza IInboxRepository (se implementado)
+/// - Garante processamento único de mensagens
+/// 
+/// Exemplo de uso:
+/// <code>
+/// cfg.UseConsumeFilter(typeof(InboxFilter&lt;&gt;), context);
+/// </code>
+/// </remarks>
 public class InboxFilter<T>(IServiceProvider serviceProvider, ILogger<InboxFilter<T>> logger) : IFilter<ConsumeContext<T>>
     where T : class
 {

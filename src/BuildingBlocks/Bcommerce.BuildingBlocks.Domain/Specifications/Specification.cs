@@ -2,26 +2,49 @@ using System.Linq.Expressions;
 
 namespace Bcommerce.BuildingBlocks.Domain.Specifications;
 
+/// <summary>
+/// Classe base abstrata para implementação do padrão Specification.
+/// </summary>
+/// <typeparam name="T">Tipo da entidade.</typeparam>
+/// <remarks>
+/// Fornece combinação de especificações com operações lógicas.
+/// - And(): combina com E lógico
+/// - Or(): combina com OU lógico
+/// - Not(): nega a especificação
+/// 
+/// Exemplo de uso:
+/// <code>
+/// var ativoEEmEstoque = new ProdutoAtivoSpec()
+///     .And(new ProdutoEmEstoqueSpec());
+/// 
+/// var produtos = await _repo.GetListAsync(ativoEEmEstoque);
+/// </code>
+/// </remarks>
 public abstract class Specification<T> : ISpecification<T>
 {
+    /// <summary>Retorna a expressão que define o critério da especificação.</summary>
     public abstract Expression<Func<T, bool>> ToExpression();
 
+    /// <inheritdoc />
     public bool IsSatisfiedBy(T entity)
     {
         var predicate = ToExpression().Compile();
         return predicate(entity);
     }
 
+    /// <summary>Combina com outra especificação usando AND.</summary>
     public Specification<T> And(Specification<T> specification)
     {
         return new AndSpecification<T>(this, specification);
     }
 
+    /// <summary>Combina com outra especificação usando OR.</summary>
     public Specification<T> Or(Specification<T> specification)
     {
         return new OrSpecification<T>(this, specification);
     }
 
+    /// <summary>Retorna a negação desta especificação.</summary>
     public Specification<T> Not()
     {
         return new NotSpecification<T>(this);

@@ -6,6 +6,21 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data.Interceptors;
 
+/// <summary>
+/// Interceptor para disparo de eventos de domínio (Síncrono).
+/// </summary>
+/// <remarks>
+/// Publica eventos armazenados nas entidades logo após o commit.
+/// - Alternativa simples ao Outbox Pattern
+/// - Dispara eventos APÓS SaveChangesAsync ter sucesso
+/// - Limpa os eventos da entidade após publicação
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Útil para testes ou cenários sem necessidade de consistência forte de mensageria
+/// optionsBuilder.AddInterceptors(domainEventInterceptor);
+/// </code>
+/// </remarks>
 public class DomainEventInterceptor(IPublisher publisher) : SaveChangesInterceptor
 {
     private readonly IPublisher _publisher = publisher;

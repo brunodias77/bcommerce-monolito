@@ -7,6 +7,19 @@ namespace Bcommerce.BuildingBlocks.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+/// <summary>
+/// Controlador base para APIs REST da aplicação.
+/// </summary>
+/// <remarks>
+/// Fornece funcionalidades comuns para todos os controllers.
+/// - Tratamento padronizado de resultados (Result Pattern)
+/// - Métodos auxiliares para respostas HTTP
+/// 
+/// Exemplo de uso:
+/// <code>
+/// public class MyController(ISender sender) : ApiControllerBase(sender)
+/// </code>
+/// </remarks>
 public abstract class ApiControllerBase(ISender sender) : ControllerBase
 {
     protected readonly ISender _sender = sender;

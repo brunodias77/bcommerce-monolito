@@ -7,6 +7,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Bcommerce.BuildingBlocks.Web.Filters;
 
+/// <summary>
+/// Filtro global de exceções para APIs.
+/// </summary>
+/// <remarks>
+/// Intercepta exceções não tratadas e as converte em respostas HTTP padronizadas.
+/// - Trata ValidationException, NotFoundException, etc.
+/// - Implementa o padrão ProblemDetails/ErrorResponse customizado
+/// 
+/// Exemplo de uso:
+/// <code>
+/// options.Filters.Add&lt;ApiExceptionFilter&gt;();
+/// </code>
+/// </remarks>
 public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger) : IExceptionFilter
 {
     private readonly ILogger<ApiExceptionFilter> _logger = logger;

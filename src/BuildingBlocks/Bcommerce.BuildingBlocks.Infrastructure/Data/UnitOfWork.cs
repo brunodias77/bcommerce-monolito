@@ -3,10 +3,19 @@ using Bcommerce.BuildingBlocks.Infrastructure.Data;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data;
 
-// O BaseDbContext já implementa IUnitOfWork. 
-// Esta classe pode ser um wrapper ou simplesmente não ser necessária se usarmos o DbContext direto.
-// Mas para seguir a estrutura solicitada, podemos criar uma implementação que injeta o DbContext.
-
+/// <summary>
+/// Implementação do padrão Unit of Work sobre o EF Core.
+/// </summary>
+/// <remarks>
+/// Encapsula a persistência de todas as alterações feitas na transação.
+/// - Wrapper sobre SaveChangesAsync do DbContext
+/// - Garante atomicidade das operações de negócio
+/// 
+/// Exemplo de uso:
+/// <code>
+/// await _unitOfWork.SaveChangesAsync(cancellationToken);
+/// </code>
+/// </remarks>
 public class UnitOfWork(BaseDbContext dbContext) : IUnitOfWork
 {
     private readonly BaseDbContext _dbContext = dbContext;

@@ -3,6 +3,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data.Configurations;
 
+/// <summary>
+/// Configuração base do EF Core para Agregados.
+/// </summary>
+/// <remarks>
+/// Especialização de EntityConfiguration para AggregateRoots.
+/// - Ignora a coleção de DomainEvents (não persistida)
+/// - Garante configurações padrão de Entidade
+/// 
+/// Exemplo de uso:
+/// <code>
+/// public class ProductConfiguration : AggregateRootConfiguration&lt;Product&gt; { ... }
+/// </code>
+/// </remarks>
 public abstract class AggregateRootConfiguration<TEntity> : EntityConfiguration<TEntity>
     where TEntity : class, IAggregateRoot
 {

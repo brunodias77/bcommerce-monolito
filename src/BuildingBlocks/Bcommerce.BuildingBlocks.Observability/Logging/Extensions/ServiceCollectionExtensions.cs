@@ -2,6 +2,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Bcommerce.BuildingBlocks.Observability.Logging.Extensions;
 
+/// <summary>
+/// Extensões para registro de serviços de logging no DI.
+/// </summary>
+/// <remarks>
+/// Registra dependências necessárias para os Enrichers do Serilog.
+/// - Adiciona IHttpContextAccessor
+/// - Registra Enrichers customizados (CorrelationId, UserContext)
+/// 
+/// Exemplo de uso:
+/// <code>
+/// services.AddLoggingServices();
+/// </code>
+/// </remarks>
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddLoggingServices(this IServiceCollection services)

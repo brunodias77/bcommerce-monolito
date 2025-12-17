@@ -8,6 +8,20 @@ using Newtonsoft.Json;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Outbox.Processors;
 
+/// <summary>
+/// Serviço responsável por processar e publicar mensagens do Outbox.
+/// </summary>
+/// <remarks>
+/// Lê mensagens da tabela Outbox e as publica no barramento de eventos.
+/// - Garante entrega "at-least-once" dos eventos
+/// - Processa em lotes para performance
+/// - Gerencia falhas e retentativas (básico)
+/// 
+/// Exemplo de uso:
+/// <code>
+/// await _outboxProcessor.ProcessAsync(cancellationToken);
+/// </code>
+/// </remarks>
 public class OutboxProcessor(
     BaseDbContext dbContext, // Acesso direto ao DbContext para processar em lote
     IPublisher publisher,
@@ -19,6 +33,10 @@ public class OutboxProcessor(
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<OutboxProcessor> _logger = logger;
 
+    /// <summary>
+    /// Executa o ciclo de processamento de mensagens pendentes do Outbox.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var messages = await _dbContext.Set<OutboxMessage>()

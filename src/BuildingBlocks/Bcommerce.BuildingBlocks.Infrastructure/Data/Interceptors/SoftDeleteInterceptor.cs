@@ -5,6 +5,20 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data.Interceptors;
 
+/// <summary>
+/// Interceptor para implementação de Soft Delete (Exclusão Lógica).
+/// </summary>
+/// <remarks>
+/// Intercepta comandos de delete e os converte em update.
+/// - Marca IsDeleted = true
+/// - Preenche DeletedAt com data atual
+/// - Altera o estado da entidade de Deleted para Modified
+/// 
+/// Exemplo de uso:
+/// <code>
+/// // Registrado no BaseDbContext
+/// </code>
+/// </remarks>
 public class SoftDeleteInterceptor(IDateTimeProvider dateTimeProvider) : SaveChangesInterceptor
 {
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;

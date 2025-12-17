@@ -7,6 +7,19 @@ using System.Text.Json;
 
 namespace Bcommerce.BuildingBlocks.Web.Middleware;
 
+/// <summary>
+/// Middleware global para tratamento de exceções.
+/// </summary>
+/// <remarks>
+/// Captura erros não tratados no pipeline e retorna respostas JSON padronizadas.
+/// - Converte exceções de domínio em status HTTP adequados
+/// - Garante que nenhuma stack trace vaze em produção (exceto via log)
+/// 
+/// Exemplo de uso:
+/// <code>
+/// app.UseMiddleware&lt;ExceptionHandlingMiddleware&gt;();
+/// </code>
+/// </remarks>
 public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;

@@ -5,6 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Data;
 
+/// <summary>
+/// Contexto base do Entity Framework Core para a aplicação.
+/// </summary>
+/// <remarks>
+/// Configura a conexão e interceptadores do EF Core.
+/// - Aplica interceptors para Auditoria, SoftDelete e Outbox
+/// - Carrega configurações de mapeamento via Reflection
+/// - Serve como base para contextos específicos de módulos
+/// 
+/// Exemplo de uso:
+/// <code>
+/// public class CatalogDbContext(DbContextOptions opts, ...) : BaseDbContext(opts, ...)
+/// {
+///     public DbSet&lt;Product&gt; Products { get; set; }
+/// }
+/// </code>
+/// </remarks>
 public abstract class BaseDbContext(
     DbContextOptions options,
     AuditableEntityInterceptor auditableEntityInterceptor,

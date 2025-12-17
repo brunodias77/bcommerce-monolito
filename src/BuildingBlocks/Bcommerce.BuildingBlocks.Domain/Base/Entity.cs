@@ -2,8 +2,32 @@ using Bcommerce.BuildingBlocks.Domain.Abstractions;
 
 namespace Bcommerce.BuildingBlocks.Domain.Base;
 
+/// <summary>
+/// Classe base abstrata para todas as entidades de domínio.
+/// </summary>
+/// <typeparam name="TId">Tipo do identificador (ex: Guid, int).</typeparam>
+/// <remarks>
+/// Implementa igualdade por identidade e rastreamento de timestamps.
+/// - Comparação por Id (não por referência)
+/// - Operators == e != sobrecarregados
+/// - CreatedAt definido automaticamente no construtor
+/// 
+/// Exemplo de uso:
+/// <code>
+/// public class Categoria : Entity&lt;Guid&gt;
+/// {
+///     public string Nome { get; private set; }
+///     
+///     public Categoria(string nome) : base(Guid.NewGuid())
+///     {
+///         Nome = nome;
+///     }
+/// }
+/// </code>
+/// </remarks>
 public abstract class Entity<TId> : IEntity
 {
+    /// <summary>Identificador único da entidade.</summary>
     public TId Id { get; protected set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

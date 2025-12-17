@@ -4,8 +4,23 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Bcommerce.BuildingBlocks.Infrastructure.Inbox.Configuration;
 
+/// <summary>
+/// Configuração do Entity Framework para a tabela de Invoice Messages.
+/// </summary>
+/// <remarks>
+/// Mapeia a entidade <see cref="InboxMessage"/> para o banco de dados.
+/// - Define chaves primárias e propriedades obrigatórias
+/// - Configura o nome da tabela como "InboxMessages"
+/// - Otimiza colunas para consulta pelo processador
+/// 
+/// Exemplo de uso:
+/// <code>
+/// modelBuilder.ApplyConfiguration(new InboxConfiguration());
+/// </code>
+/// </remarks>
 public class InboxConfiguration : IEntityTypeConfiguration<InboxMessage>
 {
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<InboxMessage> builder)
     {
         builder.ToTable("InboxMessages");

@@ -4,6 +4,19 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Bcommerce.BuildingBlocks.Web.Filters;
 
+/// <summary>
+/// Filtro de validação de ModelState.
+/// </summary>
+/// <remarks>
+/// Intercepta requisições inválidas antes de chegarem à Action.
+/// - Formata erros de validação no padrão ValidationErrorResponse
+/// - Substitui o comportamento padrão [ApiController] de validação automática
+/// 
+/// Exemplo de uso:
+/// <code>
+/// options.Filters.Add&lt;ValidationFilter&gt;();
+/// </code>
+/// </remarks>
 public class ValidationFilter : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

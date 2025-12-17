@@ -3,6 +3,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Bcommerce.BuildingBlocks.Web.Middleware;
 
+/// <summary>
+/// Middleware para identificação de Tenant (Multi-tenancy).
+/// </summary>
+/// <remarks>
+/// Extrai o ID do tenant a partir de headers da requisição.
+/// - Lê "X-Tenant-Id"
+/// - Prepara o contexto para isolamento de dados por cliente
+/// 
+/// Exemplo de uso:
+/// <code>
+/// app.UseMiddleware&lt;TenantResolutionMiddleware&gt;();
+/// </code>
+/// </remarks>
 public class TenantResolutionMiddleware(RequestDelegate next, ILogger<TenantResolutionMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
