@@ -21,7 +21,7 @@ namespace Bcommerce.BuildingBlocks.Infrastructure.Data;
 /// </remarks>
 public class Repository<TEntity, TContext>(TContext dbContext) : IRepository<TEntity>
     where TEntity : class, IAggregateRoot
-    where TContext : BaseDbContext
+    where TContext : DbContext, IUnitOfWork
 {
     protected readonly TContext DbContext = dbContext;
 
