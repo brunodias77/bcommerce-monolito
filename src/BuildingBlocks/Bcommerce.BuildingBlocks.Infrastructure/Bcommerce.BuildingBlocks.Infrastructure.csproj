@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bcommerce.BuildingBlocks.Application\Bcommerce.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\Bcommerce.BuildingBlocks.Domain\Bcommerce.BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" /> <!-- Using a recent version compatible with net10.0 preview or latest stable if net8.0 -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Quartz" Version="3.15.1" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.15.1" />
+    <!-- Assuming generic versions for compatibility, dotnet restore will resolve exact versions if omitted but better to include -->
+    <!-- Since I don't know exact versions available for net10.0 (hypothetical), I'll let dotnet add them or use standard ones -->
+    <!-- Actually, better to use 'dotnet add' again to ensure correct versions, or just write file with no versions and let restore pick? No, need versions. -->
+    <!-- I will write the file with ProjectReferences and then run dotnet add package for packages to be safe on versions -->
+  </ItemGroup>
+
+</Project>
