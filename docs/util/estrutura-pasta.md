@@ -8,8 +8,7 @@ Bcommerce/
 │   │   │   ├── IAggregateRoot.cs
 │   │   │   ├── IDomainEvent.cs
 │   │   │   ├── IValueObject.cs
-│   │   │   ├── ISoftDeletable.cs
-│   │   │   └── IVersionable.cs
+│   │   │   └── ISoftDeletable.cs
 │   │   │
 │   │   ├── Base/
 │   │   │   ├── Entity.cs
@@ -20,18 +19,12 @@ Bcommerce/
 │   │   │
 │   │   ├── Events/
 │   │   │   ├── DomainEventDispatcher.cs
-│   │   │   ├── IDomainEventHandler.cs
-│   │   │   └── DomainEventBase.cs
+│   │   │   └── IDomainEventHandler.cs
 │   │   │
-│   │   ├── Specifications/
-│   │   │   ├── ISpecification.cs
-│   │   │   ├── Specification.cs
-│   │   │   └── CompositeSpecification.cs
-│   │   │
-│   │   └── Exceptions/
-│   │       ├── DomainException.cs
-│   │       ├── InvalidValueObjectException.cs
-│   │       └── BusinessRuleException.cs
+│   │   └── Specifications/
+│   │       ├── ISpecification.cs
+│   │       ├── Specification.cs
+│   │       └── CompositeSpecification.cs
 │   │
 │   ├── Bcommerce.BuildingBlocks.Application/
 │   │   ├── Abstractions/
@@ -58,13 +51,11 @@ Bcommerce/
 │   │   │   ├── LoggingBehavior.cs
 │   │   │   ├── TransactionBehavior.cs
 │   │   │   ├── CachingBehavior.cs
-│   │   │   ├── PerformanceBehavior.cs
-│   │   │   └── IdempotencyBehavior.cs
+│   │   │   └── PerformanceBehavior.cs
 │   │   │
 │   │   ├── Models/
 │   │   │   ├── Result.cs
 │   │   │   ├── Error.cs
-│   │   │   ├── ErrorType.cs
 │   │   │   ├── PaginatedList.cs
 │   │   │   ├── PagedRequest.cs
 │   │   │   └── SortDescriptor.cs
@@ -74,13 +65,11 @@ Bcommerce/
 │   │   │   ├── ValidationException.cs
 │   │   │   ├── NotFoundException.cs
 │   │   │   ├── ConflictException.cs
-│   │   │   ├── UnauthorizedException.cs
-│   │   │   └── ForbiddenException.cs
+│   │   │   └── BusinessRuleException.cs
 │   │   │
 │   │   └── Extensions/
 │   │       ├── QueryableExtensions.cs
-│   │       ├── EnumerableExtensions.cs
-│   │       └── ResultExtensions.cs
+│   │       └── EnumerableExtensions.cs
 │   │
 │   ├── Bcommerce.BuildingBlocks.Infrastructure/
 │   │   ├── Data/
@@ -101,8 +90,7 @@ Bcommerce/
 │   │   │   │
 │   │   │   └── Converters/
 │   │   │       ├── EnumerationConverter.cs
-│   │   │       ├── ValueObjectConverter.cs
-│   │   │       └── DateTimeUtcConverter.cs
+│   │   │       └── ValueObjectConverter.cs
 │   │   │
 │   │   ├── Outbox/
 │   │   │   ├── Models/
@@ -113,10 +101,8 @@ Bcommerce/
 │   │   │   ├── Processors/
 │   │   │   │   ├── OutboxProcessor.cs
 │   │   │   │   └── IOutboxPublisher.cs
-│   │   │   ├── Configuration/
-│   │   │   │   └── OutboxConfiguration.cs
-│   │   │   └── BackgroundJobs/
-│   │   │       └── OutboxProcessorJob.cs
+│   │   │   └── Configuration/
+│   │   │       └── OutboxConfiguration.cs
 │   │   │
 │   │   ├── Inbox/
 │   │   │   ├── Models/
@@ -126,10 +112,8 @@ Bcommerce/
 │   │   │   │   └── InboxRepository.cs
 │   │   │   ├── Processors/
 │   │   │   │   └── InboxProcessor.cs
-│   │   │   ├── Configuration/
-│   │   │   │   └── InboxConfiguration.cs
-│   │   │   └── BackgroundJobs/
-│   │   │       └── InboxProcessorJob.cs
+│   │   │   └── Configuration/
+│   │   │       └── InboxConfiguration.cs
 │   │   │
 │   │   ├── AuditLog/
 │   │   │   ├── Models/
@@ -138,22 +122,15 @@ Bcommerce/
 │   │   │   │   ├── IAuditLogRepository.cs
 │   │   │   │   └── AuditLogRepository.cs
 │   │   │   └── Services/
-│   │   │       ├── IAuditLogService.cs
 │   │   │       └── AuditLogService.cs
 │   │   │
 │   │   ├── BackgroundJobs/
 │   │   │   ├── IBackgroundJob.cs
 │   │   │   ├── BackgroundJobRunner.cs
 │   │   │   └── Jobs/
+│   │   │       ├── OutboxProcessorJob.cs
 │   │   │       ├── ExpiredReservationsCleanupJob.cs
-│   │   │       ├── AbandonedCartsJob.cs
-│   │   │       ├── ExpiredPaymentsJob.cs
-│   │   │       ├── ExpiredCouponsJob.cs
-│   │   │       └── MaterializedViewRefreshJob.cs
-│   │   │
-│   │   ├── Time/
-│   │   │   ├── IDateTimeProvider.cs
-│   │   │   └── DateTimeProvider.cs
+│   │   │       └── AbandonedCartsJob.cs
 │   │   │
 │   │   └── Extensions/
 │   │       └── ServiceCollectionExtensions.cs
@@ -172,8 +149,7 @@ Bcommerce/
 │   │   │   ├── Filters/
 │   │   │   │   ├── InboxFilter.cs
 │   │   │   │   ├── LoggingFilter.cs
-│   │   │   │   ├── ExceptionHandlingFilter.cs
-│   │   │   │   └── IdempotencyFilter.cs
+│   │   │   │   └── ExceptionHandlingFilter.cs
 │   │   │   │
 │   │   │   └── Consumers/
 │   │   │       └── GenericConsumer.cs
@@ -181,16 +157,10 @@ Bcommerce/
 │   │   ├── Events/
 │   │   │   ├── IntegrationEvent.cs
 │   │   │   └── Shared/
-│   │   │       ├── UserRegisteredEvent.cs
-│   │   │       ├── ProductPublishedEvent.cs
-│   │   │       ├── StockReservedEvent.cs
-│   │   │       ├── StockReleasedEvent.cs
-│   │   │       ├── CartConvertedEvent.cs
+│   │   │       ├── UserCreatedEvent.cs
 │   │   │       ├── OrderPlacedEvent.cs
-│   │   │       ├── OrderStatusChangedEvent.cs
 │   │   │       ├── PaymentCompletedEvent.cs
-│   │   │       ├── PaymentFailedEvent.cs
-│   │   │       └── CouponUsedEvent.cs
+│   │   │       └── StockReservedEvent.cs
 │   │   │
 │   │   └── Extensions/
 │   │       └── ServiceCollectionExtensions.cs
@@ -200,8 +170,7 @@ Bcommerce/
 │   │   │   ├── ExceptionHandlingMiddleware.cs
 │   │   │   ├── RequestLoggingMiddleware.cs
 │   │   │   ├── CorrelationIdMiddleware.cs
-│   │   │   ├── PerformanceMonitoringMiddleware.cs
-│   │   │   └── TenantResolutionMiddleware.cs
+│   │   │   └── PerformanceMonitoringMiddleware.cs
 │   │   │
 │   │   ├── Filters/
 │   │   │   ├── ValidationFilter.cs
@@ -227,8 +196,7 @@ Bcommerce/
 │   │   │   ├── JwtTokenGenerator.cs
 │   │   │   ├── ITokenGenerator.cs
 │   │   │   ├── IPasswordHasher.cs
-│   │   │   ├── PasswordHasher.cs
-│   │   │   └── RefreshTokenService.cs
+│   │   │   └── PasswordHasher.cs
 │   │   │
 │   │   ├── Authorization/
 │   │   │   ├── Policies/
@@ -277,7 +245,6 @@ Bcommerce/
 │       │   │   ├── CorrelationIdEnricher.cs
 │       │   │   └── UserContextEnricher.cs
 │       │   └── Extensions/
-│       │       └── ServiceCollectionExtensions.cs
 │       │
 │       ├── Metrics/
 │       │   ├── MetricsConfiguration.cs
@@ -285,55 +252,43 @@ Bcommerce/
 │       │   │   ├── BusinessMetrics.cs
 │       │   │   └── PerformanceMetrics.cs
 │       │   └── Extensions/
-│       │       └── ServiceCollectionExtensions.cs
 │       │
 │       └── Tracing/
 │           ├── TracingConfiguration.cs
 │           ├── ActivityExtensions.cs
 │           └── Extensions/
-│               └── ServiceCollectionExtensions.cs
 │
 ├── Modules/
 │   │
 │   ├── Users/
 │   │   ├── Bcommerce.Modules.Users.Domain/
 │   │   │   ├── Entities/
-│   │   │   │   ├── ApplicationUser.cs (extends IdentityUser)
+│   │   │   │   ├── User.cs (ASP.NET Identity - managed by EF)
 │   │   │   │   ├── Profile.cs
 │   │   │   │   ├── Address.cs
 │   │   │   │   ├── Session.cs
-│   │   │   │   ├── Notification.cs
-│   │   │   │   ├── NotificationPreference.cs
-│   │   │   │   └── LoginHistory.cs
+│   │   │   │   └── Notification.cs
 │   │   │   │
 │   │   │   ├── ValueObjects/
 │   │   │   │   ├── Email.cs
 │   │   │   │   ├── PhoneNumber.cs
 │   │   │   │   ├── Cpf.cs
-│   │   │   │   ├── PostalCode.cs
-│   │   │   │   ├── DeviceInfo.cs
-│   │   │   │   └── GeoLocation.cs
+│   │   │   │   └── PostalCode.cs
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   ├── UserRegisteredEvent.cs
 │   │   │   │   ├── ProfileUpdatedEvent.cs
 │   │   │   │   ├── AddressAddedEvent.cs
-│   │   │   │   ├── AddressUpdatedEvent.cs
-│   │   │   │   ├── AddressDeletedEvent.cs
-│   │   │   │   ├── SessionCreatedEvent.cs
-│   │   │   │   ├── SessionRevokedEvent.cs
-│   │   │   │   ├── PasswordChangedEvent.cs
-│   │   │   │   └── UserDeletedEvent.cs
+│   │   │   │   └── SessionCreatedEvent.cs
 │   │   │   │
 │   │   │   ├── Repositories/
 │   │   │   │   ├── IUserRepository.cs
 │   │   │   │   ├── IProfileRepository.cs
 │   │   │   │   ├── IAddressRepository.cs
-│   │   │   │   ├── ISessionRepository.cs
-│   │   │   │   └── INotificationRepository.cs
+│   │   │   │   └── ISessionRepository.cs
 │   │   │   │
 │   │   │   └── Services/
-│   │   │       └── IUserDomainService.cs
+│   │   │       └── IDomainUserService.cs
 │   │   │
 │   │   ├── Bcommerce.Modules.Users.Application/
 │   │   │   ├── Commands/
@@ -342,31 +297,9 @@ Bcommerce/
 │   │   │   │   │   ├── RegisterUserCommandHandler.cs
 │   │   │   │   │   └── RegisterUserCommandValidator.cs
 │   │   │   │   │
-│   │   │   │   ├── Login/
-│   │   │   │   │   ├── LoginCommand.cs
-│   │   │   │   │   ├── LoginCommandHandler.cs
-│   │   │   │   │   └── LoginCommandValidator.cs
-│   │   │   │   │
-│   │   │   │   ├── RefreshToken/
-│   │   │   │   │   ├── RefreshTokenCommand.cs
-│   │   │   │   │   └── RefreshTokenCommandHandler.cs
-│   │   │   │   │
 │   │   │   │   ├── UpdateProfile/
-│   │   │   │   │   ├── UpdateProfileCommand.cs
-│   │   │   │   │   ├── UpdateProfileCommandHandler.cs
-│   │   │   │   │   └── UpdateProfileCommandValidator.cs
-│   │   │   │   │
 │   │   │   │   ├── AddAddress/
-│   │   │   │   │   ├── AddAddressCommand.cs
-│   │   │   │   │   ├── AddAddressCommandHandler.cs
-│   │   │   │   │   └── AddAddressCommandValidator.cs
-│   │   │   │   │
-│   │   │   │   ├── UpdateAddress/
-│   │   │   │   ├── DeleteAddress/
-│   │   │   │   ├── SetDefaultAddress/
-│   │   │   │   ├── RevokeSession/
-│   │   │   │   ├── MarkNotificationAsRead/
-│   │   │   │   └── UpdateNotificationPreferences/
+│   │   │   │   └── DeleteAddress/
 │   │   │   │
 │   │   │   ├── Queries/
 │   │   │   │   ├── GetUserById/
@@ -375,31 +308,22 @@ Bcommerce/
 │   │   │   │   │
 │   │   │   │   ├── GetUserProfile/
 │   │   │   │   ├── GetUserAddresses/
-│   │   │   │   ├── GetActiveSessions/
-│   │   │   │   ├── GetNotifications/
-│   │   │   │   ├── GetLoginHistory/
-│   │   │   │   └── GetNotificationPreferences/
+│   │   │   │   └── GetActiveSessions/
 │   │   │   │
 │   │   │   ├── DTOs/
 │   │   │   │   ├── UserDto.cs
 │   │   │   │   ├── ProfileDto.cs
 │   │   │   │   ├── AddressDto.cs
-│   │   │   │   ├── SessionDto.cs
-│   │   │   │   ├── NotificationDto.cs
-│   │   │   │   ├── LoginResponseDto.cs
-│   │   │   │   └── TokenDto.cs
+│   │   │   │   └── SessionDto.cs
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   └── Handlers/
 │   │   │   │       ├── UserRegisteredEventHandler.cs
-│   │   │   │       ├── ProfileUpdatedEventHandler.cs
-│   │   │   │       └── SessionCreatedEventHandler.cs
+│   │   │   │       └── ProfileUpdatedEventHandler.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── IUserService.cs
-│   │   │   │   ├── UserService.cs
-│   │   │   │   ├── IAuthService.cs
-│   │   │   │   └── AuthService.cs
+│   │   │   │   └── UserService.cs
 │   │   │   │
 │   │   │   └── Mappings/
 │   │   │       └── UserMappingProfile.cs
@@ -410,25 +334,21 @@ Bcommerce/
 │   │   │   │   ├── Migrations/
 │   │   │   │   │
 │   │   │   │   ├── Configurations/
-│   │   │   │   │   ├── ApplicationUserConfiguration.cs
 │   │   │   │   │   ├── ProfileConfiguration.cs
 │   │   │   │   │   ├── AddressConfiguration.cs
 │   │   │   │   │   ├── SessionConfiguration.cs
-│   │   │   │   │   ├── NotificationConfiguration.cs
-│   │   │   │   │   └── LoginHistoryConfiguration.cs
+│   │   │   │   │   └── NotificationConfiguration.cs
 │   │   │   │   │
 │   │   │   │   └── Repositories/
 │   │   │   │       ├── UserRepository.cs
 │   │   │   │       ├── ProfileRepository.cs
 │   │   │   │       ├── AddressRepository.cs
-│   │   │   │       ├── SessionRepository.cs
-│   │   │   │       └── NotificationRepository.cs
+│   │   │   │       └── SessionRepository.cs
 │   │   │   │
 │   │   │   ├── Identity/
 │   │   │   │   ├── ApplicationUser.cs
 │   │   │   │   ├── ApplicationRole.cs
-│   │   │   │   ├── IdentityConfiguration.cs
-│   │   │   │   └── IdentityService.cs
+│   │   │   │   └── IdentityConfiguration.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── EmailService.cs
@@ -439,12 +359,10 @@ Bcommerce/
 │   │   │
 │   │   └── Bcommerce.Modules.Users.Api/
 │   │       ├── Controllers/
-│   │       │   ├── AuthController.cs
 │   │       │   ├── UsersController.cs
 │   │       │   ├── ProfilesController.cs
 │   │       │   ├── AddressesController.cs
-│   │       │   ├── SessionsController.cs
-│   │       │   └── NotificationsController.cs
+│   │       │   └── SessionsController.cs
 │   │       │
 │   │       └── Extensions/
 │   │           └── ModuleExtensions.cs
@@ -457,9 +375,7 @@ Bcommerce/
 │   │   │   │   ├── Brand.cs
 │   │   │   │   ├── ProductImage.cs
 │   │   │   │   ├── ProductReview.cs
-│   │   │   │   ├── StockMovement.cs
-│   │   │   │   ├── StockReservation.cs
-│   │   │   │   └── UserFavorite.cs
+│   │   │   │   └── StockReservation.cs
 │   │   │   │
 │   │   │   ├── ValueObjects/
 │   │   │   │   ├── Money.cs
@@ -467,8 +383,7 @@ Bcommerce/
 │   │   │   │   ├── Slug.cs
 │   │   │   │   ├── Stock.cs
 │   │   │   │   ├── ProductDimensions.cs
-│   │   │   │   ├── Rating.cs
-│   │   │   │   └── CategoryPath.cs
+│   │   │   │   └── Rating.cs
 │   │   │   │
 │   │   │   ├── Enums/
 │   │   │   │   ├── ProductStatus.cs
@@ -476,90 +391,54 @@ Bcommerce/
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   ├── ProductCreatedEvent.cs
-│   │   │   │   ├── ProductUpdatedEvent.cs
 │   │   │   │   ├── ProductPublishedEvent.cs
-│   │   │   │   ├── ProductDeletedEvent.cs
-│   │   │   │   ├── StockUpdatedEvent.cs
 │   │   │   │   ├── StockReservedEvent.cs
 │   │   │   │   ├── StockReleasedEvent.cs
-│   │   │   │   ├── ReviewAddedEvent.cs
-│   │   │   │   ├── ReviewApprovedEvent.cs
-│   │   │   │   └── ProductFavoritedEvent.cs
+│   │   │   │   └── ReviewAddedEvent.cs
 │   │   │   │
 │   │   │   ├── Repositories/
 │   │   │   │   ├── IProductRepository.cs
 │   │   │   │   ├── ICategoryRepository.cs
 │   │   │   │   ├── IBrandRepository.cs
-│   │   │   │   ├── IProductReviewRepository.cs
 │   │   │   │   └── IStockReservationRepository.cs
 │   │   │   │
 │   │   │   └── Services/
 │   │   │       ├── IStockService.cs
-│   │   │       ├── ISlugGenerator.cs
-│   │   │       └── IPriceCalculator.cs
+│   │   │       └── ISlugGenerator.cs
 │   │   │
 │   │   ├── Bcommerce.Modules.Catalog.Application/
 │   │   │   ├── Commands/
 │   │   │   │   ├── CreateProduct/
-│   │   │   │   │   ├── CreateProductCommand.cs
-│   │   │   │   │   ├── CreateProductCommandHandler.cs
-│   │   │   │   │   └── CreateProductCommandValidator.cs
-│   │   │   │   │
 │   │   │   │   ├── UpdateProduct/
-│   │   │   │   ├── DeleteProduct/
 │   │   │   │   ├── PublishProduct/
-│   │   │   │   ├── UpdateStock/
 │   │   │   │   ├── ReserveStock/
 │   │   │   │   ├── ReleaseStock/
-│   │   │   │   ├── AddProductReview/
-│   │   │   │   ├── ApproveReview/
-│   │   │   │   ├── AddToFavorites/
-│   │   │   │   ├── RemoveFromFavorites/
-│   │   │   │   ├── CreateCategory/
-│   │   │   │   ├── UpdateCategory/
-│   │   │   │   └── CreateBrand/
+│   │   │   │   └── AddProductReview/
 │   │   │   │
 │   │   │   ├── Queries/
 │   │   │   │   ├── GetProductById/
-│   │   │   │   │   ├── GetProductByIdQuery.cs
-│   │   │   │   │   └── GetProductByIdQueryHandler.cs
-│   │   │   │   │
 │   │   │   │   ├── GetProducts/
 │   │   │   │   ├── SearchProducts/
 │   │   │   │   ├── GetProductsByCategory/
-│   │   │   │   ├── GetProductsByBrand/
-│   │   │   │   ├── GetFeaturedProducts/
-│   │   │   │   ├── GetProductReviews/
-│   │   │   │   ├── GetCategories/
-│   │   │   │   ├── GetCategoryTree/
-│   │   │   │   ├── GetBrands/
-│   │   │   │   ├── GetUserFavorites/
-│   │   │   │   └── GetProductStats/
+│   │   │   │   └── GetProductReviews/
 │   │   │   │
 │   │   │   ├── DTOs/
 │   │   │   │   ├── ProductDto.cs
 │   │   │   │   ├── ProductDetailDto.cs
-│   │   │   │   ├── ProductListDto.cs
 │   │   │   │   ├── CategoryDto.cs
-│   │   │   │   ├── CategoryTreeDto.cs
 │   │   │   │   ├── BrandDto.cs
-│   │   │   │   ├── ProductReviewDto.cs
-│   │   │   │   ├── ProductStatsDto.cs
-│   │   │   │   └── StockMovementDto.cs
+│   │   │   │   └── ProductReviewDto.cs
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   └── Handlers/
 │   │   │   │       ├── ProductPublishedEventHandler.cs
-│   │   │   │       ├── StockReservedEventHandler.cs
-│   │   │   │       └── ReviewAddedEventHandler.cs
+│   │   │   │       └── StockReservedEventHandler.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── IProductService.cs
 │   │   │   │   ├── ProductService.cs
 │   │   │   │   ├── IStockService.cs
-│   │   │   │   ├── StockService.cs
-│   │   │   │   ├── ICategoryService.cs
-│   │   │   │   └── CategoryService.cs
+│   │   │   │   └── StockService.cs
 │   │   │   │
 │   │   │   └── Mappings/
 │   │   │       └── CatalogMappingProfile.cs
@@ -574,22 +453,17 @@ Bcommerce/
 │   │   │   │   │   ├── CategoryConfiguration.cs
 │   │   │   │   │   ├── BrandConfiguration.cs
 │   │   │   │   │   ├── ProductImageConfiguration.cs
-│   │   │   │   │   ├── ProductReviewConfiguration.cs
-│   │   │   │   │   ├── StockMovementConfiguration.cs
-│   │   │   │   │   ├── StockReservationConfiguration.cs
-│   │   │   │   │   └── UserFavoriteConfiguration.cs
+│   │   │   │   │   └── StockReservationConfiguration.cs
 │   │   │   │   │
 │   │   │   │   └── Repositories/
 │   │   │   │       ├── ProductRepository.cs
 │   │   │   │       ├── CategoryRepository.cs
 │   │   │   │       ├── BrandRepository.cs
-│   │   │   │       ├── ProductReviewRepository.cs
 │   │   │   │       └── StockReservationRepository.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── SlugGenerator.cs
-│   │   │   │   ├── ImageStorageService.cs
-│   │   │   │   └── PriceCalculator.cs
+│   │   │   │   └── ImageStorageService.cs
 │   │   │   │
 │   │   │   └── Extensions/
 │   │   │       └── ServiceCollectionExtensions.cs
@@ -599,9 +473,7 @@ Bcommerce/
 │   │       │   ├── ProductsController.cs
 │   │       │   ├── CategoriesController.cs
 │   │       │   ├── BrandsController.cs
-│   │       │   ├── ReviewsController.cs
-│   │       │   ├── FavoritesController.cs
-│   │       │   └── StockController.cs
+│   │       │   └── ReviewsController.cs
 │   │       │
 │   │       └── Extensions/
 │   │           └── ModuleExtensions.cs
@@ -611,14 +483,12 @@ Bcommerce/
 │   │   │   ├── Entities/
 │   │   │   │   ├── ShoppingCart.cs
 │   │   │   │   ├── CartItem.cs
-│   │   │   │   ├── SavedCart.cs
-│   │   │   │   └── CartActivityLog.cs
+│   │   │   │   └── SavedCart.cs
 │   │   │   │
 │   │   │   ├── ValueObjects/
 │   │   │   │   ├── CartId.cs
 │   │   │   │   ├── SessionId.cs
-│   │   │   │   ├── ProductSnapshot.cs
-│   │   │   │   └── CartTotals.cs
+│   │   │   │   └── ProductSnapshot.cs
 │   │   │   │
 │   │   │   ├── Enums/
 │   │   │   │   └── CartStatus.cs
@@ -626,67 +496,39 @@ Bcommerce/
 │   │   │   ├── Events/
 │   │   │   │   ├── CartCreatedEvent.cs
 │   │   │   │   ├── ItemAddedToCartEvent.cs
-│   │   │   │   ├── ItemUpdatedInCartEvent.cs
 │   │   │   │   ├── ItemRemovedFromCartEvent.cs
-│   │   │   │   ├── CartClearedEvent.cs
-│   │   │   │   ├── CouponAppliedEvent.cs
-│   │   │   │   ├── CouponRemovedEvent.cs
 │   │   │   │   ├── CartConvertedEvent.cs
-│   │   │   │   ├── CartMergedEvent.cs
 │   │   │   │   └── CartAbandonedEvent.cs
 │   │   │   │
 │   │   │   ├── Repositories/
-│   │   │   │   ├── ICartRepository.cs
-│   │   │   │   └── ISavedCartRepository.cs
+│   │   │   │   └── ICartRepository.cs
 │   │   │   │
 │   │   │   └── Services/
-│   │   │       ├── ICartDomainService.cs
-│   │   │       └── ICartPricingService.cs
+│   │   │       └── ICartDomainService.cs
 │   │   │
 │   │   ├── Bcommerce.Modules.Cart.Application/
 │   │   │   ├── Commands/
 │   │   │   │   ├── CreateCart/
-│   │   │   │   │   ├── CreateCartCommand.cs
-│   │   │   │   │   ├── CreateCartCommandHandler.cs
-│   │   │   │   │   └── CreateCartCommandValidator.cs
-│   │   │   │   │
 │   │   │   │   ├── AddItemToCart/
-│   │   │   │   │   ├── AddItemToCartCommand.cs
-│   │   │   │   │   ├── AddItemToCartCommandHandler.cs
-│   │   │   │   │   └── AddItemToCartCommandValidator.cs
-│   │   │   │   │
 │   │   │   │   ├── UpdateCartItem/
 │   │   │   │   ├── RemoveCartItem/
-│   │   │   │   ├── ClearCart/
 │   │   │   │   ├── ApplyCoupon/
-│   │   │   │   ├── RemoveCoupon/
-│   │   │   │   ├── MergeCarts/
-│   │   │   │   ├── SaveCart/
-│   │   │   │   └── ConvertCart/
+│   │   │   │   └── ClearCart/
 │   │   │   │
 │   │   │   ├── Queries/
 │   │   │   │   ├── GetCart/
-│   │   │   │   │   ├── GetCartQuery.cs
-│   │   │   │   │   └── GetCartQueryHandler.cs
-│   │   │   │   │
 │   │   │   │   ├── GetCartByUser/
-│   │   │   │   ├── GetCartBySession/
-│   │   │   │   ├── GetCartTotals/
-│   │   │   │   ├── GetAbandonedCarts/
-│   │   │   │   └── GetSavedCarts/
+│   │   │   │   └── GetAbandonedCarts/
 │   │   │   │
 │   │   │   ├── DTOs/
 │   │   │   │   ├── CartDto.cs
 │   │   │   │   ├── CartItemDto.cs
-│   │   │   │   ├── CartSummaryDto.cs
-│   │   │   │   ├── CartTotalsDto.cs
-│   │   │   │   └── SavedCartDto.cs
+│   │   │   │   └── CartSummaryDto.cs
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   └── Handlers/
 │   │   │   │       ├── ItemAddedToCartEventHandler.cs
-│   │   │   │       ├── CartConvertedEventHandler.cs
-│   │   │   │       └── CouponAppliedEventHandler.cs
+│   │   │   │       └── CartConvertedEventHandler.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── ICartService.cs
@@ -702,21 +544,17 @@ Bcommerce/
 │   │   │   │   │
 │   │   │   │   ├── Configurations/
 │   │   │   │   │   ├── ShoppingCartConfiguration.cs
-│   │   │   │   │   ├── CartItemConfiguration.cs
-│   │   │   │   │   ├── SavedCartConfiguration.cs
-│   │   │   │   │   └── CartActivityLogConfiguration.cs
+│   │   │   │   │   └── CartItemConfiguration.cs
 │   │   │   │   │
 │   │   │   │   └── Repositories/
-│   │   │   │       ├── CartRepository.cs
-│   │   │   │       └── SavedCartRepository.cs
+│   │   │   │       └── CartRepository.cs
 │   │   │   │
 │   │   │   └── Extensions/
 │   │   │       └── ServiceCollectionExtensions.cs
 │   │   │
 │   │   └── Bcommerce.Modules.Cart.Api/
 │   │       ├── Controllers/
-│   │       │   ├── CartController.cs
-│   │       │   └── SavedCartsController.cs
+│   │       │   └── CartController.cs
 │   │       │
 │   │       └── Extensions/
 │   │           └── ModuleExtensions.cs
@@ -734,87 +572,57 @@ Bcommerce/
 │   │   │   ├── ValueObjects/
 │   │   │   │   ├── OrderNumber.cs
 │   │   │   │   ├── ShippingAddress.cs
-│   │   │   │   ├── BillingAddress.cs
-│   │   │   │   ├── OrderTotals.cs
-│   │   │   │   ├── TrackingInfo.cs
-│   │   │   │   └── RefundAmount.cs
+│   │   │   │   ├── TrackingCode.cs
+│   │   │   │   └── OrderTotal.cs
 │   │   │   │
 │   │   │   ├── Enums/
 │   │   │   │   ├── OrderStatus.cs
 │   │   │   │   ├── ShippingMethod.cs
-│   │   │   │   ├── CancellationReason.cs
-│   │   │   │   └── RefundStatus.cs
+│   │   │   │   └── CancellationReason.cs
 │   │   │   │
 │   │   │   ├── Events/
-│   │   │   │   ├── OrderCreatedEvent.cs
 │   │   │   │   ├── OrderPlacedEvent.cs
-│   │   │   │   ├── OrderStatusChangedEvent.cs
 │   │   │   │   ├── OrderPaidEvent.cs
 │   │   │   │   ├── OrderShippedEvent.cs
 │   │   │   │   ├── OrderDeliveredEvent.cs
-│   │   │   │   ├── OrderCancelledEvent.cs
-│   │   │   │   ├── OrderRefundedEvent.cs
-│   │   │   │   └── InvoiceGeneratedEvent.cs
+│   │   │   │   └── OrderCancelledEvent.cs
 │   │   │   │
 │   │   │   ├── Repositories/
-│   │   │   │   ├── IOrderRepository.cs
-│   │   │   │   └── IInvoiceRepository.cs
+│   │   │   │   └── IOrderRepository.cs
 │   │   │   │
 │   │   │   └── Services/
 │   │   │       ├── IOrderDomainService.cs
-│   │   │       └── IOrderNumberGenerator.cs
+│   │   │       └── OrderStateMachine.cs
 │   │   │
 │   │   ├── Bcommerce.Modules.Orders.Application/
 │   │   │   ├── Commands/
-│   │   │   │   ├── CreateOrder/
-│   │   │   │   │   ├── CreateOrderCommand.cs
-│   │   │   │   │   ├── CreateOrderCommandHandler.cs
-│   │   │   │   │   └── CreateOrderCommandValidator.cs
-│   │   │   │   │
 │   │   │   │   ├── PlaceOrder/
-│   │   │   │   ├── CancelOrder/
-│   │   │   │   ├── UpdateOrderStatus/
+│   │   │   │   ├── ConfirmPayment/
 │   │   │   │   ├── ShipOrder/
-│   │   │   │   ├── DeliverOrder/
-│   │   │   │   ├── RefundOrder/
-│   │   │   │   ├── AddTrackingEvent/
-│   │   │   │   └── GenerateInvoice/
+│   │   │   │   ├── CancelOrder/
+│   │   │   │   └── RequestRefund/
 │   │   │   │
 │   │   │   ├── Queries/
 │   │   │   │   ├── GetOrderById/
-│   │   │   │   │   ├── GetOrderByIdQuery.cs
-│   │   │   │   │   └── GetOrderByIdQueryHandler.cs
-│   │   │   │   │
-│   │   │   │   ├── GetOrderByNumber/
 │   │   │   │   ├── GetUserOrders/
-│   │   │   │   ├── GetOrdersByStatus/
-│   │   │   │   ├── GetOrderStatusHistory/
-│   │   │   │   ├── GetTrackingEvents/
-│   │   │   │   ├── GetInvoice/
-│   │   │   │   └── GetOrdersSummary/
+│   │   │   │   ├── GetOrderStatus/
+│   │   │   │   └── GetOrderTracking/
 │   │   │   │
 │   │   │   ├── DTOs/
 │   │   │   │   ├── OrderDto.cs
 │   │   │   │   ├── OrderDetailDto.cs
-│   │   │   │   ├── OrderListDto.cs
 │   │   │   │   ├── OrderItemDto.cs
-│   │   │   │   ├── OrderStatusHistoryDto.cs
-│   │   │   │   ├── TrackingEventDto.cs
-│   │   │   │   ├── InvoiceDto.cs
-│   │   │   │   └── OrderSummaryDto.cs
+│   │   │   │   └── TrackingDto.cs
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   └── Handlers/
 │   │   │   │       ├── OrderPlacedEventHandler.cs
 │   │   │   │       ├── OrderPaidEventHandler.cs
-│   │   │   │       ├── OrderShippedEventHandler.cs
-│   │   │   │       └── OrderCancelledEventHandler.cs
+│   │   │   │       └── OrderShippedEventHandler.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── IOrderService.cs
-│   │   │   │   ├── OrderService.cs
-│   │   │   │   ├── IShippingService.cs
-│   │   │   │   └── ShippingService.cs
+│   │   │   │   └── OrderService.cs
 │   │   │   │
 │   │   │   └── Mappings/
 │   │   │       └── OrderMappingProfile.cs
@@ -827,19 +635,14 @@ Bcommerce/
 │   │   │   │   ├── Configurations/
 │   │   │   │   │   ├── OrderConfiguration.cs
 │   │   │   │   │   ├── OrderItemConfiguration.cs
-│   │   │   │   │   ├── OrderStatusHistoryConfiguration.cs
-│   │   │   │   │   ├── TrackingEventConfiguration.cs
-│   │   │   │   │   ├── InvoiceConfiguration.cs
-│   │   │   │   │   └── OrderRefundConfiguration.cs
+│   │   │   │   │   └── OrderStatusHistoryConfiguration.cs
 │   │   │   │   │
 │   │   │   │   └── Repositories/
-│   │   │   │       ├── OrderRepository.cs
-│   │   │   │       └── InvoiceRepository.cs
+│   │   │   │       └── OrderRepository.cs
 │   │   │   │
 │   │   │   ├── Services/
-│   │   │   │   ├── OrderNumberGenerator.cs
-│   │   │   │   ├── ShippingCalculator.cs
-│   │   │   │   └── InvoiceGenerator.cs
+│   │   │   │   ├── ShippingService.cs
+│   │   │   │   └── InvoiceService.cs
 │   │   │   │
 │   │   │   └── Extensions/
 │   │   │       └── ServiceCollectionExtensions.cs
@@ -847,8 +650,7 @@ Bcommerce/
 │   │   └── Bcommerce.Modules.Orders.Api/
 │   │       ├── Controllers/
 │   │       │   ├── OrdersController.cs
-│   │       │   ├── TrackingController.cs
-│   │       │   └── InvoicesController.cs
+│   │       │   └── TrackingController.cs
 │   │       │
 │   │       └── Extensions/
 │   │           └── ModuleExtensions.cs
@@ -857,96 +659,63 @@ Bcommerce/
 │   │   ├── Bcommerce.Modules.Payments.Domain/
 │   │   │   ├── Entities/
 │   │   │   │   ├── Payment.cs
-│   │   │   │   ├── UserPaymentMethod.cs
+│   │   │   │   ├── PaymentMethod.cs
 │   │   │   │   ├── PaymentTransaction.cs
 │   │   │   │   ├── PaymentRefund.cs
-│   │   │   │   ├── Chargeback.cs
-│   │   │   │   └── Webhook.cs
+│   │   │   │   └── Chargeback.cs
 │   │   │   │
 │   │   │   ├── ValueObjects/
 │   │   │   │   ├── PaymentAmount.cs
-│   │   │   │   ├── PaymentMethod.cs
-│   │   │   │   ├── CreditCard.cs
-│   │   │   │   ├── PixInfo.cs
-│   │   │   │   ├── BoletoInfo.cs
-│   │   │   │   ├── InstallmentInfo.cs
-│   │   │   │   └── FraudAnalysis.cs
+│   │   │   │   ├── CardDetails.cs
+│   │   │   │   ├── PixData.cs
+│   │   │   │   └── BoletoData.cs
 │   │   │   │
 │   │   │   ├── Enums/
 │   │   │   │   ├── PaymentStatus.cs
 │   │   │   │   ├── PaymentMethodType.cs
-│   │   │   │   ├── CardBrand.cs
 │   │   │   │   ├── TransactionType.cs
-│   │   │   │   └── RefundStatus.cs
+│   │   │   │   └── CardBrand.cs
 │   │   │   │
 │   │   │   ├── Events/
-│   │   │   │   ├── PaymentCreatedEvent.cs
+│   │   │   │   ├── PaymentInitiatedEvent.cs
 │   │   │   │   ├── PaymentAuthorizedEvent.cs
 │   │   │   │   ├── PaymentCapturedEvent.cs
-│   │   │   │   ├── PaymentCompletedEvent.cs
 │   │   │   │   ├── PaymentFailedEvent.cs
-│   │   │   │   ├── PaymentCancelledEvent.cs
-│   │   │   │   ├── PaymentRefundedEvent.cs
-│   │   │   │   ├── ChargebackCreatedEvent.cs
-│   │   │   │   └── WebhookReceivedEvent.cs
+│   │   │   │   └── RefundProcessedEvent.cs
 │   │   │   │
 │   │   │   ├── Repositories/
 │   │   │   │   ├── IPaymentRepository.cs
-│   │   │   │   ├── IUserPaymentMethodRepository.cs
-│   │   │   │   └── IWebhookRepository.cs
+│   │   │   │   └── IPaymentMethodRepository.cs
 │   │   │   │
 │   │   │   └── Services/
-│   │   │       ├── IPaymentDomainService.cs
-│   │   │       └── IPaymentGateway.cs
+│   │   │       ├── IPaymentGateway.cs
+│   │   │       └── IPaymentDomainService.cs
 │   │   │
 │   │   ├── Bcommerce.Modules.Payments.Application/
 │   │   │   ├── Commands/
-│   │   │   │   ├── CreatePayment/
-│   │   │   │   │   ├── CreatePaymentCommand.cs
-│   │   │   │   │   ├── CreatePaymentCommandHandler.cs
-│   │   │   │   │   └── CreatePaymentCommandValidator.cs
-│   │   │   │   │
 │   │   │   │   ├── ProcessPayment/
 │   │   │   │   ├── CapturePayment/
-│   │   │   │   ├── CancelPayment/
 │   │   │   │   ├── RefundPayment/
-│   │   │   │   ├── SavePaymentMethod/
-│   │   │   │   ├── DeletePaymentMethod/
-│   │   │   │   ├── ProcessWebhook/
-│   │   │   │   └── ProcessChargeback/
+│   │   │   │   └── SavePaymentMethod/
 │   │   │   │
 │   │   │   ├── Queries/
-│   │   │   │   ├── GetPaymentById/
-│   │   │   │   │   ├── GetPaymentByIdQuery.cs
-│   │   │   │   │   └── GetPaymentByIdQueryHandler.cs
-│   │   │   │   │
-│   │   │   │   ├── GetPaymentByOrder/
-│   │   │   │   ├── GetUserPaymentMethods/
-│   │   │   │   ├── GetPaymentTransactions/
-│   │   │   │   ├── GetPaymentRefunds/
-│   │   │   │   └── GetChargebacks/
+│   │   │   │   ├── GetPaymentStatus/
+│   │   │   │   ├── GetPaymentMethods/
+│   │   │   │   └── GetPaymentHistory/
 │   │   │   │
 │   │   │   ├── DTOs/
 │   │   │   │   ├── PaymentDto.cs
-│   │   │   │   ├── PaymentDetailDto.cs
-│   │   │   │   ├── UserPaymentMethodDto.cs
-│   │   │   │   ├── PaymentTransactionDto.cs
-│   │   │   │   ├── PaymentRefundDto.cs
-│   │   │   │   ├── ChargebackDto.cs
-│   │   │   │   ├── PixPaymentDto.cs
-│   │   │   │   └── BoletoPaymentDto.cs
+│   │   │   │   ├── PaymentMethodDto.cs
+│   │   │   │   └── PaymentResultDto.cs
 │   │   │   │
 │   │   │   ├── Events/
 │   │   │   │   └── Handlers/
-│   │   │   │       ├── PaymentCompletedEventHandler.cs
-│   │   │   │       ├── PaymentFailedEventHandler.cs
-│   │   │   │       └── WebhookReceivedEventHandler.cs
+│   │   │   │       ├── PaymentCapturedEventHandler.cs
+│   │   │   │       └── PaymentFailedEventHandler.cs
 │   │   │   │
 │   │   │   ├── Services/
 │   │   │   │   ├── IPaymentService.cs
-│   │   │   │   ├── PaymentService.cs
-│   │   │   │   ├── IPaymentGatewayService.cs
-│   │   │   │   └── PaymentGatewayService.cs
+│   │   │   │   └── PaymentService.cs
 │   │   │   │
 │   │   │   └── Mappings/
 │   │   │       └── PaymentMappingProfile.cs
@@ -958,29 +727,27 @@ Bcommerce/
 │   │   │   │   │
 │   │   │   │   ├── Configurations/
 │   │   │   │   │   ├── PaymentConfiguration.cs
-│   │   │   │   │   ├── UserPaymentMethodConfiguration.cs
-│   │   │   │   │   ├── PaymentTransactionConfiguration.cs
-│   │   │   │   │   ├── PaymentRefundConfiguration.cs
-│   │   │   │   │   ├── ChargebackConfiguration.cs
-│   │   │   │   │   └── WebhookConfiguration.cs
+│   │   │   │   │   └── PaymentMethodConfiguration.cs
 │   │   │   │   │
 │   │   │   │   └── Repositories/
 │   │   │   │       ├── PaymentRepository.cs
-│   │   │   │       ├── UserPaymentMethodRepository.cs
-│   │   │   │       └── WebhookRepository.cs
+│   │   │   │       └── PaymentMethodRepository.cs
 │   │   │   │
 │   │   │   ├── Gateways/
 │   │   │   │   ├── Stripe/
 │   │   │   │   │   ├── StripeGateway.cs
-│   │   │   │   │   ├── StripeSettings.cs
-│   │   │   │   │   └── StripeMapper.cs
+│   │   │   │   │   └── StripeConfiguration.cs
 │   │   │   │   │
-│   │   │   │   ├── Pagarme/
-│   │   │   │   │   ├── PagarmeGateway.cs
-│   │   │   │   │   ├── PagarmeSettings.cs
-│   │   │   │   │   └── PagarmeMapper.cs
+│   │   │   │   ├── MercadoPago/
+│   │   │   │   │   ├── MercadoPagoGateway.cs
+│   │   │   │   │   └── MercadoPagoConfiguration.cs
 │   │   │   │   │
-│   │   │   │   └── IPaymentGatewayAdapter.cs
+│   │   │   │   └── Abstractions/
+│   │   │   │       └── PaymentGatewayBase.cs
+│   │   │   │
+│   │   │   ├── Webhooks/
+│   │   │   │   ├── IWebhookProcessor.cs
+│   │   │   │   └── WebhookProcessor.cs
 │   │   │   │
 │   │   │   └── Extensions/
 │   │   │       └── ServiceCollectionExtensions.cs
@@ -998,16 +765,13 @@ Bcommerce/
 │       ├── Bcommerce.Modules.Coupons.Domain/
 │       │   ├── Entities/
 │       │   │   ├── Coupon.cs
-│       │   │   ├── EligibleCategory.cs
-│       │   │   ├── EligibleProduct.cs
-│       │   │   ├── EligibleUser.cs
 │       │   │   ├── CouponUsage.cs
-│       │   │   └── CouponReservation.cs
+│       │   │   ├── CouponReservation.cs
+│       │   │   └── CouponEligibility.cs
 │       │   │
 │       │   ├── ValueObjects/
 │       │   │   ├── CouponCode.cs
 │       │   │   ├── DiscountValue.cs
-│       │   │   ├── UsageLimits.cs
 │       │   │   └── ValidityPeriod.cs
 │       │   │
 │       │   ├── Enums/
@@ -1017,59 +781,38 @@ Bcommerce/
 │       │   │
 │       │   ├── Events/
 │       │   │   ├── CouponCreatedEvent.cs
-│       │   │   ├── CouponActivatedEvent.cs
 │       │   │   ├── CouponUsedEvent.cs
-│       │   │   ├── CouponDepletedEvent.cs
 │       │   │   ├── CouponExpiredEvent.cs
-│       │   │   └── CouponReservedEvent.cs
+│       │   │   └── CouponDepletedEvent.cs
 │       │   │
 │       │   ├── Repositories/
-│       │   │   ├── ICouponRepository.cs
-│       │   │   └── ICouponReservationRepository.cs
+│       │   │   └── ICouponRepository.cs
 │       │   │
 │       │   └── Services/
-│       │       ├── ICouponDomainService.cs
 │       │       └── ICouponValidator.cs
 │       │
 │       ├── Bcommerce.Modules.Coupons.Application/
 │       │   ├── Commands/
 │       │   │   ├── CreateCoupon/
-│       │   │   │   ├── CreateCouponCommand.cs
-│       │   │   │   ├── CreateCouponCommandHandler.cs
-│       │   │   │   └── CreateCouponCommandValidator.cs
-│       │   │   │
-│       │   │   ├── UpdateCoupon/
 │       │   │   ├── ActivateCoupon/
 │       │   │   ├── DeactivateCoupon/
-│       │   │   ├── DeleteCoupon/
-│       │   │   ├── ValidateCoupon/
-│       │   │   ├── ReserveCoupon/
-│       │   │   ├── ReleaseCoupon/
-│       │   │   └── UseCoupon/
+│       │   │   ├── ApplyCoupon/
+│       │   │   └── ReleaseCouponReservation/
 │       │   │
 │       │   ├── Queries/
-│       │   │   ├── GetCouponById/
-│       │   │   │   ├── GetCouponByIdQuery.cs
-│       │   │   │   └── GetCouponByIdQueryHandler.cs
-│       │   │   │
 │       │   │   ├── GetCouponByCode/
-│       │   │   ├── GetCoupons/
 │       │   │   ├── GetActiveCoupons/
-│       │   │   ├── GetUserCoupons/
-│       │   │   ├── GetCouponUsages/
-│       │   │   └── GetCouponMetrics/
+│       │   │   ├── ValidateCoupon/
+│       │   │   └── GetCouponUsageStats/
 │       │   │
 │       │   ├── DTOs/
 │       │   │   ├── CouponDto.cs
-│       │   │   ├── CouponDetailDto.cs
-│       │   │   ├── CouponUsageDto.cs
 │       │   │   ├── CouponValidationDto.cs
-│       │   │   └── CouponMetricsDto.cs
+│       │   │   └── CouponStatsDto.cs
 │       │   │
 │       │   ├── Events/
 │       │   │   └── Handlers/
 │       │   │       ├── CouponUsedEventHandler.cs
-│       │   │       ├── CouponDepletedEventHandler.cs
 │       │   │       └── CouponExpiredEventHandler.cs
 │       │   │
 │       │   ├── Services/
@@ -1077,4 +820,131 @@ Bcommerce/
 │       │   │   └── CouponService.cs
 │       │   │
 │       │   └── Mappings/
-│       │       └──
+│       │       └── CouponMappingProfile.cs
+│       │
+│       ├── Bcommerce.Modules.Coupons.Infrastructure/
+│       │   ├── Persistence/
+│       │   │   ├── CouponsDbContext.cs
+│       │   │   ├── Migrations/
+│       │   │   │
+│       │   │   ├── Configurations/
+│       │   │   │   ├── CouponConfiguration.cs
+│       │   │   │   └── CouponUsageConfiguration.cs
+│       │   │   │
+│       │   │   └── Repositories/
+│       │   │       └── CouponRepository.cs
+│       │   │
+│       │   └── Extensions/
+│       │       └── ServiceCollectionExtensions.cs
+│       │
+│       └── Bcommerce.Modules.Coupons.Api/
+│           ├── Controllers/
+│           │   └── CouponsController.cs
+│           │
+│           └── Extensions/
+│               └── ModuleExtensions.cs
+│
+├── Host/
+│   └── Bcommerce.Host.WebApi/
+│       ├── Program.cs
+│       ├── Startup.cs
+│       ├── appsettings.json
+│       ├── appsettings.Development.json
+│       ├── appsettings.Production.json
+│       │
+│       ├── Configuration/
+│       │   ├── ModulesConfiguration.cs
+│       │   ├── DatabaseConfiguration.cs
+│       │   ├── MassTransitConfiguration.cs
+│       │   └── SwaggerConfiguration.cs
+│       │
+│       ├── BackgroundServices/
+│       │   ├── OutboxProcessorService.cs
+│       │   ├── InboxProcessorService.cs
+│       │   └── StockReservationCleanupService.cs
+│       │
+│       └── Extensions/
+│           └── HostExtensions.cs
+│
+├── Tests/
+│   ├── UnitTests/
+│   │   ├── Bcommerce.Modules.Users.Domain.Tests/
+│   │   ├── Bcommerce.Modules.Catalog.Domain.Tests/
+│   │   ├── Bcommerce.Modules.Cart.Domain.Tests/
+│   │   ├── Bcommerce.Modules.Orders.Domain.Tests/
+│   │   ├── Bcommerce.Modules.Payments.Domain.Tests/
+│   │   └── Bcommerce.Modules.Coupons.Domain.Tests/
+│   │
+│   ├── IntegrationTests/
+│   │   ├── Bcommerce.Modules.Users.IntegrationTests/
+│   │   ├── Bcommerce.Modules.Catalog.IntegrationTests/
+│   │   ├── Bcommerce.Modules.Cart.IntegrationTests/
+│   │   ├── Bcommerce.Modules.Orders.IntegrationTests/
+│   │   ├── Bcommerce.Modules.Payments.IntegrationTests/
+│   │   └── Bcommerce.Modules.Coupons.IntegrationTests/
+│   │
+│   ├── ArchitectureTests/
+│   │   └── Bcommerce.ArchitectureTests/
+│   │       ├── ModularityTests.cs
+│   │       ├── DependencyTests.cs
+│   │       └── LayerTests.cs
+│   │
+│   └── TestHelpers/
+│       ├── Bcommerce.TestHelpers/
+│       │   ├── Builders/
+│       │   ├── Fixtures/
+│       │   └── Mocks/
+│       │
+│       └── Bcommerce.TestHelpers.Integration/
+│           ├── DatabaseFixture.cs
+│           ├── WebApplicationFactoryFixture.cs
+│           └── TestContainers/
+│
+├── Scripts/
+│   ├── Database/
+│   │   ├── schema.sql
+│   │   ├── seed-data.sql
+│   │   └── migrations/
+│   │
+│   ├── Docker/
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml
+│   │   └── docker-compose.override.yml
+│   │
+│   └── CI-CD/
+│       ├── build.sh
+│       ├── test.sh
+│       └── deploy.sh
+│
+├── Docs/
+│   ├── Architecture/
+│   │   ├── ADR/
+│   │   │   ├── 001-modular-monolith.md
+│   │   │   ├── 002-masstransit-in-memory.md
+│   │   │   └── 003-outbox-inbox-pattern.md
+│   │   │
+│   │   ├── diagrams/
+│   │   │   ├── system-context.puml
+│   │   │   ├── module-dependencies.puml
+│   │   │   └── data-flow.puml
+│   │   │
+│   │   └── README.md
+│   │
+│   └── API/
+│       ├── swagger.json
+│       └── postman-collection.json
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       ├── cd.yml
+│       └── pr-validation.yml
+│
+├── .editorconfig
+├── .gitignore
+├── Directory.Build.props
+├── Directory.Packages.props
+├── global.json
+├── nuget.config
+├── Bcommerce.sln
+└── README.md
