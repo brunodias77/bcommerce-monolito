@@ -1,5 +1,0 @@
-/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Application/obj/Debug/net9.0/BuildingBlocks.Application.csproj.AssemblyReference.cache
-/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Application/obj/Debug/net9.0/BuildingBlocks.Application.GeneratedMSBuildEditorConfig.editorconfig
-/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Application/obj/Debug/net9.0/BuildingBlocks.Application.AssemblyInfoInputs.cache
-/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Application/obj/Debug/net9.0/BuildingBlocks.Application.AssemblyInfo.cs
-/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Application/obj/Debug/net9.0/BuildingBlocks.Application.csproj.CoreCompileInputs.cache

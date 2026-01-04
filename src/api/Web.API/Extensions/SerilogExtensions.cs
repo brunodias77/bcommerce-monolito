@@ -3,6 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Formatting.Compact;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Web.API.Extensions;
 
@@ -11,6 +12,30 @@ namespace Web.API.Extensions;
 /// </summary>
 public static class SerilogExtensions
 {
+    /// <summary>
+    /// Tema customizado com as cores do Dracula Theme
+    /// </summary>
+    public static AnsiConsoleTheme DraculaTheme { get; } = new AnsiConsoleTheme(
+        new Dictionary<ConsoleThemeStyle, string>
+        {
+            [ConsoleThemeStyle.Text] = "\x1b[38;2;248;248;242m",           // Foreground
+            [ConsoleThemeStyle.SecondaryText] = "\x1b[38;2;98;114;164m",  // Comment
+            [ConsoleThemeStyle.TertiaryText] = "\x1b[38;2;98;114;164m",   // Comment
+            [ConsoleThemeStyle.Invalid] = "\x1b[38;2;241;250;140m",       // Yellow
+            [ConsoleThemeStyle.Null] = "\x1b[38;2;139;233;253m",          // Cyan
+            [ConsoleThemeStyle.Name] = "\x1b[38;2;139;233;253m",          // Cyan
+            [ConsoleThemeStyle.String] = "\x1b[38;2;241;250;140m",        // Yellow
+            [ConsoleThemeStyle.Number] = "\x1b[38;2;189;147;249m",        // Purple
+            [ConsoleThemeStyle.Boolean] = "\x1b[38;2;189;147;249m",       // Purple
+            [ConsoleThemeStyle.Scalar] = "\x1b[38;2;189;147;249m",        // Purple
+            [ConsoleThemeStyle.LevelVerbose] = "\x1b[37m",                // White
+            [ConsoleThemeStyle.LevelDebug] = "\x1b[37m",                  // White
+            [ConsoleThemeStyle.LevelInformation] = "\x1b[38;2;80;250;123m", // Green
+            [ConsoleThemeStyle.LevelWarning] = "\x1b[38;2;255;184;108m",  // Orange
+            [ConsoleThemeStyle.LevelError] = "\x1b[38;2;255;85;85m",      // Red
+            [ConsoleThemeStyle.LevelFatal] = "\x1b[38;2;255;85;85m",      // Red
+        });
+
     /// <summary>
     /// Configura o Serilog para a aplicação
     /// </summary>
@@ -31,7 +56,9 @@ public static class SerilogExtensions
             .Enrich.WithExceptionDetails()
             .Enrich.WithProperty("Application", "BCommerce.API")
             .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"));
+            .WriteTo.Console(
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}",
+                theme: DraculaTheme));
 
         return builder;
     }
