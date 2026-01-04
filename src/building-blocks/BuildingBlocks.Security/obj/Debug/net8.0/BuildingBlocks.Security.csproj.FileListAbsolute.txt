@@ -1,0 +1,12 @@
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/bin/Debug/net8.0/BuildingBlocks.Security.deps.json
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/bin/Debug/net8.0/BuildingBlocks.Security.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/bin/Debug/net8.0/BuildingBlocks.Security.pdb
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.csproj.AssemblyReference.cache
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.GeneratedMSBuildEditorConfig.editorconfig
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.AssemblyInfoInputs.cache
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.AssemblyInfo.cs
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.csproj.CoreCompileInputs.cache
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/refint/BuildingBlocks.Security.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/BuildingBlocks.Security.pdb
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Security/obj/Debug/net8.0/ref/BuildingBlocks.Security.dll

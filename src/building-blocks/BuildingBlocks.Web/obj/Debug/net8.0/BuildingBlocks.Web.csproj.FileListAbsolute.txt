@@ -1,0 +1,17 @@
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Web.deps.json
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Web.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Web.pdb
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Application.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Domain.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Application.pdb
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/bin/Debug/net8.0/BuildingBlocks.Domain.pdb
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.csproj.AssemblyReference.cache
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.GeneratedMSBuildEditorConfig.editorconfig
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.AssemblyInfoInputs.cache
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.AssemblyInfo.cs
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.csproj.CoreCompileInputs.cache
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/Building.24967AAA.Up2Date
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/refint/BuildingBlocks.Web.dll
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/BuildingBlocks.Web.pdb
+/Users/diasdev/Documents/programacao/dotnet/bcommerce-monolito/src/building-blocks/BuildingBlocks.Web/obj/Debug/net8.0/ref/BuildingBlocks.Web.dll
